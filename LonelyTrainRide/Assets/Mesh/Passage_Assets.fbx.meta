@@ -1,0 +1,141 @@
+fileFormatVersion: 2
+guid: f02983d6a0c36464a97968f16750e902
+timeCreated: 1488647865
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Boat
+    100002: Boat_Bottom
+    100004: Boat_HeadPieace
+    100006: Boat_Rails
+    100008: Camera
+    100010: Lamp
+    100012: //RootNode
+    100014: Rooji
+    100016: Sail
+    100018: Sail_Pole_Moving
+    400000: Boat
+    400002: Boat_Bottom
+    400004: Boat_HeadPieace
+    400006: Boat_Rails
+    400008: Camera
+    400010: Lamp
+    400012: //RootNode
+    400014: Rooji
+    400016: Sail
+    400018: Sail_Pole_Moving
+    2300000: Boat
+    2300002: Boat_Bottom
+    2300004: Boat_HeadPieace
+    2300006: Boat_Rails
+    2300008: Rooji
+    2300010: Sail
+    2300012: Sail_Pole_Moving
+    3300000: Boat
+    3300002: Boat_Bottom
+    3300004: Boat_HeadPieace
+    3300006: Boat_Rails
+    3300008: Rooji
+    3300010: Sail
+    3300012: Sail_Pole_Moving
+    4300000: Sail
+    4300002: Boat
+    4300004: Sail_Pole_Moving
+    4300006: Boat_HeadPieace
+    4300008: Boat_Rails
+    4300010: Boat_Bottom
+    4300012: Rooji
+    7400000: Boat|Boat_Base|Take 001|BaseLayer
+    7400002: Boat|Boat_Bottom|Take 001|BaseLayer
+    7400004: Boat|Boat_HeadPieace|Take 001|BaseLayer
+    7400006: Boat|Boat_Rails|Take 001|BaseLayer
+    7400008: Boat|ElderWoodBard|Take 001|BaseLayer
+    7400010: Boat|Rooji_BackUp|Take 001|BaseLayer
+    7400012: Boat|Rooji|Take 001|BaseLayer
+    7400014: Boat_HeadPieace|Boat_Base|Take 001|BaseLayer
+    7400016: Boat_HeadPieace|Boat_Bottom|Take 001|BaseLayer
+    7400018: Boat_HeadPieace|Boat_HeadPieace|Take 001|BaseLayer
+    7400020: Boat_HeadPieace|Boat_Rails|Take 001|BaseLayer
+    7400022: Boat_HeadPieace|ElderWoodBard|Take 001|BaseLayer
+    7400024: Boat_HeadPieace|Rooji_BackUp|Take 001|BaseLayer
+    7400026: Boat_HeadPieace|Rooji|Take 001|BaseLayer
+    7400028: Boat_Rails|Boat_Base|Take 001|BaseLayer
+    7400030: Boat_Rails|Boat_Bottom|Take 001|BaseLayer
+    7400032: Boat_Rails|Boat_HeadPieace|Take 001|BaseLayer
+    7400034: Boat_Rails|Boat_Rails|Take 001|BaseLayer
+    7400036: Boat_Rails|ElderWoodBard|Take 001|BaseLayer
+    7400038: Boat_Rails|Rooji_BackUp|Take 001|BaseLayer
+    7400040: Boat_Rails|Rooji|Take 001|BaseLayer
+    7400042: Boat_Bottom|Boat_Base|Take 001|BaseLayer
+    7400044: Boat_Bottom|Boat_Bottom|Take 001|BaseLayer
+    7400046: Boat_Bottom|Boat_HeadPieace|Take 001|BaseLayer
+    7400048: Boat_Bottom|Boat_Rails|Take 001|BaseLayer
+    7400050: Boat_Bottom|ElderWoodBard|Take 001|BaseLayer
+    7400052: Boat_Bottom|Rooji_BackUp|Take 001|BaseLayer
+    7400054: Boat_Bottom|Rooji|Take 001|BaseLayer
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
