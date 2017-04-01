@@ -56,6 +56,7 @@ Shader "Test/Water_01"
 			float4 _Dir2;
 			uniform float _DepthFactor;
 			float _Smoothing;
+
 			uniform sampler2D _CameraDepthTexture;
 			uniform float4 _EdgeColor;
 			uniform float4 _DeepColor;

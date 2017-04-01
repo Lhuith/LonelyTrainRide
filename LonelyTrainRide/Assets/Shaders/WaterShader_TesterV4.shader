@@ -156,10 +156,6 @@ Properties{
 						
 						//o.uv = float4( v.texcoord.xy, 0, 0 );
 						
-						
-						
-
-
 						o.posWorld = mul(unity_ObjectToWorld, v.vertex);
 						
 						o.uv =  o.posWorld.xyz;

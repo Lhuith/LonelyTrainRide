@@ -1,12 +1,8 @@
 ﻿Shader "Custom/Test/RayCastTester"
 {
-	Properties
-	{
-		_MainTex ("Texture", 2D) = "white" {}
-	}
 	SubShader
 	{
-		Blend SrcAlpha OneMinusSrcAlpha
+	    Blend SrcAlpha Zero
 
 		Pass
 		{
@@ -40,34 +36,33 @@
 
 			fixed4 renderSurface(float3 pos)
 			{
-				const float2 eps = float2(0.0,0.01);
+        const float2 eps = float2(0.0, 0.01);
 
-				float ambientIntensity = 0.1;
-				float3 lightDir = float3(0, -0.5, 0.5);
+        float ambientIntensity = 0.1;
+        float3 lightDir = float3(0, -0.5, 0.5);
 
-				float3 normal = normalize(float3(
-				distFunc(pos + eps.yxx) - distFunc(pos - eps.yxx), 
-				distFunc(pos + eps.xyx) - distFunc(pos - eps.xyx), 
-				distFunc(pos + eps.xxy) - distFunc(pos - eps.xxy)));
-				
-				float diffuse = ambientIntensity + max(dot(-lightDir, normal), 0);
+        float3 normal = normalize(float3(
+          distFunc(pos + eps.yxx) - distFunc(pos - eps.yxx),
+          distFunc(pos + eps.xyx) - distFunc(pos - eps.xyx),
+          distFunc(pos + eps.xxy) - distFunc(pos - eps.xxy)));
 
-				return fixed4(diffuse, diffuse, diffuse, 1); 
+        float diffuse = ambientIntensity + max(dot(-lightDir, normal), 0);
+
+        return fixed4(diffuse, diffuse, diffuse, 1);
 			}
+
+			float3 _CamPos;
+			float3 _CamRight;
+			float3 _CamUp;
+			float3 _CamForward;
 
 			fixed4 frag (v2f i) : SV_Target
 			{
 				float2 uv = i.uv - 0.5;
-				float3 camUp = float3(0, 1, 0);
-				float3 camForward = float3(0,0,1);
-				float3 camRight = float3(1,0,0);
-
-				float3 pos = float3(0,0, -5);
-				float3 ray = camUp * uv.y + camRight * uv.x + camForward;
+				float3 pos = _CamPos;
+				float3 ray = _CamUp * uv.y + _CamRight * uv.x + _CamForward;
 
 				fixed4 color = 0;
-
-				float4 tex = tex2D(_MainTex, i.uv.xy * _MainTex_ST.xy + _MainTex_ST.zw);
 
 				for (int i = 0; i < 30; i++)
 				{
@@ -89,8 +84,7 @@
 
 				}
 
-
-				return color * tex;
+				return color;
 			}
 			ENDCG
 		}

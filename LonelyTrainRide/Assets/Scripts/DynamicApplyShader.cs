@@ -40,7 +40,6 @@ public class DynamicApplyShader : MonoBehaviour {
     {
         RaycastHit hit;
         Vector3 mouse = Input.mousePosition;
-        Vector3 mWpos = Camera.main.ViewportToScreenPoint(mouse);
         Vector3 dir = transform.forward;
         Ray ray = new Ray(viewer.position, -viewer.up);
 
@@ -48,8 +47,6 @@ public class DynamicApplyShader : MonoBehaviour {
 
         if (Physics.Raycast(ray, out hit))
         {
-            MeshRenderer mRend = hit.transform.GetComponent<MeshRenderer>();
-
             Vector3 pixelUV = hit.textureCoord ;
 
             //pixelUV.x *= 241;

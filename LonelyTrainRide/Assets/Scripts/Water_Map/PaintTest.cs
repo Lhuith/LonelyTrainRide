@@ -5,18 +5,18 @@ using UnityEngine;
 public class PaintTest : MonoBehaviour
 {
 
-    Transform viewer;
+    //Transform viewer;
 
 	// Use this for initialization
 	void Start ()
     {
-        viewer = GameObject.Find("Passanger").transform;
+        //viewer = GameObject.Find("Passanger").transform;
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        RaycastHit hit;
+       // RaycastHit hit;
 
        // Vector3 dir = -viewer.transform.up;
        //

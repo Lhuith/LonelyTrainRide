@@ -12,7 +12,7 @@ public class DynamicInformation
 
     DynamicInformation(Material _mat, Texture _intialTex, float _interval)
     {
-        mat = mat;
+        mat = _mat;
         intialTexture = _intialTex;
         updateInterval = _interval;
     }
@@ -106,7 +106,7 @@ public class EndlessTerrain : MonoBehaviour {
         MeshFilter meshFilter;
         MeshCollider meshCollider;
 
-        PaintTest paint;
+        //PaintTest paint;
         DynamicApplyShader dynamicApply;
 
         LODinfo[] detailLevels;
@@ -136,7 +136,7 @@ public class EndlessTerrain : MonoBehaviour {
             dynamicApply.updateInterval = _dynamicInfo.updateInterval;
             dynamicApply.IntialTexture = _dynamicInfo.intialTexture;
 
-            paint = meshObject.AddComponent<PaintTest>();
+            //paint = meshObject.AddComponent<PaintTest>();
             meshObject.transform.position = postionV3;
             meshObject.transform.parent = parent;
             meshObject.GetComponent<MeshRenderer>().material = mat;
