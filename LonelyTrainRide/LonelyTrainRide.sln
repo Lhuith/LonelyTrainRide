@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LonelyTrainRide.CSharp", "L
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LonelyTrainRide.CSharp.Editor.Plugins", "LonelyTrainRide.CSharp.Editor.Plugins.csproj", "{2F0F85F1-C931-485B-D6EA-FDB93318AB3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LonelyTrainRide.CSharp.Editor", "LonelyTrainRide.CSharp.Editor.csproj", "{4EAEBF3D-402B-40E3-C80A-0361E658B65E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,10 +25,6 @@ Global
 		{2F0F85F1-C931-485B-D6EA-FDB93318AB3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F0F85F1-C931-485B-D6EA-FDB93318AB3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F0F85F1-C931-485B-D6EA-FDB93318AB3B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4EAEBF3D-402B-40E3-C80A-0361E658B65E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4EAEBF3D-402B-40E3-C80A-0361E658B65E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4EAEBF3D-402B-40E3-C80A-0361E658B65E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4EAEBF3D-402B-40E3-C80A-0361E658B65E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -81,10 +81,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Binston\FXAA\Antialiasing.cs" />
-    <Compile Include="Assets\Binston\FXAA\PostEffectsBase.cs" />
-    <Compile Include="Assets\Binston\FXAA\PostEffectsHelper.cs" />
-    <Compile Include="Assets\Binston\RenderDepth.cs" />
     <Compile Include="Assets\Camera_Imageing_Controls.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Cube.cs" />
@@ -108,14 +104,6 @@
     <Compile Include="Assets\Scripts\Water_Map\TextureGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Binston\Barrier.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\DLAA.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\FXAA2.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\FXAA3Console.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\FXAAPreset2.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\FXAAPreset3.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\NFAA.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\SSAA.shader" />
     <None Include="Assets\Shaders\13_AnisotropicReflection.shader" />
     <None Include="Assets\Shaders\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\CustomDiffuse.shader" />

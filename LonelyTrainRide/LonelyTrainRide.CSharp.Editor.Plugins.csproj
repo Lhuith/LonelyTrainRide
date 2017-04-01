@@ -127,14 +127,6 @@
     <Compile Include="Assets\Standard Assets\Editor\CrossPlatformInput\CrossPlatformInputInitialize.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Binston\Barrier.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\DLAA.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\FXAA2.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\FXAA3Console.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\FXAAPreset2.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\FXAAPreset3.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\NFAA.shader" />
-    <None Include="Assets\Binston\FXAA\_Antialiasing\SSAA.shader" />
     <None Include="Assets\Shaders\13_AnisotropicReflection.shader" />
     <None Include="Assets\Shaders\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\CustomDiffuse.shader" />
