@@ -459,6 +459,7 @@ SubShader {
 			cloudy = cos(gTime * 0.25 + 0.4) * 0.26;
 			float2 xy = IN.pos / _ScreenParams.xy;
 			float lightning = 0.0;
+
 			if(cloudy >= 0.2)
 			{
 				float f = fmod(_Time.x + 1.5, 2.5);
@@ -473,7 +474,7 @@ SubShader {
 
 			flash = clamp (float3(1.0, 1.0, 1.2) * lightning, 0.0, 1.0);
 		
-			if(IN.rayDir.y < 0.0)
+			if(IN.rayDir.y < 0.2)
             {
                 half eyeCos = dot(_WorldSpaceLightPos0.xyz, normalize(IN.rayDir.xyz));
                 half eyeCos2 = eyeCos * eyeCos;

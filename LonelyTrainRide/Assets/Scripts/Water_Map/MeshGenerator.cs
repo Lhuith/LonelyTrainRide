@@ -28,7 +28,7 @@ public static class MeshGenerator
 
                 float heightPoint = heightCurve.Evaluate(heightMap[x, y]) * (heightMultiplier);
 
-                meshData.vertices[vertexIndex] = new Vector3(topLeftX + x, heightPoint, topLeftZ - y);
+                meshData.vertices[vertexIndex] = new Vector3(topLeftX + x, 1, topLeftZ - y);
                 meshData.uvs[vertexIndex] = new Vector2(x / (float)width, y / (float)height);
 
 

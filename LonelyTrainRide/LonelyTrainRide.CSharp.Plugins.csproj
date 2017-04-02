@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>GamePlugins:3</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.5.2f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -123,24 +125,24 @@
     <Compile Include="Assets\Standard Assets\Environment\Water\Water\Scripts\WaterTile.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\13_AnisotropicReflection.shader" />
-    <None Include="Assets\Shaders\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\CustomDiffuse.shader" />
     <None Include="Assets\Shaders\DynamicTest\Invert.shader" />
     <None Include="Assets\Shaders\DynamicTest\Smoke.shader" />
-    <None Include="Assets\Shaders\Groundfromspace_Shader.shader" />
+    <None Include="Assets\Shaders\Sky\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\Sky\EquirectangularDisplay.shader" />
+    <None Include="Assets\Shaders\Sky\Groundfromspace_Shader.shader" />
     <None Include="Assets\Shaders\Sky\SkyDisplay.shader" />
+    <None Include="Assets\Shaders\Sky\SkyDomeShader.shader" />
+    <None Include="Assets\Shaders\Sky\SkyFromSpace_Shader.shader" />
     <None Include="Assets\Shaders\Sky\SkyGen.shader" />
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade.shader" />
     <None Include="Assets\Shaders\Sky\newShader.shader" />
-    <None Include="Assets\Shaders\SkyDomeShader.shader" />
-    <None Include="Assets\Shaders\SkyFromSpace_Shader.shader" />
+    <None Include="Assets\Shaders\Test\13_AnisotropicReflection.shader" />
     <None Include="Assets\Shaders\Test\RayCastTester.shader" />
-    <None Include="Assets\Shaders\WaterShader_TesterV4.shader" />
-    <None Include="Assets\Shaders\WaterShader_V6.shader" />
-    <None Include="Assets\Shaders\Water_Shader_01.shader" />
-    <None Include="Assets\Shaders\Water_Shader_Endless_Test.shader" />
+    <None Include="Assets\Shaders\Water_Tests\WaterShader_TesterV4.shader" />
+    <None Include="Assets\Shaders\Water_Tests\WaterShader_V6.shader" />
+    <None Include="Assets\Shaders\Water_Tests\Water_Shader_01.shader" />
+    <None Include="Assets\Shaders\Water_Tests\Water_Shader_Endless_Test.shader" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />
