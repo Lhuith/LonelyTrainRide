@@ -19,11 +19,16 @@ public class Sky_Shader_Manager : MonoBehaviour {
         skyMatGen.SetColor("_BackColor", TestColor);
         skyMatGen.SetVector("_MousePos", Input.mousePosition);
         skyMatGen.SetVector("_iResolution", resulotion);
+
+        skyTexture.wrapMode = TextureWrapMode.Repeat;
     }
 
     void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-        //Graphics.Blit(source, destination, skyMatGen);
+        if (this.GetComponent<Camera>().targetTexture == null)
+            this.GetComponent<Camera>().targetTexture = skyTexture;
+
+        Graphics.Blit(source, destination, skyMatGen);
     }
 
 

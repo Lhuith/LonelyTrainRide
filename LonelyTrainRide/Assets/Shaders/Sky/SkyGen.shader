@@ -7,7 +7,7 @@
 	}
 	SubShader
 	{
-		Tags { "LightMode" = "ForwardBase" }
+		Tags { "Queue"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
 		Cull Off
 		Zwrite Off
 		Fog { Mode off }
@@ -23,7 +23,10 @@
 			#define CLOUD_UPPER 3000.0
 
 			#define TEXTURE_NOISE
-			//#define REAL_SHADOW
+			#define REAL_SHADOW
+
+			#define FLATTEN .2
+			#define NUM_STEPS 70
 
 			#define MOD2 float2(.16632, .17369)
 			#define MOD3 float3(.16532, .17369, .15787)
@@ -41,6 +44,7 @@
 				float2 uv : TEXCOORD0;
 				float4 pos : SV_POSITION;
 				float4 Wpos: TEXCOORD1;
+				float4 scrPos : TEXCOORD2;
 				float3 normal : NORMAL;
 			};
 
@@ -195,7 +199,7 @@
 			#endif
 			//============================================
 			//============================================
-			float3 GetSky(in float3 pos, in float3 rd, out float2 outPos)
+			float3 GetSky(in float3 pos, in float3 rd)
 			{
 				float sunAmount = max(dot(rd, _WorldSpaceLightPos0) , 0.0);
 				// Do the Blue and sun..
@@ -209,7 +213,7 @@
 
 				// Start Position
 				float3 p = float3(pos.x + rd.x * beg, 0.0, pos.z + rd.z * beg);
-				outPos = p.xz;
+				//outPos = p.xz;
 				beg += Hash(p) * 150.0;
 
 				//Trace clouds through that layer
@@ -267,6 +271,31 @@
 			    return float3(4000.0 * sin(.16*t)+12290.0, 0.0, 8800.0 * cos(.145*t+.3));
 			} 
 
+
+			float3 IntoSphere(float2 uv)
+			{
+				float3 dir;
+				uv = (-1.0 + 2.0 * uv);
+				dir.x = uv.x;
+				dir.z = uv.y;
+				dir.y = sqrt(1.0 - dir.x * dir.x - dir.z * dir.z) * FLATTEN;
+				if(length(dir) >= 1.0) return float3(0.0, .001, .999);
+				dir = normalize(dir);
+
+				return dir;
+			}
+
+			float2 IntoCartesian(float3 dir)
+			{
+				float2 uv;
+				dir.y /= FLATTEN;
+				dir = normalize(dir);
+				uv.x = dir.x;
+				uv.y = dir.z;
+				uv = .5 + (.5 * uv);
+				return uv;
+			}
+
 			v2f vert (appdata_full v)
 			{
 				v2f o;
@@ -274,6 +303,7 @@
 				o.Wpos = mul(unity_WorldToObject, v.vertex);
 				o.uv = v.texcoord;
 				o.normal = v.normal;
+				o.scrPos = ComputeScreenPos(o.pos);
 				return o;
 			}
 			
@@ -282,7 +312,7 @@
 			{ 
 				float m = (_Time.y);
 				gTime = _Time.x * 0.5 + m + 75.5;
-				cloudy = cos(gTime * 0.25 + 0.4) * 0.26;
+				cloudy = cos(gTime * 0.25 + 0.4) * 0.26 / 2;
 				float lightning = 0.0;
 
 				if(cloudy >= 0.2)
@@ -299,76 +329,18 @@
 
 				flash = clamp (float3(1.0, 1.0, 1.2) * lightning, 0.0, 1.0);
 
-				float2 xy = (-1.0 + 2.0 * i.uv);
-				float2 uv = (-1.0 + 2.0 * xy);
+				float2 uv = i.pos.xy / _ScreenParams;
 
 				float3 cameraPos = _WorldSpaceCameraPos;
-				float3 camTar = CameraPath(1 - 0.0);
-				//camTar.y = cameraPos.y = sin(_Time.x) * 200.0 + 300.0;
-				//camTar.y += 370.0;
 
-				float roll = 0;
-				float3 cw = normalize(camTar - cameraPos);
-				float3 cp = float3(sin(roll), cos(roll), 0.0);
-				float3 cu = cross(cw,cp);
-				float3 cv = cross(cu, cw);
-				float3 dir = normalize(uv.x * cu + uv.y * cv + 1.3 * cw);
-				float3x3 camMat = float3x3(cu, cv, cw);
+				float3 dir = IntoSphere(uv);
+				uv = IntoCartesian(dir);
+				dir = IntoSphere(uv);
 
 				float3 col;
 				float2 pos;
 
-				if(dir.y < 0.0)
-				{
-					col = GetSky(float3(1,1,1), dir, pos);
-				}
-				else
-				{
-					//col = GetSky(cameraPos, dir, pos);
-				}
-				float l = exp(-length(pos) * 0.00002);
-
-				col = lerp(float3(0.6 - cloudy * 1.2, 0,0) + 
-						flash * 0.3, col, max(1, 0.2));
-				// Do te Lends Flare...
-				float bri = dot(cw, _WorldSpaceLightPos0) * 2.7 * clamp(-cloudy + .2, 0.0, .2);
-
-				if (bri > 0.0)
-	{
-		float2 sunPos = float2( dot( _WorldSpaceLightPos0, cu ), dot( _WorldSpaceLightPos0, cv ) );
-		float2 uvT = uv-sunPos;
-		uvT = uvT*(length(uvT));
-		bri = pow(bri, 6.0)*.6;
-
-		float glare1 = max(1.2-length(uvT+sunPos*2.)*2.0, 0.0);
-		float glare2 = max(1.2-length(uvT+sunPos*.5)*4.0, 0.0);
-		uvT = lerp (uvT, uv, -2.3);
-		float glare3 = max(1.2-length(uvT+sunPos*5.0)*1.2, 0.0);
-
-		col += bri * _LightColor0 * float3(1.0, .5, .2)  * pow(glare1, 10.0)*25.0;
-		col += bri * float3(.8, .8, 1.0) * pow(glare2, 8.0)*9.0;
-		col += bri * _LightColor0 * pow(glare3, 4.0)*10.0;
-		}
-	
-			float2 st =  uv * float2(.5+(xy.y+1.0)*.3, .02)+float2(gTime*.5+xy.y*.2, gTime*.2);
-			// Rain...
-		#ifdef TEXTURE_NOISE
-		 	float f = tex2Dlod(_NoiseTex, float4(st, -100.0, 1.0)).y * tex2Dlod(_NoiseTex, float4( st*.773, -100.0, 1.0)).x * 1.55;
-		#else
-			float f = Noise( st*200.5 ) * Noise( st*120.5 ) * 1.3;
-		#endif
-			float rain = clamp(cloudy-.15, 0.0, 1.0);
-			f = clamp(pow(abs(f), 15.0) * 5.0 * (rain*rain*125.0), 0.0, (xy.y+.1)*.6);
-			col = lerp(col, float3(0.15, .15, .15)+flash, f);
-			col = clamp(col, 0.0,1.0);
-		
-			// Stretch RGB upwards... 
-			//col = (1.0 - exp(-col * 2.0)) * 1.1565;
-			//col = (1.0 - exp(-col * 3.0)) * 1.052;
-			col = pow(col, float3(.7,.7,.7));
-			//col = (col*col*(3.0-2.0*col));
-
-			col *= .55+0.45*pow(70.0*xy.x*xy.y*(1.0-xy.x)*(1.0-xy.y), 0.15 );	
+				col = GetSky(cameraPos, dir);
 
 				return float4(col, 1.0);
 			}

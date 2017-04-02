@@ -147,8 +147,10 @@
     <None Include="Assets\Shaders\DynamicTest\Invert.shader" />
     <None Include="Assets\Shaders\DynamicTest\Smoke.shader" />
     <None Include="Assets\Shaders\Groundfromspace_Shader.shader" />
+    <None Include="Assets\Shaders\Sky\EquirectangularDisplay.shader" />
     <None Include="Assets\Shaders\Sky\SkyDisplay.shader" />
     <None Include="Assets\Shaders\Sky\SkyGen.shader" />
+    <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade.shader" />
     <None Include="Assets\Shaders\Sky\newShader.shader" />
     <None Include="Assets\Shaders\SkyDomeShader.shader" />
     <None Include="Assets\Shaders\SkyFromSpace_Shader.shader" />
