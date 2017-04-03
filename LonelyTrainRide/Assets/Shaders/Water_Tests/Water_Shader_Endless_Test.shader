@@ -70,7 +70,7 @@ Shader "Test/Water_Shader_Endless_Test"
 			uniform float _Alpha;
 			uniform samplerCUBE _Cube;
 			float _ReflectionFactor;
-			half _Detial;
+			half _Detail;
 			float _ReflectionExposure;
 
 			float _SineAmplitude;
@@ -194,7 +194,7 @@ Shader "Test/Water_Shader_Endless_Test"
 				finalColor.rgb += _OceanColor * lightFinal;
 
 				float3 worldRefl = reflect(-i.viewDir, i.normalDir.xyz);
-				finalColor.rgb *= IBLRefl(_Cube, _Detial, worldRefl, _ReflectionExposure, _ReflectionFactor);
+				finalColor.rgb *= IBLRefl(_Cube, _Detail, worldRefl, _ReflectionExposure, _ReflectionFactor);
 
 				return finalColor;
 			}

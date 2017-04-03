@@ -495,7 +495,7 @@ SubShader {
             //Adjust color from HDR
 
             finalCol *= _HdrExposure;
-			finalCol *= .55+0.45*pow(70.0 * xy.x * xy.y * (1.0 - xy.x ) * (1.0 - xy.y), 0.15 );
+			//finalCol *= .55+0.45*pow(70.0 * xy.x * xy.y * (1.0 - xy.x ) * (1.0 - xy.y), 0.15 );
 
 			//finalCol += gTime;
             return half4(finalCol,1.0);

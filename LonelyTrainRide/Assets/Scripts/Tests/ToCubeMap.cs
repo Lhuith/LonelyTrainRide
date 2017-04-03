@@ -53,7 +53,7 @@ public class ToCubeMap : MonoBehaviour
 
         cam.transform.position = transform.position;
 
-        ReflectionCubeMap.hideFlags = HideFlags.HideAndDontSave;
+      // ReflectionCubeMap.hideFlags = HideFlags.HideAndDontSave;
         ReflectionCubeMap.wrapMode = TextureWrapMode.Clamp;
 
         reflectMat.SetTexture("_Tex", ReflectionCubeMap);
