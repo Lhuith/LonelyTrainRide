@@ -1,31 +1,15 @@
 fileFormatVersion: 2
-guid: b578ffa6f7e4fe34c9f2859fa9464919
-timeCreated: 1490685024
+guid: 8b34dc56e2725e34396489a0470dec64
+timeCreated: 1491244974
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: Camera
-    100002: Canvas
-    100004: Cart
-    100006: Cart_Back_UP
-    100008: Lamp
-    100010: //RootNode
-    400000: Camera
-    400002: Canvas
-    400004: Cart
-    400006: Cart_Back_UP
-    400008: Lamp
-    400010: //RootNode
-    2300000: Canvas
-    2300002: Cart
-    2300004: Cart_Back_UP
-    3300000: Canvas
-    3300002: Cart
-    3300004: Cart_Back_UP
-    4300000: Cart_Back_UP
-    4300002: Canvas
-    4300004: Cart
+    100000: //RootNode
+    400000: //RootNode
+    2300000: //RootNode
+    3300000: //RootNode
+    4300000: Cart
   materials:
     importMaterials: 1
     materialName: 0

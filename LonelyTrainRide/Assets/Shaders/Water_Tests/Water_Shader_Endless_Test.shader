@@ -51,6 +51,14 @@ Shader "Test/Water_Shader_Endless_Test"
 			#pragma shader_feature _IBLMODE_OFF _IBLMODE_REFL _IBLMODE_REFR
 			#include "UnityCG.cginc"
 
+			#define FAR 30.
+			#define ITR 60
+			
+			#define PRIMARY_INTENSITY 1.3
+			#define PRIMARY_CONCENTRATION 12.
+			#define SECONDARY_INTENSITY 5.
+			#define SECONDARY_CONCENTRATION 0.9
+
 			uniform float _HighlightThresholdMax;
 			uniform fixed4 _Color;
 			uniform fixed4 _SpecColor;
@@ -130,6 +138,7 @@ Shader "Test/Water_Shader_Endless_Test"
 				vertex.x = (_Steepness.x *_SineAmplitude) *_Dir.x * cos(_SineFrequency.x * (dotprod + disp));
 				vertex.z = (_Steepness.x *_SineAmplitude) *_Dir.y * cos(_SineFrequency.x * (dotprod + disp));
 				vertex.y = _SineAmplitude * - sin(_SineFrequency.x * (dotprod + disp));
+
 				vertex.x = (_Steepness.y *_SineAmplitude) * _Dir2.x * cos(_SineFrequency.y * (dotprod2 + disp2));
 				vertex.z = (_Steepness.y *_SineAmplitude) *_Dir2.y *  cos (_SineFrequency.y * (dotprod2 + disp2));
 				vertex.y = _SineAmplitude * sin(_SineFrequency.y * (dotprod2 + disp2));
@@ -143,8 +152,10 @@ Shader "Test/Water_Shader_Endless_Test"
 				
 			
 				o.wPos =  mul(unity_ObjectToWorld, v.vertex);
-				v.vertex += GestnerWave(o.wPos, _Time.y);
-				//v.normal = normalize(o.wPos);
+				float4 vertNew = GestnerWave(o.wPos, _Time.y);
+				//v.normal /= normalize((v.vertex - vertNew));
+				v.vertex += vertNew;
+
 				o.tangentDir = normalize(mul(unity_WorldToObject, half4(v.tangent.xyz, 0.0)).xyz);
 				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
 				//dyno = tex2Dlod(_DynamicTex, float4(v.texcoord.xy, 0.0,0.0));
