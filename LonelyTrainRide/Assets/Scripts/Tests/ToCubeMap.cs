@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Rendering;
 
 [ExecuteInEditMode]
 public class ToCubeMap : MonoBehaviour
@@ -49,9 +50,12 @@ public class ToCubeMap : MonoBehaviour
             cam.farClipPlane = farClip;
             cam.enabled = false;
         }
-        //texToCube = new RenderTexture(cubemapSize, cubemapSize, 16);
-        //texToCube.dimension = UnityEngine.Rendering.TextureDimension.Cube;
-        //texToCube.hideFlags = HideFlags.HideAndDontSave;
+
+        cam.transform.position = transform.position;
+
+        ReflectionCubeMap.hideFlags = HideFlags.HideAndDontSave;
+        ReflectionCubeMap.wrapMode = TextureWrapMode.Clamp;
+
         reflectMat.SetTexture("_Tex", ReflectionCubeMap);
         cam.RenderToCubemap(ReflectionCubeMap, faceMask);
     }

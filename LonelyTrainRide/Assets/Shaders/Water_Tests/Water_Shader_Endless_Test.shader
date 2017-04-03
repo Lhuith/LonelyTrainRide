@@ -6,7 +6,7 @@ Shader "Test/Water_Shader_Endless_Test"
 	{
 		_MainTex ("Color (RGB) Alpha (A)", 2D) = "white" {}
 		_DynamicTex("Texture", 2D) = "white" {}
-		_AlphaMap("Alpha Mappig", 2D) = "white" {}
+		_Alpha("Alpha Mappig", Float) = 1.0
 
 		_OceanColor("Color Of Ocean", Color) = (1,1,1,1)
 
@@ -15,7 +15,7 @@ Shader "Test/Water_Shader_Endless_Test"
 		_AniY("Anisotropic Y", Range(0.0, 2.0)) = 1.0
 		_Shininess("Shininess", Float) = 1.0
 		_HighlightThresholdMax("Region Around Depth Collision", Float) = 0
-		_DepthFactor("Water DepthFactor", Range(-100,100)) = 0
+		_DepthFactor("Water DepthFactor", Range(0.01,001)) = 0
 		[KeywordEnum(Off, Refl, Refr)] _IBLMode ("IBL Mode", Float) = 0
 		_ReflectionFactor("Specular %", Range(0,1)) = 1
 
@@ -32,7 +32,6 @@ Shader "Test/Water_Shader_Endless_Test"
 		//two direction vectors as we are using two gerstner waves
 		_Dir ("Wave Direction", Vector) = (1,1,0,0)
 		_Dir2 ("2nd Wave Direction", Vector) = (1,1,0,0)
-		_DepthFactor("Water Edge Power", Range(0,300)) = 0
 		_Smoothing("Normal Smoothing", float) = 10
 
 	}
@@ -60,7 +59,7 @@ Shader "Test/Water_Shader_Endless_Test"
 			uniform half _Shininess;
 			uniform float _Quality;
 
-			uniform sampler2D _CameraDepthTexture;
+			uniform sampler2D_float _CameraDepthTexture;
 			uniform float4 _EdgeColor;
 			uniform float4 _DeepColor;
 			uniform float4 _OceanColor;
@@ -68,7 +67,7 @@ Shader "Test/Water_Shader_Endless_Test"
 			uniform half4 _LightColor0;
 
 			uniform float _DepthFactor;
-
+			uniform float _Alpha;
 			uniform samplerCUBE _Cube;
 			float _ReflectionFactor;
 			half _Detial;
@@ -131,7 +130,6 @@ Shader "Test/Water_Shader_Endless_Test"
 				vertex.x = (_Steepness.x *_SineAmplitude) *_Dir.x * cos(_SineFrequency.x * (dotprod + disp));
 				vertex.z = (_Steepness.x *_SineAmplitude) *_Dir.y * cos(_SineFrequency.x * (dotprod + disp));
 				vertex.y = _SineAmplitude * - sin(_SineFrequency.x * (dotprod + disp));
-
 				vertex.x = (_Steepness.y *_SineAmplitude) * _Dir2.x * cos(_SineFrequency.y * (dotprod2 + disp2));
 				vertex.z = (_Steepness.y *_SineAmplitude) *_Dir2.y *  cos (_SineFrequency.y * (dotprod2 + disp2));
 				vertex.y = _SineAmplitude * sin(_SineFrequency.y * (dotprod2 + disp2));
@@ -144,40 +142,38 @@ Shader "Test/Water_Shader_Endless_Test"
 				v2f o;
 				
 			
-				
-
+				o.wPos =  mul(unity_ObjectToWorld, v.vertex);
+				v.vertex += GestnerWave(o.wPos, _Time.y);
+				//v.normal = normalize(o.wPos);
 				o.tangentDir = normalize(mul(unity_WorldToObject, half4(v.tangent.xyz, 0.0)).xyz);
 				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
 				//dyno = tex2Dlod(_DynamicTex, float4(v.texcoord.xy, 0.0,0.0));
-				o.wPos =  mul(unity_ObjectToWorld, v.vertex);
-				v.vertex += GestnerWave(o.wPos, _Time.x);
-				v.normal += normalize(GestnerWave(o.wPos, _Time.x));
-				o.projPos = ComputeScreenPos (o.pos);
 				o.normalDir = normalize(mul(half4(v.normal, 0.0), unity_WorldToObject).xyz);
 
 				o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
-
-				half3 fragmentToLightSource = _WorldSpaceLightPos0.xyz - o.wPos.xyz;
-
-				o.lightDir = fixed4(
-				normalize(lerp(_WorldSpaceLightPos0.xyz, fragmentToLightSource, _WorldSpaceLightPos0.w)),
-				lerp(1.0, 1.0 / length(fragmentToLightSource), _WorldSpaceLightPos0.w));
+				o.projPos = ComputeScreenPos (o.pos);
 				COMPUTE_EYEDEPTH(o.projPos.z);
 				o.uv = v.texcoord;
 
 				return o;
 			}
-
+			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				fixed4 OceanMap = tex2D(_MainTex, i.uv);	
-				float sceneZ = LinearEyeDepth  (SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture,UNITY_PROJ_COORD(i.projPos)));
-				float partZ = i.projPos.z;
-				float fade = saturate (_DepthFactor * (sceneZ - partZ));
 
-				float4 finalColor = float4(0,0,0,0);
-				//finalColor.a *= abs(1 - fade);
-				OceanMap.a *= abs(1 - fade);
+				half3 fragmentToLightSource = _WorldSpaceLightPos0.xyz - i.wPos.xyz;
+
+				i.lightDir = fixed4(
+				normalize(lerp(_WorldSpaceLightPos0.xyz, fragmentToLightSource, _WorldSpaceLightPos0.w)),
+				lerp(1.0, 1.0 / length(fragmentToLightSource), _WorldSpaceLightPos0.w));
+			
+				fixed4 OceanMap = tex2D(_MainTex, i.uv);	
+				float sceneZEye = LinearEyeDepth   (SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture,UNITY_PROJ_COORD(i.projPos)));
+				float partZ = i.projPos.z;
+				float fade = saturate (_DepthFactor * ((sceneZEye) - partZ));
+				_Alpha *= fade;
+				float4 finalColor = float4(0,0,0, _Alpha);
+				//finalColor *= fade;
 
 				fixed3 h = normalize(i.lightDir.xyz + i.viewDir);
 				fixed3 binormal = cross(i.normalDir, i.tangentDir);
@@ -193,16 +189,14 @@ Shader "Test/Water_Shader_Endless_Test"
 				fixed3 specularReflection = diffuseReflection * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess;
 							
 				fixed4 lightFinal = fixed4(specularReflection + diffuseReflection +
-								UNITY_LIGHTMODEL_AMBIENT.xyz, 1.0);
+								UNITY_LIGHTMODEL_AMBIENT.xyz, _Alpha) / _Alpha;
 				
 				finalColor.rgb += _OceanColor * lightFinal;
 
-				#if _IBLMODE_REFL
-					float3 worldRefl = reflect(-i.viewDir, i.normalDir.xyz);
-					lightFinal.rgb *= IBLRefl(_Cube, _Detial, worldRefl, _ReflectionExposure, _ReflectionFactor);
-				#endif
+				float3 worldRefl = reflect(-i.viewDir, i.normalDir.xyz);
+				finalColor.rgb *= IBLRefl(_Cube, _Detial, worldRefl, _ReflectionExposure, _ReflectionFactor);
 
-				return lightFinal * OceanMap;
+				return finalColor;
 			}
 			ENDCG
 		}
