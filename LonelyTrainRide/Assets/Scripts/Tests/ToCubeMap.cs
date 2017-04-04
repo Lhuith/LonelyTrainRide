@@ -39,7 +39,6 @@ public class ToCubeMap : MonoBehaviour
         {
             GameObject go = new GameObject("CubemapCamera", typeof(Camera));
          
-            go.hideFlags = HideFlags.HideAndDontSave;
             go.transform.position = transform.position;
             go.transform.rotation = Quaternion.identity;
 
@@ -53,11 +52,16 @@ public class ToCubeMap : MonoBehaviour
 
         cam.transform.position = transform.position;
 
-      // ReflectionCubeMap.hideFlags = HideFlags.HideAndDontSave;
         ReflectionCubeMap.wrapMode = TextureWrapMode.Clamp;
 
         reflectMat.SetTexture("_Tex", ReflectionCubeMap);
         cam.RenderToCubemap(ReflectionCubeMap, faceMask);
+    }
+
+    void OnDisable()
+    {
+        
+        Destroy(cam);
     }
 }
 

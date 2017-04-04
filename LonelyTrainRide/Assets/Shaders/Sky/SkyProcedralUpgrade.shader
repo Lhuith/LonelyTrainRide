@@ -8,6 +8,8 @@ Properties {
     _MIE ("MIE", Float) = 0.0010
     _SUN("Sun brightness", Float) = 20.0
 	_NoiseTex("Noise Texture", 2D) = "white"{}
+	_FallOffTex01("FallOff Texture 01", 2D) = "white"{}
+	_CloudCoverage("Cloud Density", Range(-1,1)) = 0
 }
  
 SubShader {
@@ -74,13 +76,15 @@ SubShader {
 
 			uniform float4 _BackColor;
 			uniform float cloudy;
-		
+			uniform float _CloudCoverage;
 			//uniform float3 _MousePos;
 			uniform float2 _iResolution;
 			float3 flash;
 
 			sampler2D _NoiseTex;
 			float4 _MainTex_ST;
+			sampler2D _FallOffTex01;
+			float4 _FallOffTex01_ST;
 
         struct appdata_t {
             float4 vertex : POSITION;
@@ -114,9 +118,10 @@ SubShader {
 				float2 p = floor(f);
 				f = frac(f);
 				f = f * f * (3.0 - 2.0 * f);
-				float3 coord =  float3(( p + f + .5) / 256.0, 0.0);
+				float3 coord =  float3(( p + f + .5) / 256.0, 0.0) + _Time.x / 100;
+
 				float res = tex2Dlod(_NoiseTex, float4(coord, 0.0)).x;
-				return res;
+				return res;//clamp(res - falloff, 0, 1);
 			}
 
 			float Noise(in float3 x)
@@ -126,10 +131,9 @@ SubShader {
 				f = f * f * (3.0 - 2.0 * f);
 
 				float2 uv = (p.xy + float2(37.0, 17.0) * p.z) + f.xy;
-				float3 coord =  float3((uv + 0.5) / 256.0, 0.0);
+				float3 coord =  float3((uv + 0.5) / 256.0, 0.0) + _Time.x / 100;
 				float2 rg = tex2Dlod(_NoiseTex, float4(coord, 0.0)).yx;
-
-				return lerp(rg.x, rg.y, f.z);
+				return lerp(rg.x, rg.y, f.z);//clamp(lerp(rg.x, rg.y, f.z) - (falloff.xy), 0, 1);
 			}
 			#else
 			//============================================
@@ -141,7 +145,7 @@ SubShader {
 				f = f * f * (3.0 - 2.0 * f);
 				float n = p.x + p.y * 57.0;
 				
-				float res = lerp(lerp( Hash (n + 0.0), Hash(n+ 1.0), f.x),
+				float3 res = lerp(lerp( Hash (n + 0.0), Hash(n+ 1.0), f.x),
 								 lerp( Hash (n + 57.0), Hash(n+ 58.0), f.x), f.y);
 				return res;
 			}
@@ -169,10 +173,10 @@ SubShader {
 				float f;
 
 				f = 0.5000 * Noise(p); p = p * 3.02; 
-				f += 0.2500 * Noise(p); p = p * 3.03;	p+= _Time.y*1.0;
-				f += 0.1250 * Noise(p); p = p * 3.01;	p+= _Time.y*0.25;
-				f += 0.0625 * Noise(p); p = p * 3.03;	p+= _Time.y*0.125;
-				f += 0.03125 * Noise(p); p = p * 3.02; p+= _Time.y*0.0125;
+				f += 0.2500 * Noise(p); p = p * 3.03;	p+= _Time.x*1.0;
+				f += 0.1250 * Noise(p); p = p * 3.01;	p+= _Time.x*0.25;
+				f += 0.0625 * Noise(p); p = p * 3.03;	p-= _Time.x*0.125;
+				f += 0.03125 * Noise(p); p = p * 3.02;  p-= _Time.x*0.0125;
 				f += 0.015625 * Noise(p);
 
 				return f;
@@ -214,6 +218,7 @@ SubShader {
 			//============================================
 			float3 GetSky(in float3 pos, in float3 rd)
 			{
+
 				float sunAmount = max(dot(rd, _WorldSpaceLightPos0) , 0.0);
 				// Do the Blue and sun..
 				float3 sky = lerp(float3(0.0, 0.1, 0.4), float3(0.3, 0.6, 0.8), 1.0 - rd.y);
@@ -238,7 +243,7 @@ SubShader {
 				shade.x = .01;
 				//I think this is as small as the loop can be
 				// for a reasonable cloud density illusion.
-				for(int i = 0; i < 20; i++)
+				for(int i = 0; i < 12; i++)
 				{
 					if(shadeSum.y >= 1.0) break;
 					float h = Map(p);
@@ -261,7 +266,7 @@ SubShader {
 				float shadePow = pow(shadeSum.x, .4);
 				float3 clouds = lerp(float3(shadePow, shadePow ,shadePow), _LightColor0, (1.0-shadeSum.y)*.4);
 	
-				clouds += min((1.0-sqrt(shadeSum.y)) * pow(sunAmount, 4.0), 1.0) * 2.0;
+				clouds += min((1.0 - sqrt(shadeSum.y)) * pow(sunAmount, 4.0), 1.0) * 2.0;
    
 				clouds += flash * (shadeSum.y+shadeSum.x+.2) * .5;
 
@@ -270,44 +275,10 @@ SubShader {
 				return clamp(sky, 0.0, 1.0);
 			}
 
-		   float2 RadialCoords(float3 a_coords)
-			{
-			    float3 a_coords_n = normalize(a_coords);
-			    float lon = atan2(a_coords_n.z, a_coords_n.x);
-			    float lat = acos(a_coords_n.y);
-			    float2 sphereCoords = float2(lon, lat) * (1.0 / 3.14159265359);
-			    return float2(sphereCoords.x * 0.5 + 0.5, 1 - sphereCoords.y);
-			}
-			
 			float3 CameraPath( float t )
 			{
 			    return float3(4000.0 * sin(.16*t)+12290.0, 0.0, 8800.0 * cos(.145*t+.3));
 			} 
-
-
-			float3 IntoSphere(float2 uv)
-			{
-				float3 dir;
-				uv = (-1.0 + 2.0 * uv);
-				dir.x = uv.x;
-				dir.z = uv.y;
-				dir.y = sqrt(1.0 - dir.x * dir.x - dir.z * dir.z) * FLATTEN;
-				if(length(dir) >= 1.0) return float3(0.0, .001, .999);
-				dir = normalize(dir);
-
-				return dir;
-			}
-
-			float2 IntoCartesian(float3 dir)
-			{
-				float2 uv;
-				dir.y /= FLATTEN;
-				dir = normalize(dir);
-				uv.x = dir.x;
-				uv.y = dir.z;
-				uv = .5 + (.5 * uv);
-				return uv;
-			}
 
 
         float scale(float inCos)
@@ -446,17 +417,26 @@ SubShader {
         {
             return 0.75 + 0.75*eyeCos2;
         }
- 
+		
+
+		float3 blend(float3 A, float3 B)
+		{
+			float3 C;
+			C.rgb = (A.r * A.rgb + (1 - A.r) * B.r * B.rgb);
+			return C;
+		}
+
+
         half4 frag (v2f IN) : SV_Target
         {
-            half3 col;
+			float3 col;
 			float3 clouds;
 			float3 light;
 			float3 finalCol;
 
 			float m = (_Time.y);
 			gTime = _Time.y * 0.5 + m + 75.5;
-			cloudy = cos(gTime * 0.25 + 0.4) * 0.26;
+			cloudy = _CloudCoverage;
 			float2 xy = IN.pos / _ScreenParams.xy;
 			float lightning = 0.0;
 
@@ -470,34 +450,35 @@ SubShader {
 					lightning = fmod(-gTime * (1.5 - Hash(gTime * 0.3) * 0.002), 1.0) *	f;
 
 				}
+
 			}
 
 			flash = clamp (float3(1.0, 1.0, 1.2) * lightning, 0.0, 1.0);
 		
-			if(IN.rayDir.y < 0.2)
+			if(IN.rayDir.y < 0.1)
             {
                 half eyeCos = dot(_WorldSpaceLightPos0.xyz, normalize(IN.rayDir.xyz));
                 half eyeCos2 = eyeCos * eyeCos;
-			    clouds =  GetSky(float3(0,0,0), IN.rayDir) + getRayleighPhase(eyeCos2) * IN.cIn.xyz + getMiePhase(eyeCos, eyeCos2) * IN.cOut * _LightColor0;
+			   
 		
-
-                col = getRayleighPhase(eyeCos2) * IN.cIn.xyz + getMiePhase(eyeCos, eyeCos2) * IN.cOut * _LightColor0;			
+				clouds = GetSky(_WorldSpaceCameraPos, IN.rayDir) * getRayleighPhase(eyeCos2) * IN.cIn.xyz + getMiePhase(eyeCos, eyeCos2) * IN.cOut * _LightColor0;
+                col = getRayleighPhase(eyeCos2) * IN.cIn.xyz + getMiePhase(eyeCos, eyeCos2) * IN.cOut * (_LightColor0 * clouds);
+			
+				finalCol = col;
+				finalCol *= clouds;
 		
-				clouds *= lerp(clouds, col, col);
-				finalCol = col + clouds;
             }
             else
             {
                 col = IN.cIn.xyz + _GroundColor * IN.cOut;
 				clouds = IN.cIn.xyz + _GroundColor * IN.cOut;
-				finalCol = col + clouds;
+				finalCol = col * clouds;
             }
             //Adjust color from HDR
 
-            finalCol *= _HdrExposure;
-			//finalCol *= .55+0.45*pow(70.0 * xy.x * xy.y * (1.0 - xy.x ) * (1.0 - xy.y), 0.15 );
+			finalCol *= _HdrExposure;
 
-			//finalCol += gTime;
+			//finalCol *= .55+0.45*pow(70.0 * xy.x * xy.y * (1.0 - xy.x ) * (1.0 - xy.y), 0.15 );
             return half4(finalCol,1.0);
  
         }

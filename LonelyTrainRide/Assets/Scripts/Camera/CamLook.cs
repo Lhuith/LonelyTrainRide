@@ -30,6 +30,8 @@ public class CamLook : MonoBehaviour
         if (characterBody) targetCharacterDirection = characterBody.transform.localRotation.eulerAngles;
     }
 
+
+
     void Update()
     {
         // Ensure the cursor is always locked when set
@@ -77,6 +79,11 @@ public class CamLook : MonoBehaviour
         {
             var yRotation = Quaternion.AngleAxis(_mouseAbsolute.x, transform.InverseTransformDirection(Vector3.up));
             transform.localRotation *= yRotation;
+        }
+
+        {
+  
+
         }
     }
 }

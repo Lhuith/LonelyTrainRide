@@ -131,11 +131,11 @@ public class EndlessTerrain : MonoBehaviour {
             meshRenderer = meshObject.AddComponent<MeshRenderer>();
             meshFilter = meshObject.AddComponent<MeshFilter>();
             meshCollider = meshObject.AddComponent<MeshCollider>();
-            dynamicApply = meshObject.AddComponent<DynamicApplyShader>();
+           // dynamicApply = meshObject.AddComponent<DynamicApplyShader>();
 
             //dynamicApply.mat = _dynamicInfo.mat;
-            dynamicApply.updateInterval = _dynamicInfo.updateInterval;
-            dynamicApply.IntialTexture = _dynamicInfo.intialTexture;
+            //dynamicApply.updateInterval = _dynamicInfo.updateInterval;
+            //dynamicApply.IntialTexture = _dynamicInfo.intialTexture;
 
             //paint = meshObject.AddComponent<PaintTest>();
             meshObject.transform.position = postionV3;

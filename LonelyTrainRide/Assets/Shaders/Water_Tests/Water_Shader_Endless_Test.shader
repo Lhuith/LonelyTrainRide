@@ -6,6 +6,8 @@ Shader "Test/Water_Shader_Endless_Test"
 	{
 		_MainTex ("Color (RGB) Alpha (A)", 2D) = "white" {}
 		_DynamicTex("Texture", 2D) = "white" {}
+		_NoiseTex("Noise Texture", 2D) = "white" {}
+		_FallOff("FallOff Texture", 2D) = "white" {}
 		_Alpha("Alpha Mappig", Float) = 1.0
 
 		_OceanColor("Color Of Ocean", Color) = (1,1,1,1)
@@ -32,7 +34,7 @@ Shader "Test/Water_Shader_Endless_Test"
 		//two direction vectors as we are using two gerstner waves
 		_Dir ("Wave Direction", Vector) = (1,1,0,0)
 		_Dir2 ("2nd Wave Direction", Vector) = (1,1,0,0)
-		_Smoothing("Normal Smoothing", float) = 10
+		_GlitterStrength("Glitter Strength", float) = 10
 
 	}
 	SubShader
@@ -50,14 +52,6 @@ Shader "Test/Water_Shader_Endless_Test"
 			#pragma fragment frag
 			#pragma shader_feature _IBLMODE_OFF _IBLMODE_REFL _IBLMODE_REFR
 			#include "UnityCG.cginc"
-
-			#define FAR 30.
-			#define ITR 60
-			
-			#define PRIMARY_INTENSITY 1.3
-			#define PRIMARY_CONCENTRATION 12.
-			#define SECONDARY_INTENSITY 5.
-			#define SECONDARY_CONCENTRATION 0.9
 
 			uniform float _HighlightThresholdMax;
 			uniform fixed4 _Color;
@@ -88,6 +82,7 @@ Shader "Test/Water_Shader_Endless_Test"
 			float4 _Dir;
 			float4 _Dir2;
 
+			float _GlitterStrength;
 			struct v2f
 			{
 				float2 uv : TEXCOORD0;
@@ -104,6 +99,10 @@ Shader "Test/Water_Shader_Endless_Test"
 			float4 _MainTex_ST;
 			sampler2D _AlphaMap;
 			float4 _AlphaMap_ST;
+			sampler2D _NoiseTex;
+			float4 _NoiseTex_ST;
+			float4 _FallOff_ST;
+			sampler2D _FallOff;
 
 			float4 blend(float4 A, float4 B)
 			{
@@ -146,6 +145,104 @@ Shader "Test/Water_Shader_Endless_Test"
 				return vertex;
 			}
 
+			float3 mod289(float3 x) {
+				return x - floor(x * (1.0 / 289.0)) * 289.0;
+			}
+
+			float4 mod289(float4 x) {
+				return x - floor(x * (1.0 / 289.0)) * 289.0;
+			}
+
+			float4 permute(float4 x) {
+				return mod289(((x*34.0) + 1.0)*x);
+			}
+
+			float4 taylorInvSqrt(float4 r)
+			{
+				return 1.79284291400159 - 0.85373472095314 * r;
+			}
+
+			float snoise(float3 v)
+			{
+				const float2  C = float2(1.0 / 6.0, 1.0 / 3.0);
+				const float4  D = float4(0.0, 0.5, 1.0, 2.0);
+
+				// First corner
+				float3 i = floor(v + dot(v, C.yyy));
+				float3 x0 = v - i + dot(i, C.xxx);
+
+				// Other corners
+				float3 g = step(x0.yzx, x0.xyz);
+				float3 l = 1.0 - g;
+				float3 i1 = min(g.xyz, l.zxy);
+				float3 i2 = max(g.xyz, l.zxy);
+
+				//   x0 = x0 - 0.0 + 0.0 * C.xxx;
+				//   x1 = x0 - i1  + 1.0 * C.xxx;
+				//   x2 = x0 - i2  + 2.0 * C.xxx;
+				//   x3 = x0 - 1.0 + 3.0 * C.xxx;
+				float3 x1 = x0 - i1 + C.xxx;
+				float3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y
+				float3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y
+
+										   // Permutations
+				i = mod289(i);
+				float4 p = permute(permute(permute(
+					i.z + float4(0.0, i1.z, i2.z, 1.0))
+					+ i.y + float4(0.0, i1.y, i2.y, 1.0))
+					+ i.x + float4(0.0, i1.x, i2.x, 1.0));
+
+				// Gradients: 7x7 points over a square, mapped onto an octahedron.
+				// The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)
+				float n_ = 0.142857142857; // 1.0/7.0
+				float3  ns = n_ * D.wyz - D.xzx;
+
+				float4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)
+
+				float4 x_ = floor(j * ns.z);
+				float4 y_ = floor(j - 7.0 * x_);    // mod(j,N)
+
+				float4 x = x_ *ns.x + ns.yyyy;
+				float4 y = y_ *ns.x + ns.yyyy;
+				float4 h = 1.0 - abs(x) - abs(y);
+
+				float4 b0 = float4(x.xy, y.xy);
+				float4 b1 = float4(x.zw, y.zw);
+
+				//float4 s0 = float4(lessThan(b0,0.0))*2.0 - 1.0;
+				//float4 s1 = float4(lessThan(b1,0.0))*2.0 - 1.0;
+				float4 s0 = floor(b0)*2.0 + 1.0;
+				float4 s1 = floor(b1)*2.0 + 1.0;
+				float4 sh = -step(h, float4(0.0, 0.0, 0.0, 0.0));
+
+				float4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+				float4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+
+				float3 p0 = float3(a0.xy, h.x);
+				float3 p1 = float3(a0.zw, h.y);
+				float3 p2 = float3(a1.xy, h.z);
+				float3 p3 = float3(a1.zw, h.w);
+
+				//Normalise gradients
+				float4 norm = taylorInvSqrt(float4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+				p0 *= norm.x;
+				p1 *= norm.y;
+				p2 *= norm.z;
+				p3 *= norm.w;
+
+				// lerp final noise value
+				float4 m = max(0.6 - float4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
+				m = m * m;
+				return 42.0 * dot(m*m, float4(dot(p0, x0), dot(p1, x1),
+					dot(p2, x2), dot(p3, x3)));
+			}
+
+			float3 hsv(float h, float s, float v)
+			{
+				return lerp(float3(1.0, 1.0, 1.0), clamp((abs(frac(
+					h + float3(3.0, 2.0, 1.0) / 3.0) * 6.0 - 3.0) - 1.0), 0.0, 1.0), s) * v;
+			}
+
 			v2f vert (appdata_full v)
 			{
 				v2f o;
@@ -157,11 +254,10 @@ Shader "Test/Water_Shader_Endless_Test"
 				v.vertex += vertNew;
 
 				o.tangentDir = normalize(mul(unity_WorldToObject, half4(v.tangent.xyz, 0.0)).xyz);
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
 				//dyno = tex2Dlod(_DynamicTex, float4(v.texcoord.xy, 0.0,0.0));
 				o.normalDir = normalize(mul(half4(v.normal, 0.0), unity_WorldToObject).xyz);
-
 				o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
+				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
 				o.projPos = ComputeScreenPos (o.pos);
 				COMPUTE_EYEDEPTH(o.projPos.z);
 				o.uv = v.texcoord;
@@ -173,7 +269,7 @@ Shader "Test/Water_Shader_Endless_Test"
 			{
 
 				half3 fragmentToLightSource = _WorldSpaceLightPos0.xyz - i.wPos.xyz;
-
+				float3 worldRefl = reflect(-i.viewDir, i.normalDir.xyz);
 				i.lightDir = fixed4(
 				normalize(lerp(_WorldSpaceLightPos0.xyz, fragmentToLightSource, _WorldSpaceLightPos0.w)),
 				lerp(1.0, 1.0 / length(fragmentToLightSource), _WorldSpaceLightPos0.w));
@@ -195,19 +291,34 @@ Shader "Test/Water_Shader_Endless_Test"
 				fixed nDotV = dot(i.normalDir, i.viewDir);
 				fixed tDotHX = dot(i.tangentDir, h) / _AniX;
 				fixed bDotHY = dot(binormal, h) / _AniY;	
-							
-				fixed3 diffuseReflection = i.lightDir.w * _LightColor0.xyz * saturate(nDotl);						
-				fixed3 specularReflection = diffuseReflection * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess;
-							
-				fixed4 lightFinal = fixed4(specularReflection + diffuseReflection +
+
+
+				fixed3 diffuseReflection = i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
+				fixed3 specularReflection =  diffuseReflection * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess;
+
+
+				fixed4 lightFinal = fixed4(specularReflection + diffuseReflection  + 
 								UNITY_LIGHTMODEL_AMBIENT.xyz, _Alpha) / _Alpha;
 				
 				finalColor.rgb += _OceanColor * lightFinal;
+				float3 reflection = IBLRefl(_Cube, _Detail, worldRefl, _ReflectionExposure, _ReflectionFactor);
+				finalColor.rgb *= reflection;
 
-				float3 worldRefl = reflect(-i.viewDir, i.normalDir.xyz);
-				finalColor.rgb *= IBLRefl(_Cube, _Detail, worldRefl, _ReflectionExposure, _ReflectionFactor);
+				//Sparkle:
+				float2 uv = (i.uv.xy * 24);
 
-				return finalColor;
+				float fadeLR = .5 - abs(uv.x - .5);
+				float fadeTB = 1. - uv.y;
+				float3 pos = float3(uv * float2(3., 1.) - float2(0., _Time.x * .03), _Time.x  * .01);
+
+				float n = diffuseReflection * specularReflection * smoothstep(.6, 1., snoise(pos * 60.)) * 10.;
+
+				float col = hsv(n * .2 + .7, .4, 1.);
+
+				float4 glitColor = float4(col * float3(n, n, n), n) / nDotl;
+
+
+				return finalColor + glitColor / _GlitterStrength;
 			}
 			ENDCG
 		}
