@@ -59,8 +59,7 @@ public class ToCubeMap : MonoBehaviour
     }
 
     void OnDisable()
-    {
-        
+    {   
         Destroy(cam);
     }
 }

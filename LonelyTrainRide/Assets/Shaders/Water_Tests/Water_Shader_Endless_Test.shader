@@ -89,7 +89,7 @@ Shader "Test/Water_Shader_Endless_Test"
 				float4 pos : SV_POSITION;
 				float4 wPos : TEXCOORD1;
 				float4 projPos : TEXCOORD2;
-				fixed3 normalDir : TECOORD3;
+				fixed3 normalDir : TEXCOORD3;
 				fixed4 lightDir : TEXCOORD4;
 				fixed3 viewDir : TEXCOORD5;
 				float3 tangentDir : TEXCOORD7;
@@ -104,7 +104,7 @@ Shader "Test/Water_Shader_Endless_Test"
 			float4 _FallOff_ST;
 			sampler2D _FallOff;
 
-			float4 blend(float4 A, float4 B)
+			float4 blend(float4 A, float4 B) 
 			{
 			   float4 C;
 			   C.a = A.a + (1 - A.a) * B.a;

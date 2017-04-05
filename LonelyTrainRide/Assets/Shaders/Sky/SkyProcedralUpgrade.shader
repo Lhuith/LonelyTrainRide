@@ -243,7 +243,7 @@ SubShader {
 				shade.x = .01;
 				//I think this is as small as the loop can be
 				// for a reasonable cloud density illusion.
-				for(int i = 0; i < 12; i++)
+				for(int i = 0; i < 55; i++)
 				{
 					if(shadeSum.y >= 1.0) break;
 					float h = Map(p);
