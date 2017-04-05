@@ -5,7 +5,7 @@ Shader "Test/Water_Shader_Endless_Test"
 	Properties
 	{
 		_MainTex ("Color (RGB) Alpha (A)", 2D) = "white" {}
-		_DynamicTex("Texture", 2D) = "white" {}
+		_GlitterTex("Glitter Texture", 2D) = "white" {}
 		_NoiseTex("Noise Texture", 2D) = "white" {}
 		_FallOff("FallOff Texture", 2D) = "white" {}
 		_Alpha("Alpha Mappig", Float) = 1.0
@@ -34,7 +34,7 @@ Shader "Test/Water_Shader_Endless_Test"
 		//two direction vectors as we are using two gerstner waves
 		_Dir ("Wave Direction", Vector) = (1,1,0,0)
 		_Dir2 ("2nd Wave Direction", Vector) = (1,1,0,0)
-		_GlitterStrength("Glitter Strength", float) = 10
+		_GlitterStrength("Glitter Strength", Range(0 , .1)) = .5
 
 	}
 	SubShader
@@ -71,6 +71,7 @@ Shader "Test/Water_Shader_Endless_Test"
 			uniform float _DepthFactor;
 			uniform float _Alpha;
 			uniform samplerCUBE _Cube;
+
 			float _ReflectionFactor;
 			half _Detail;
 			float _ReflectionExposure;
@@ -103,6 +104,7 @@ Shader "Test/Water_Shader_Endless_Test"
 			float4 _NoiseTex_ST;
 			float4 _FallOff_ST;
 			sampler2D _FallOff;
+			sampler2D _GlitterTex;
 
 			float4 blend(float4 A, float4 B) 
 			{
@@ -242,7 +244,28 @@ Shader "Test/Water_Shader_Endless_Test"
 				return lerp(float3(1.0, 1.0, 1.0), clamp((abs(frac(
 					h + float3(3.0, 2.0, 1.0) / 3.0) * 6.0 - 3.0) - 1.0), 0.0, 1.0), s) * v;
 			}
-
+			// Blurs using a 3x3 filter kernel
+		float4 BlurFunction3x3(sampler2D texsampler, float2 uv) : COLOR0
+			{
+			  // TOP ROW
+			  float4 s11 = tex2D(texsampler, uv + float2(-1.0f / 1024.0f, -1.0f / 768.0f));    // LEFT
+			  float4 s12 = tex2D(texsampler, uv + float2(0, -1.0f / 768.0f));              // MIDDLE
+			  float4 s13 = tex2D(texsampler, uv + float2(1.0f / 1024.0f, -1.0f / 768.0f)); // RIGHT
+			 								
+			  // MIDDLE ROW					
+			  float4 s21 = tex2D(texsampler, uv + float2(-1.0f / 1024.0f, 0));             // LEFT
+			  float4 col = tex2D(texsampler, uv);                                          // DEAD CENTER
+			  float4 s23 = tex2D(texsampler, uv + float2(-1.0f / 1024.0f, 0));                 // RIGHT
+			 								
+			  float4 s31 = tex2D(texsampler, uv + float2(-1.0f / 1024.0f, 1.0f / 768.0f)); // LEFT
+			  float4 s32 = tex2D(texsampler, uv + float2(0, 1.0f / 768.0f));                   // MIDDLE
+			  float4 s33 = tex2D(texsampler, uv + float2(1.0f / 1024.0f, 1.0f / 768.0f));  // RIGHT
+			 
+			  // Average the color with surrounding samples
+			  col = (col + s11 + s12 + s13 + s21 + s23 + s31 + s32 + s33) / 9;
+			  return col;
+			}
+			 
 			v2f vert (appdata_full v)
 			{
 				v2f o;
@@ -305,20 +328,18 @@ Shader "Test/Water_Shader_Endless_Test"
 				finalColor.rgb *= reflection;
 
 				//Sparkle:
-				float2 uv = (i.uv.xy * 24);
-
+				float2 uv = i.uv.xy ;
 				float fadeLR = .5 - abs(uv.x - .5);
 				float fadeTB = 1. - uv.y;
-				float3 pos = float3(uv * float2(3., 1.) - float2(0., _Time.x * .03), _Time.x  * .01);
-
-				float n = diffuseReflection * specularReflection * smoothstep(.6, 1., snoise(pos * 60.)) * 10.;
-
+				float3 pos = float3(uv * float2(3., 1.) - float2(0., _Time.x * .001), _Time.y  * .001);
+				float n =  fadeLR * fadeTB * specularReflection * smoothstep(.6, 1., snoise(pos * 1028)) * 10.;
 				float col = hsv(n * .2 + .7, .4, 1.);
+				float4 glitColor = (float4(col * float3(n, n, n), n)) * _GlitterStrength;
 
-				float4 glitColor = float4(col * float3(n, n, n), n) / nDotl;
+				float4 GlitterMap = glitColor * _LightColor0;
 
 
-				return finalColor + glitColor / _GlitterStrength;
+				return finalColor + float4(GlitterMap);
 			}
 			ENDCG
 		}

@@ -24,7 +24,7 @@ SubShader {
  
         #include "UnityCG.cginc"
         #include "Lighting.cginc"
- 		uniform float gTime;
+ 		uniform half gTime;
 		uniform half _SUN;
         uniform half _HdrExposure,_RL,_MIE;        // HDR exposure
         uniform half3 _GroundColor;
@@ -33,14 +33,14 @@ SubShader {
         #define WR 0.65
         #define WG 0.57
         #define WB 0.475
-        static const float3 kInvWavelength = float3(1.0 / (WR*WR*WR*WR), 1.0 / (WG*WG*WG*WG), 1.0 / (WB*WB*WB*WB));
+        static const half3 kInvWavelength = half3(1.0 / (WR*WR*WR*WR), 1.0 / (WG*WG*WG*WG), 1.0 / (WB*WB*WB*WB));
         #define OUTER_RADIUS 1.025
-        static const float kOuterRadius = OUTER_RADIUS;
-        static const float kOuterRadius2 = OUTER_RADIUS*OUTER_RADIUS;
-        static const float kInnerRadius = 1.0;
-        static const float kInnerRadius2 = 1.0;
+        static const half kOuterRadius = OUTER_RADIUS;
+        static const half kOuterRadius2 = OUTER_RADIUS*OUTER_RADIUS;
+        static const half kInnerRadius = 1.0;
+        static const half kInnerRadius2 = 1.0;
  
-        static const float kCameraHeight = 0.0001;
+        static const half kCameraHeight = 0.0001;
  
         //#define kRAYLEIGH 0.0025        // Rayleigh constant
         //#define kMIE 0.0010              // Mie constant
@@ -49,20 +49,20 @@ SubShader {
         #define kMIE _MIE             // Mie constant
         #define kSUN_BRIGHTNESS _SUN     // Sun brightness
  
-        static const float kKrESun = kRAYLEIGH * kSUN_BRIGHTNESS;
-        static const float kKmESun = kMIE * kSUN_BRIGHTNESS;
-        static const float kKr4PI = kRAYLEIGH * 4.0 * 3.14159265;
-        static const float kKm4PI = kMIE * 4.0 * 3.14159265;
-        static const float kScale = 1.0 / (OUTER_RADIUS - 1.0);
-        static const float kScaleDepth = 0.25;
-        static const float kScaleOverScaleDepth = (1.0 / (OUTER_RADIUS - 1.0)) / 0.25;
-        static const float kSamples = 2.0; // THIS IS UNROLLED MANUALLY, DON'T TOUCH
+        static const half kKrESun = kRAYLEIGH * kSUN_BRIGHTNESS;
+        static const half kKmESun = kMIE * kSUN_BRIGHTNESS;
+        static const half kKr4PI = kRAYLEIGH * 4.0 * 3.14159265;
+        static const half kKm4PI = kMIE * 4.0 * 3.14159265;
+        static const half kScale = 1.0 / (OUTER_RADIUS - 1.0);
+        static const half kScaleDepth = 0.25;
+        static const half kScaleOverScaleDepth = (1.0 / (OUTER_RADIUS - 1.0)) / 0.25;
+        static const half kSamples = 2.0; // THIS IS UNROLLED MANUALLY, DON'T TOUCH
  
         #define MIE_G (-0.990)
         #define MIE_G2 0.9801
  
 		
-			#define CLOUD_LOWER 2000.0
+			#define CLOUD_LOWER 1000.0
 			#define CLOUD_UPPER 3800.0
 
 			#define TEXTURE_NOISE
@@ -71,40 +71,41 @@ SubShader {
 			#define FLATTEN .2
 			#define NUM_STEPS 70
 
-			#define MOD2 float2(.16632, .17369)
-			#define MOD3 float3(.16532, .17369, .15787)
+			#define MOD2 half2(.16632, .17369)
+			#define MOD3 half3(.16532, .17369, .15787)
 
-			uniform float4 _BackColor;
-			uniform float cloudy;
-			uniform float _CloudCoverage;
-			//uniform float3 _MousePos;
-			uniform float2 _iResolution;
-			float3 flash;
+			uniform half4 _BackColor;
+			uniform half cloudy;
+			uniform half _CloudCoverage;
+			//uniform half3 _MousePos;
+			uniform half2 _iResolution;
+			half3 flash;
 
 			sampler2D _NoiseTex;
-			float4 _MainTex_ST;
+			half4 _MainTex_ST;
 			sampler2D _FallOffTex01;
-			float4 _FallOffTex01_ST;
+			half4 _FallOffTex01_ST;
 
         struct appdata_t {
-            float4 vertex : POSITION;
+            half4 vertex : POSITION;
         };
  
         struct v2f {
-                float4 pos : SV_POSITION;
+                half4 pos : SV_POSITION;
                 half3 rayDir : TEXCOORD0;    // Vector for incoming ray, normalized ( == -eyeRay )
                 half3 cIn : TEXCOORD1;         // In-scatter coefficient
                 half3 cOut : TEXCOORD2;        // Out-scatter coefficient
+				half3 viewDir : TEXCOORD3;
            };
 		
 			//============================================
-			float Hash(float p)
+			half Hash(half p)
 			{
-				float2 p2 = frac(float2(p, p) * MOD2);
+				half2 p2 = frac(half2(p, p) * MOD2);
 				p2 += dot(p2.yx, p2.xy + 19.19);
 				return frac(p2.x * p2.y);
 			}
-			float Hash(float3 p)
+			half Hash(half3 p)
 			{
 				p = frac(p * MOD3);
 				p += dot(p.xyz, p.yzx + 19.19);
@@ -113,64 +114,64 @@ SubShader {
 			//============================================
 			#ifdef TEXTURE_NOISE
 			//============================================
-			float Noise(in float2 f)
+			half Noise(in half2 f)
 			{
-				float2 p = floor(f);
+				half2 p = floor(f);
 				f = frac(f);
 				f = f * f * (3.0 - 2.0 * f);
-				float3 coord =  float3(( p + f + .5) / 256.0, 0.0) + _Time.x / 100;
+				half3 coord =  half3(( p + f + .5) / 256.0, 0.0) + _Time.x / 100;
 
-				float res = tex2Dlod(_NoiseTex, float4(coord, 0.0)).x;
+				half res = tex2Dlod(_NoiseTex, half4(coord, 0.0)).x;
 				return res;//clamp(res - falloff, 0, 1);
 			}
 
-			float Noise(in float3 x)
+			half Noise(in half3 x)
 			{
-				float3 p = floor(x);
-				float3 f = frac(x);
+				half3 p = floor(x);
+				half3 f = frac(x);
 				f = f * f * (3.0 - 2.0 * f);
 
-				float2 uv = (p.xy + float2(37.0, 17.0) * p.z) + f.xy;
-				float3 coord =  float3((uv + 0.5) / 256.0, 0.0) + _Time.x / 100;
-				float2 rg = tex2Dlod(_NoiseTex, float4(coord, 0.0)).yx;
+				half2 uv = (p.xy + half2(37.0, 17.0) * p.z) + f.xy;
+				half3 coord =  half3((uv + 0.5) / 256.0, 0.0) + _Time.x / 100;
+				half2 rg = tex2Dlod(_NoiseTex, half4(coord, 0.0)).yx;
 				return lerp(rg.x, rg.y, f.z);//clamp(lerp(rg.x, rg.y, f.z) - (falloff.xy), 0, 1);
 			}
 			#else
 			//============================================
 			//============================================
-			float Noise(in float2 x)
+			half Noise(in half2 x)
 			{
-				float2 p = floor(x);
-				float2 f = frac(x);
+				half2 p = floor(x);
+				half2 f = frac(x);
 				f = f * f * (3.0 - 2.0 * f);
-				float n = p.x + p.y * 57.0;
+				half n = p.x + p.y * 57.0;
 				
-				float3 res = lerp(lerp( Hash (n + 0.0), Hash(n+ 1.0), f.x),
+				half3 res = lerp(lerp( Hash (n + 0.0), Hash(n+ 1.0), f.x),
 								 lerp( Hash (n + 57.0), Hash(n+ 58.0), f.x), f.y);
 				return res;
 			}
-			float Noise(in float3 p)
+			half Noise(in half3 p)
 			{
-				float3 i = floor(p);
-				float3 f = frac(p);
+				half3 i = floor(p);
+				half3 f = frac(p);
 				f *= f * (3.0 - 2.0 * f);
 
 				return lerp(
-					lerp(lerp(Hash(i + float3(0.0,0.0,0.0)), Hash(i + float3(1.0, 0.0, 0.0)), f.x),
-						 lerp(Hash(i + float3(0.0,1.0,0.0)), Hash(i + float3(1.0, 1.0, 0.0)), f.x),
+					lerp(lerp(Hash(i + half3(0.0,0.0,0.0)), Hash(i + half3(1.0, 0.0, 0.0)), f.x),
+						 lerp(Hash(i + half3(0.0,1.0,0.0)), Hash(i + half3(1.0, 1.0, 0.0)), f.x),
 						 f.y),
-					lerp(lerp(Hash(i + float3(0.0,0.0,1.0)), Hash(i + float3(1.0, 0.0, 1.0)), f.x),
-						 lerp(Hash(i + float3(0.0,1.0,1.0)), Hash(i + float3(1.0, 1.0, 1.0)), f.x),
+					lerp(lerp(Hash(i + half3(0.0,0.0,1.0)), Hash(i + half3(1.0, 0.0, 1.0)), f.x),
+						 lerp(Hash(i + half3(0.0,1.0,1.0)), Hash(i + half3(1.0, 1.0, 1.0)), f.x),
 						 f.y),
 						 f.z);
 			}
 			#endif
 			//============================================
 			//============================================
-			float FBM(float3 p)
+			half FBM(half3 p)
 			{
 				p *= .25;
-				float f;
+				half f;
 
 				f = 0.5000 * Noise(p); p = p * 3.02; 
 				f += 0.2500 * Noise(p); p = p * 3.03;	p+= _Time.x*1.0;
@@ -185,10 +186,10 @@ SubShader {
 			//============================================
 			//============================================
 			//============================================
-			float Map(float3 p)
+			half Map(half3 p)
 			{
 				p *= 0.002;
-				float h = FBM(p);
+				half h = FBM(p);
 				return h - cloudy - 0.5;
 			}
 			//============================================
@@ -199,10 +200,10 @@ SubShader {
 			//============================================
 			#ifdef REAL_SHADOW
 			//Real Shadow...
-			float Shadow(float3 pos, float3 rd)
+			half Shadow(half3 pos, half3 rd)
 			{
 				pos += rd * 400.0;
-				float s = 0.0;
+				half s = 0.0;
 
 				for(int i = 0; i < 5; i++)
 				{
@@ -216,37 +217,37 @@ SubShader {
 			#endif
 			//============================================
 			//============================================
-			float3 GetSky(in float3 pos, in float3 rd)
+			half3 GetSky(in half3 pos, in half3 rd)
 			{
 
-				float sunAmount = max(dot(rd, _WorldSpaceLightPos0) , 0.0);
+				half sunAmount = max(dot(rd, _WorldSpaceLightPos0) , 0.0);
 				// Do the Blue and sun..
-				float3 sky = lerp(float3(0.0, 0.1, 0.4), float3(0.3, 0.6, 0.8), 1.0 - rd.y);
+				half3 sky = lerp(half3(0.0, 0.1, 0.4), half3(0.3, 0.6, 0.8), 1.0 - rd.y);
 				sky = sky + _LightColor0 * min(pow(sunAmount, 1500.0) * 5.0, 1.0);
 				sky = sky + _LightColor0 * min(pow(sunAmount, 10.0) * 0.6, 1.0);
 
 				//Find the start and end of the cloud layer
-				float beg = ((CLOUD_LOWER - pos.y) / rd.y);
-				float end = ((CLOUD_UPPER - pos.y) / rd.y);
+				half beg = ((CLOUD_LOWER - pos.y) / rd.y);
+				half end = ((CLOUD_UPPER - pos.y) / rd.y);
 
 				// Start Position
-				float3 p = float3(pos.x + rd.x * beg, 0.0, pos.z + rd.z * beg);
+				half3 p = half3(pos.x + rd.x * beg, 0.0, pos.z + rd.z * beg);
 				//outPos = p.xz;
 				beg += Hash(p) * 150.0;
 
 				//Trace clouds through that layer
-				float d = 0.0;
-				float3 add = rd * ((end - beg) / 45.0);
-				float2 shade;
-				float2 shadeSum = float2(0.0, 0.0);
-				float diffrence = CLOUD_UPPER - CLOUD_LOWER;
+				half d = 0.0;
+				half3 add = rd * ((end - beg) / 45.0);
+				half2 shade;
+				half2 shadeSum = half2(0.0, 0.0);
+				half diffrence = CLOUD_UPPER - CLOUD_LOWER;
 				shade.x = .01;
 				//I think this is as small as the loop can be
 				// for a reasonable cloud density illusion.
 				for(int i = 0; i < 55; i++)
 				{
-					if(shadeSum.y >= 1.0) break;
-					float h = Map(p);
+					if(shadeSum.y >= 1.35) break;
+					half h = Map(p);
 					shade.y = max(-h,0.0);
 				#ifdef REAL_SHADOW
 				shade.x = Shadow(p, _WorldSpaceLightPos0);
@@ -263,8 +264,8 @@ SubShader {
 				shadeSum.x /= 10.0;
 				shadeSum = min(shadeSum, 1.0);
 
-				float shadePow = pow(shadeSum.x, .4);
-				float3 clouds = lerp(float3(shadePow, shadePow ,shadePow), _LightColor0, (1.0-shadeSum.y)*.4);
+				half shadePow = pow(shadeSum.x, .4);
+				half3 clouds = lerp(half3(shadePow, shadePow ,shadePow), _LightColor0, (1.0-shadeSum.y)*.4);
 	
 				clouds += min((1.0 - sqrt(shadeSum.y)) * pow(sunAmount, 4.0), 1.0) * 2.0;
    
@@ -275,15 +276,15 @@ SubShader {
 				return clamp(sky, 0.0, 1.0);
 			}
 
-			float3 CameraPath( float t )
+			half3 CameraPath( half t )
 			{
-			    return float3(4000.0 * sin(.16*t)+12290.0, 0.0, 8800.0 * cos(.145*t+.3));
+			    return half3(4000.0 * sin(.16*t)+12290.0, 0.0, 8800.0 * cos(.145*t+.3));
 			} 
 
 
-        float scale(float inCos)
+        half scale(half inCos)
         {
-            float x = 1.0 - inCos;
+            half x = 1.0 - inCos;
             return 0.25 * exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));
         }
  
@@ -291,59 +292,60 @@ SubShader {
         {
             v2f OUT;
             OUT.pos = mul(UNITY_MATRIX_MVP, v.vertex);
-            float3 cameraPos = float3(0,kInnerRadius + kCameraHeight,0);     // The camera's current position
+            half3 cameraPos = half3(0,kInnerRadius + kCameraHeight,0);     // The camera's current position
        
             // Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
-            float3 eyeRay = normalize(mul((float3x3)unity_ObjectToWorld, v.vertex.xyz));
+            half3 eyeRay = normalize(mul((half3x3)unity_ObjectToWorld, v.vertex.xyz));
  
             OUT.rayDir = half3(-eyeRay);
  
-            float far = 0.0;
+            half far = 0.0;
             if(eyeRay.y >= 0.0)
             {
                 // Sky
                 // Calculate the length of the "atmosphere"
                 far = sqrt(kOuterRadius2 + kInnerRadius2 * eyeRay.y * eyeRay.y - kInnerRadius2) - kInnerRadius * eyeRay.y;
  
-                float3 pos = cameraPos + far * eyeRay;
-               
+                half3 pos = cameraPos + far * eyeRay;
+				OUT.viewDir = normalize(_WorldSpaceCameraPos.xyz - mul(unity_ObjectToWorld, v.vertex.xyz));
+
                 // Calculate the ray's starting position, then calculate its scattering offset
-                float height = kInnerRadius + kCameraHeight;
-                float depth = exp(kScaleOverScaleDepth * (-kCameraHeight));
-                float startAngle = dot(eyeRay, cameraPos) / height;
-                float startOffset = depth*scale(startAngle);
+                half height = kInnerRadius + kCameraHeight;
+                half depth = exp(kScaleOverScaleDepth * (-kCameraHeight));
+                half startAngle = dot(eyeRay, cameraPos) / height;
+                half startOffset = depth*scale(startAngle);
                
            
                 // Initialize the scattering loop variables
-                float sampleLength = far / kSamples;
-                float scaledLength = sampleLength * kScale;
-                float3 sampleRay = eyeRay * sampleLength;
-                float3 samplePoint = cameraPos + sampleRay * 0.5;
+                half sampleLength = far / kSamples;
+                half scaledLength = sampleLength * kScale;
+                half3 sampleRay = eyeRay * sampleLength;
+                half3 samplePoint = cameraPos + sampleRay * 0.5;
  
                 // Now loop through the sample rays
-                float3 frontColor = float3(0.0, 0.0, 0.0);
+                half3 frontColor = half3(0.0, 0.0, 0.0);
                 // WTF BBQ: WP8 and desktop FL_9_1 do not like the for loop here
                 // (but an almost identical loop is perfectly fine in the ground calculations below)
                 // Just unrolling this manually seems to make everything fine again.
 //                for(int i=0; i<int(kSamples); i++)
                 {
-                    float height = length(samplePoint);
-                    float depth = exp(kScaleOverScaleDepth * (kInnerRadius - height));
-                    float lightAngle = dot(_WorldSpaceLightPos0.xyz, samplePoint) / height;
-                    float cameraAngle = dot(eyeRay, samplePoint) / height;
-                    float scatter = (startOffset + depth*(scale(lightAngle) - scale(cameraAngle)));
-                    float3 attenuate = exp(-scatter * (kInvWavelength * kKr4PI + kKm4PI));
+                    half height = length(samplePoint);
+                    half depth = exp(kScaleOverScaleDepth * (kInnerRadius - height));
+                    half lightAngle = dot(_WorldSpaceLightPos0.xyz, samplePoint) / height;
+                    half cameraAngle = dot(eyeRay, samplePoint) / height;
+                    half scatter = (startOffset + depth*(scale(lightAngle) - scale(cameraAngle)));
+                    half3 attenuate = exp(-scatter * (kInvWavelength * kKr4PI + kKm4PI));
  
                     frontColor += attenuate * (depth * scaledLength);
                     samplePoint += sampleRay;
                 }
                 {
-                    float height = length(samplePoint);
-                    float depth = exp(kScaleOverScaleDepth * (kInnerRadius - height));
-                    float lightAngle = dot(_WorldSpaceLightPos0.xyz, samplePoint) / height;
-                    float cameraAngle = dot(eyeRay, samplePoint) / height;
-                    float scatter = (startOffset + depth*(scale(lightAngle) - scale(cameraAngle)));
-                    float3 attenuate = exp(-scatter * (kInvWavelength * kKr4PI + kKm4PI));
+                    half height = length(samplePoint);
+                    half depth = exp(kScaleOverScaleDepth * (kInnerRadius - height));
+                    half lightAngle = dot(_WorldSpaceLightPos0.xyz, samplePoint) / height;
+                    half cameraAngle = dot(eyeRay, samplePoint) / height;
+                    half scatter = (startOffset + depth*(scale(lightAngle) - scale(cameraAngle)));
+                    half3 attenuate = exp(-scatter * (kInvWavelength * kKr4PI + kKm4PI));
  
                     frontColor += attenuate * (depth * scaledLength);
                     samplePoint += sampleRay;
@@ -360,32 +362,32 @@ SubShader {
                 // Ground
                 far = (-kCameraHeight) / (min(-0.00001, eyeRay.y));
  
-                float3 pos = cameraPos + far * eyeRay;
+                half3 pos = cameraPos + far * eyeRay;
  
                 // Calculate the ray's starting position, then calculate its scattering offset
-                float depth = exp((-kCameraHeight) * (1.0/kScaleDepth));
-                float cameraAngle = dot(-eyeRay, pos);
-                float lightAngle = dot(_WorldSpaceLightPos0.xyz, pos);
-                float cameraScale = scale(cameraAngle);
-                float lightScale = scale(lightAngle);
-                float cameraOffset = depth*cameraScale;
-                float temp = (lightScale + cameraScale);
+                half depth = exp((-kCameraHeight) * (1.0/kScaleDepth));
+                half cameraAngle = dot(-eyeRay, pos);
+                half lightAngle = dot(_WorldSpaceLightPos0.xyz, pos);
+                half cameraScale = scale(cameraAngle);
+                half lightScale = scale(lightAngle);
+                half cameraOffset = depth*cameraScale;
+                half temp = (lightScale + cameraScale);
                
                 // Initialize the scattering loop variables
-                float sampleLength = far / kSamples;
-                float scaledLength = sampleLength * kScale;
-                float3 sampleRay = eyeRay * sampleLength;
-                float3 samplePoint = cameraPos + sampleRay * 0.5;
+                half sampleLength = far / kSamples;
+                half scaledLength = sampleLength * kScale;
+                half3 sampleRay = eyeRay * sampleLength;
+                half3 samplePoint = cameraPos + sampleRay * 0.5;
                
                 // Now loop through the sample rays
-                float3 frontColor = float3(0.0, 0.0, 0.0);
-                float3 attenuate;
+                half3 frontColor = half3(0.0, 0.0, 0.0);
+                half3 attenuate;
 
                 for(int i=0; i<int(kSamples); i++)
                 {
-                    float height = length(samplePoint);
-                    float depth = exp(kScaleOverScaleDepth * (kInnerRadius - height));
-                    float scatter = depth*temp - cameraOffset;
+                    half height = length(samplePoint);
+                    half depth = exp(kScaleOverScaleDepth * (kInnerRadius - height));
+                    half scatter = depth*temp - cameraOffset;
                     attenuate = exp(-scatter * (kInvWavelength * kKr4PI + kKm4PI));
                     frontColor += attenuate * (depth * scaledLength);
                     samplePoint += sampleRay;
@@ -419,9 +421,9 @@ SubShader {
         }
 		
 
-		float3 blend(float3 A, float3 B)
+		half3 blend(half3 A, half3 B)
 		{
-			float3 C;
+			half3 C;
 			C.rgb = (A.r * A.rgb + (1 - A.r) * B.r * B.rgb);
 			return C;
 		}
@@ -429,20 +431,20 @@ SubShader {
 
         half4 frag (v2f IN) : SV_Target
         {
-			float3 col;
-			float3 clouds;
-			float3 light;
-			float3 finalCol;
+			half3 col;
+			half3 clouds;
+			half3 light;
+			half3 finalCol;
 
-			float m = (_Time.y);
+			half m = (_Time.y);
 			gTime = _Time.y * 0.5 + m + 75.5;
 			cloudy = _CloudCoverage;
-			float2 xy = IN.pos / _ScreenParams.xy;
-			float lightning = 0.0;
+			half2 xy = IN.pos / _ScreenParams.xy;
+			half lightning = 0.0;
 
 			if(cloudy >= 0.2)
 			{
-				float f = fmod(_Time.x + 1.5, 2.5);
+				half f = fmod(_Time.x + 1.5, 2.5);
 
 				if(f < .8)
 				{
@@ -453,19 +455,19 @@ SubShader {
 
 			}
 
-			flash = clamp (float3(1.0, 1.0, 1.2) * lightning, 0.0, 1.0);
+			flash = clamp (half3(1.0, 1.0, 1.2) * lightning, 0.0, 1.0);
 		
 			if(IN.rayDir.y < 0.1)
             {
-                half eyeCos = dot(_WorldSpaceLightPos0.xyz, normalize(IN.rayDir.xyz));
+                half eyeCos = dot(_WorldSpaceLightPos0.xyz, normalize(float3(IN.rayDir.x, IN.rayDir.y, IN.rayDir.z)));
                 half eyeCos2 = eyeCos * eyeCos;
-			   
-		
-				clouds = GetSky(_WorldSpaceCameraPos, IN.rayDir) * getRayleighPhase(eyeCos2) * IN.cIn.xyz + getMiePhase(eyeCos, eyeCos2) * IN.cOut * _LightColor0;
-                col = getRayleighPhase(eyeCos2) * IN.cIn.xyz + getMiePhase(eyeCos, eyeCos2) * IN.cOut * (_LightColor0 * clouds);
+			  	
 			
-				finalCol = col;
-				finalCol *= clouds;
+                col = getRayleighPhase(eyeCos2) * IN.cIn.xyz + getMiePhase(eyeCos, eyeCos2) * IN.cOut * (_LightColor0);
+				clouds = pow(GetSky(_WorldSpaceCameraPos, IN.rayDir) * col, 1.5);
+				//clouds += _HdrExposure;
+				finalCol = clouds;
+		
 		
             }
             else

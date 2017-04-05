@@ -13,6 +13,7 @@ public class ToCubeMap : MonoBehaviour
     public float farClip = 500;
     public bool oneFacePerFrame = false;
     public LayerMask layerMask;
+    public GameObject go;
 
     void Start()
     {
@@ -35,10 +36,8 @@ public class ToCubeMap : MonoBehaviour
 
     void UpdateCubeMap(int faceMask)
     {
-        if (!cam)
+        if (go)
         {
-            GameObject go = new GameObject("CubemapCamera", typeof(Camera));
-         
             go.transform.position = transform.position;
             go.transform.rotation = Quaternion.identity;
 
@@ -47,20 +46,20 @@ public class ToCubeMap : MonoBehaviour
             cam.cullingMask = layerMask;
             cam.nearClipPlane = nearClip;
             cam.farClipPlane = farClip;
+            cam.transform.position = transform.position;
             cam.enabled = false;
+
+
+            ReflectionCubeMap.wrapMode = TextureWrapMode.Clamp;
+
+            reflectMat.SetTexture("_Tex", ReflectionCubeMap);
+            cam.RenderToCubemap(ReflectionCubeMap, faceMask);
+
         }
-
-        cam.transform.position = transform.position;
-
-        ReflectionCubeMap.wrapMode = TextureWrapMode.Clamp;
-
-        reflectMat.SetTexture("_Tex", ReflectionCubeMap);
-        cam.RenderToCubemap(ReflectionCubeMap, faceMask);
     }
 
     void OnDisable()
-    {   
-        Destroy(cam);
+    {
     }
 }
-
+ 
