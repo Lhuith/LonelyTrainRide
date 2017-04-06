@@ -87,7 +87,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\InputControlls.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Cube.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Grid.cs" />
@@ -98,6 +97,7 @@
     <Compile Include="Assets\Scripts\Camera\CamLook.cs" />
     <Compile Include="Assets\Scripts\Camera\Camera_Imageing_Controls.cs" />
     <Compile Include="Assets\Scripts\Camera\RenderMaterial.cs" />
+    <Compile Include="Assets\Scripts\InputControlls.cs" />
     <Compile Include="Assets\Scripts\Sky\Sky_Shader_Manager.cs" />
     <Compile Include="Assets\Scripts\Tests\Atmosphere_Manager.cs" />
     <Compile Include="Assets\Scripts\Tests\ToCubeMap.cs" />

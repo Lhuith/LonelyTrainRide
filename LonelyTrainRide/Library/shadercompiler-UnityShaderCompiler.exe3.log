@@ -1,14 +1,6 @@
 Base path: C:/Program Files/Unity/Editor/Data
 Cmd: getPlatforms
 Cmd: compileSnippet
-  error: 1 plat 8 at (246): 'vert': Top-level return value is not completely initialized; Output value 'vert' is not completely initialized\nCompiling Vertex program with _IBLMODE_REFL
+  error: 2 plat 8 at (247): unable to unroll loop, loop does not appear to terminate in a timely manner (3 iterations) or unrolled loop is too large, use the [unroll(n)] attribute to force an exact higher number\nCompiling Fragment program
 Platform defines: UNITY_NO_SCREENSPACE_SHADOWS UNITY_ENABLE_REFLECTION_BUFFERS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING SHADER_API_MOBILE SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA
-  api=8 type=0 insize=9019 outsize=3502 kw=_IBLMODE_REFL pd=UNITY_NO_SCREENSPACE_SHADOWS UNITY_ENABLE_REFLECTION_BUFFERS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING SHADER_API_MOBILE SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA ok=1
-Cmd: compileSnippet
-  error: 2 plat 8 at (246): unable to unroll loop, loop does not appear to terminate in a timely manner (3 iterations) or unrolled loop is too large, use the [unroll(n)] attribute to force an exact higher number\nCompiling Fragment program
-Platform defines: UNITY_NO_SCREENSPACE_SHADOWS UNITY_ENABLE_REFLECTION_BUFFERS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING SHADER_API_MOBILE SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA
-  api=8 type=1 insize=16822 outsize=0 kw= pd=UNITY_NO_SCREENSPACE_SHADOWS UNITY_ENABLE_REFLECTION_BUFFERS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING SHADER_API_MOBILE SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA ok=0
-Cmd: compileSnippet
-  error: 2 plat 1 at (265): variable 'o' used without having been completely initialized\nCompiling Vertex program with _IBLMODE_REFL
-Platform defines: UNITY_ENABLE_REFLECTION_BUFFERS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING SHADER_API_DESKTOP
-  api=1 type=0 insize=9019 outsize=0 kw=_IBLMODE_REFL pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING SHADER_API_DESKTOP ok=0
+  api=8 type=1 insize=16723 outsize=0 kw= pd=UNITY_NO_SCREENSPACE_SHADOWS UNITY_ENABLE_REFLECTION_BUFFERS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING SHADER_API_MOBILE SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA ok=0
