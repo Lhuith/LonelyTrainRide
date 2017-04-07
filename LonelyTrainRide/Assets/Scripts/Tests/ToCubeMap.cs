@@ -40,7 +40,7 @@ public class ToCubeMap : MonoBehaviour
         {
             go.transform.position = transform.position;
             go.transform.rotation = Quaternion.identity;
-
+            go.transform.parent = transform.root;
             cam = go.GetComponent<Camera>();
             cam.depthTextureMode = DepthTextureMode.Depth;
             cam.cullingMask = layerMask;

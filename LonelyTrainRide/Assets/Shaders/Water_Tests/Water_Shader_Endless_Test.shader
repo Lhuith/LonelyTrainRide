@@ -328,7 +328,7 @@ Shader "Test/Water_Shader_Endless_Test"
 				finalColor.rgb *= reflection;
 
 				//Sparkle:
-				float2 uv = i.uv.xy ;
+				float2 uv = i.uv.xy * 5;
 				float fadeLR = .5 - abs(uv.x - .5);
 				float fadeTB = 1. - uv.y;
 				float3 pos = float3(uv * float2(3., 1.) - float2(0., _Time.x * .001), _Time.y  * .001);
