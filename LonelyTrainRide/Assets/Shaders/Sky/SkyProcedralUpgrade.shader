@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 Shader "Skybox/ProceduralUpgrade" {
 Properties {
@@ -291,7 +293,7 @@ SubShader {
         v2f vert (appdata_t v)
         {
             v2f OUT;
-            OUT.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+            OUT.pos = UnityObjectToClipPos(v.vertex);
             half3 cameraPos = half3(0,kInnerRadius + kCameraHeight,0);     // The camera's current position
        
             // Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)

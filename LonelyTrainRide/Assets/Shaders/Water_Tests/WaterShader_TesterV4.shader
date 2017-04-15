@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 // Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
 
 // Upgrade NOTE: replaced 'PositionFog()' with multiply of UNITY_MATRIX_MVP by position
@@ -232,7 +234,7 @@ Properties{
 					//Binormal direction
 					o.binormalDir = normalize(cross(o.normalDir, o.tangentDir) * v.tangent.w);
 					//Unity transform Position
-					o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+					o.pos = UnityObjectToClipPos(v.vertex);
 					
 //					o.posWorld = mul(_Object2World, v.vertex);
 					
@@ -478,7 +480,7 @@ Properties{
 
  				o.tex = v.texcoord;
             	
-               	o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+               	o.vertex = UnityObjectToClipPos(v.vertex);
 				o.projPos = ComputeScreenPos (o.vertex);
 				COMPUTE_EYEDEPTH(o.projPos.z);
 				

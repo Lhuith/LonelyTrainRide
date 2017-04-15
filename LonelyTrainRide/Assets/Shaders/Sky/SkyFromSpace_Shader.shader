@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 // Good Color 5BA6C8FF
 
@@ -155,7 +157,7 @@ Shader "Custom/Test/SkyFromSpace"
 		 }
 	
 		//Finally, scale the Mie and Rayleigh colors;
-		o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+		o.pos = UnityObjectToClipPos(v.vertex);
 		o.frontSecondaryColor.rgb = v3FrontColor * _fKmESun;
 		o.frontColor.rgb = v3FrontColor * (_v3InWaveLength.xyz * _fKrESun);
 		o.v3Direction = (_WorldSpaceCameraPos.xyz - v3Pos);

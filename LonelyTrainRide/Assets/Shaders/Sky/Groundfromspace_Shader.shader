@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: commented out 'float3 _WorldSpaceCameraPos', a built-in variable
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: commented out 'float3 _WorldSpaceCameraPos', a built-in variable
 // Good Color 5BA6C8FF
 
 Shader "Custom/Test/Ground_From_Space"
@@ -145,7 +147,7 @@ Shader "Custom/Test/Ground_From_Space"
 	 		v3SamplePoint += v3SampleRay;
 	 	}
 	 	
-	 	o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+	 	o.pos = UnityObjectToClipPos(v.vertex);
 	 	o.frontColor.rgb = v3FrontColor * (_v3InWaveLength.xyz * _fKrESun + _fKmESun);
 	 	o.frontSecondaryColor.rgb = v3Attenuate;
 	 	o.tex = v.texcoord;

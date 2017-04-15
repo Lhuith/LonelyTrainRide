@@ -1,4 +1,6 @@
-﻿Shader "Skybox/Atmospheric_Scatter_Shader"
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Skybox/Atmospheric_Scatter_Shader"
 {
 Properties
 	{
@@ -152,7 +154,7 @@ Properties
 		 }
 	
 		//Finally, scale the Mie and Rayleigh colors;
-		o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+		o.pos = UnityObjectToClipPos(v.vertex);
 		o.frontSecondaryColor.rgb = v3FrontColor * _fKmESun;
 		o.frontColor.rgb = v3FrontColor * (_v3InWaveLength.xyz * _fKrESun);
 		o.v3Direction = (_WorldSpaceCameraPos.xyz - v3Pos);

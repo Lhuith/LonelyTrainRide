@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
 
 // Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
@@ -238,7 +240,7 @@ Properties{
 					//Unity transform Position
 					o.normalDir = normalize(cross(o.binormalDir, o.tangentDir));
 					//tangent Direction
-					o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+					o.pos = UnityObjectToClipPos(v.vertex);
 
 					//view Direction
 					o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.posWorld.xyz);
@@ -475,7 +477,7 @@ Properties{
 						
  						o.tex = v.texcoord;
             	
-               	o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+               	o.vertex = UnityObjectToClipPos(v.vertex);
 				o.projPos = ComputeScreenPos (o.vertex);
 				COMPUTE_EYEDEPTH(o.projPos.z);
 	      

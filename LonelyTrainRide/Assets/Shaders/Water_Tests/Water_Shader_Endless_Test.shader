@@ -1,4 +1,6 @@
-﻿
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+
 Shader "Test/Water_Shader_Endless_Test"
 {
 	Properties
@@ -76,7 +78,7 @@ SubShader
 	{
 		Tags { "Queue"="Transparent" "RenderType"="Transparent" "LightMode" = "ForwardBase"}
 		Cull Off 
-		Blend SrcAlpha OneMinusSrcAlpha
+		//Blend SrcAlpha OneMinusSrcAlpha
 		
 		
 		Pass
@@ -353,7 +355,7 @@ SubShader
 				//dyno = tex2Dlod(_DynamicTex, float4(v.texcoord.xy, 0.0,0.0));
 				o.normalDir = normalize(mul(half4(v.normal, 0.0), unity_WorldToObject).xyz);
 				o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 				o.screenPos = ComputeScreenPos (o.pos);
 
 				COMPUTE_EYEDEPTH(o.eyeDepth);
@@ -409,9 +411,9 @@ SubShader
 
 				if(fade < _FadeLimit)
 				{
-				float si = trace(_WorldSpaceLightPos0, _LightProjectionMatrix, _Object2Light, _CameraDepthTexture);
+				float si = trace(i.fragPos, _LightProjectionMatrix, _Object2Light, _CameraDepthTexture);
 				float SSS = exp(si *_sigma_t) * _LightColor0;
-				fade *= SSS;
+				fade += SSS;
 				fadecol = fade + _ShoreColor * (1 - fade);
 
 				}
