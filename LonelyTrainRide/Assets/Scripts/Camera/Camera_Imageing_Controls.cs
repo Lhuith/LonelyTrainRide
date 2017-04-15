@@ -17,6 +17,6 @@ public class Camera_Imageing_Controls : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-		
-	}
+        Camera.main.depthTextureMode = DepthTextureMode.Depth;
+    }
 }

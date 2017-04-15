@@ -63,7 +63,7 @@ SubShader {
  
 		
 			#define CLOUD_LOWER 1000.0
-			#define CLOUD_UPPER 3800.0
+			#define CLOUD_UPPER 4000.0
 
 			#define TEXTURE_NOISE
 			#define REAL_SHADOW
@@ -463,10 +463,10 @@ SubShader {
                 half eyeCos2 = eyeCos * eyeCos;
 			  	
 			
-                col = getRayleighPhase(eyeCos2) * IN.cIn.xyz + getMiePhase(eyeCos, eyeCos2) * IN.cOut * (_LightColor0);
-				clouds = pow(GetSky(_WorldSpaceCameraPos, IN.rayDir) * col, 1.5);
-				//clouds += _HdrExposure;
-				finalCol = clouds;
+                col = getRayleighPhase(eyeCos2) * IN.cIn.xyz + getMiePhase(eyeCos, eyeCos2) * _LightColor0 * IN.cOut;
+				clouds = pow(GetSky(_WorldSpaceCameraPos, IN.rayDir), 4) + col;
+
+				finalCol =  col;
 		
 		
             }
