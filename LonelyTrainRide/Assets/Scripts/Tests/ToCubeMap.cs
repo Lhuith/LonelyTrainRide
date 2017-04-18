@@ -38,8 +38,8 @@ public class ToCubeMap : MonoBehaviour
     {
         if (go)
         {
-            go.transform.position = transform.position;
-            go.transform.rotation = Quaternion.identity;
+            go.transform.position = Camera.main.transform.position - new Vector3(10, 10, 10);
+            go.transform.rotation = Quaternion.Inverse(Camera.main.transform.rotation);
             go.transform.parent = transform.root;
             cam = go.GetComponent<Camera>();
             cam.depthTextureMode = DepthTextureMode.Depth;

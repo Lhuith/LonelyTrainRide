@@ -15,7 +15,7 @@ Shader "Test/Water_Shader_Endless_Test"
 		_Alpha("Alpha Mappig", Float) = 1.0
 		_SubColor("Ocean SubSurface Color", Color) = (1,1,1,1)
 		[PowerSlider(3.0)] _DepthFactor("Water DepthFactor", Range(-100,100)) = 0
-		_sigma_t("Depth Value", Range(-1, 1)) = .05
+		_sigma_t("Depth Value", Range(-10, 10)) = .05
 		_ScatterTex ("Scatter Texture", 2D) = "white" {}
 		//density = 8.;
 		//ss_pow = 5.; 
@@ -78,7 +78,7 @@ SubShader
 	{
 		Tags { "Queue"="Transparent" "RenderType"="Transparent" "LightMode" = "ForwardBase"}
 		Cull Off 
-		//Blend SrcAlpha OneMinusSrcAlpha
+		Blend SrcAlpha OneMinusSrcAlpha
 		
 		
 		Pass
@@ -91,7 +91,7 @@ SubShader
 			#include "UnityCG.cginc"
 			#pragma shader_feature _IBLMODE_OFF _IBLMODE_REFL _IBLMODE_REFR
 			uniform float4 _OceanColor;
-			uniform float4 _ShoreColor;
+			uniform float4 _SubColor;
 
 			//------------
 			// Lighting Controls
@@ -127,6 +127,7 @@ SubShader
 			//Depth
 			sampler2D _CameraDepthTexture;
 			float4 _CameraDepthTexture_TexelSize;
+			sampler2D _LightTexture0;
 			uniform float _sigma_t;
 			sampler2D _ScatterTex;
 			float4x4 _LightProjectionMatrix;
@@ -135,7 +136,6 @@ SubShader
 			//Depth
 
 			uniform float _InvFade;
-			uniform float4 _SubColor;
 			//Depth
 			//-------------------------------------------
 
@@ -309,8 +309,7 @@ SubShader
 			}
 
 							
-			   float trace(float3 P, uniform float4x4  lightTexMatrix, // to light texture space
-			            uniform float4x4  lightMatrix,    // to light space
+			   float trace(float3 P, uniform float4x4  lightTexMatrix,  uniform float4x4  lightMatrix, 
 			            uniform sampler2D DepthTex
 			            )
 			{
@@ -361,6 +360,12 @@ SubShader
 				COMPUTE_EYEDEPTH(o.eyeDepth);
 				o.uv = v.texcoord;
 
+								half3 fragmentToLightSource = _WorldSpaceLightPos0.xyz - o.wPos.xyz;
+				o.lightDir = fixed4(
+				normalize(lerp(_WorldSpaceLightPos0.xyz, fragmentToLightSource, _WorldSpaceLightPos0.w)),
+				lerp(1.0, 1.0 / length(fragmentToLightSource), _WorldSpaceLightPos0.w));
+			
+
 				half3 eyeRay = normalize(mul(unity_WorldToObject, v.vertex.xyz));
 				o.rayDir = half3(-eyeRay);
 				o.fragPos = v.vertex;
@@ -370,15 +375,11 @@ SubShader
 			fixed4 frag (v2f i) : SV_Target
 			{
 
-				half3 fragmentToLightSource = _WorldSpaceLightPos0.xyz - i.wPos.xyz;
 				float3 worldRefl = reflect(-i.viewDir, i.normalDir.xyz);
 
 				float worldReflAngle = dot(normalize(-i.viewDir), i.normalDir.xyz);
-
-				i.lightDir = fixed4(
-				normalize(lerp(_WorldSpaceLightPos0.xyz, fragmentToLightSource, _WorldSpaceLightPos0.w)),
-				lerp(1.0, 1.0 / length(fragmentToLightSource), _WorldSpaceLightPos0.w));
-			
+				float worldReflightAngle = dot(normalize(_WorldSpaceLightPos0), i.normalDir.xyz);
+				
 		
 				fixed4 OutlineMap = tex2D(_Outline, i.uv);
 				float rawZ =  SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture,UNITY_PROJ_COORD(i.screenPos));
@@ -394,10 +395,10 @@ SubShader
 				float4 finalColor = float4(0,0,0, 1.0);
 				float4 fadecol = float4(0,0,0,1);
 
-				//fixed4 OceanMap = tex2D(_MainTex, fade + _ShoreColor * (1 - fade));
+				//fixed4 OceanMap = tex2D(_MainTex, fade + _SubColor * (1 - fade));
 
 		
-				//_ShoreColor.a -= 0.001;
+				//_SubColor.a -= 0.001;
 
 				fixed3 h = normalize(i.lightDir.xyz + i.viewDir);
 				fixed3 binormal = cross(i.normalDir, i.tangentDir);
@@ -411,17 +412,16 @@ SubShader
 
 				if(fade < _FadeLimit)
 				{
-				float si = trace(i.fragPos, _LightProjectionMatrix, _Object2Light, _CameraDepthTexture);
-				float SSS = exp(si *_sigma_t) * _LightColor0;
-				fade += SSS;
-				fadecol = fade + _ShoreColor * (1 - fade);
-
 				}
 
+
 				fixed3 diffuseReflection = i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
-				fixed3 specularReflection =  diffuseReflection * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess;
+				fixed3 specularReflection =  diffuseReflection * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess * _SpecColor;
 
-
+				float si = trace(worldReflightAngle, _LightProjectionMatrix, _Object2Light, _CameraDepthTexture);
+				float SSS = exp(si * _sigma_t) ;
+				fade += SSS;
+				fadecol = float4(fade,fade,fade,fade);
 
 				fixed4 lightFinal = fixed4(specularReflection + diffuseReflection +
 								UNITY_LIGHTMODEL_AMBIENT.xyz, 1.0);
@@ -442,11 +442,8 @@ SubShader
 				glitColor = ((float4(col * float3(n, n, n), n)) * _GlitterStrength) * float4(specularReflection,1.0);
 				glitColor.rgb = lerp(glitColor.rgb, specularReflection, nDotl) * _LightColor0;
 				glitColor.rgb *= reflection;
-				//finalColor.a *= SSS;
-				//float4 scatter = tex2D( _ScatterTex, float2( SSS, 0 ));
-				finalColor.rgb *= fadecol;
 
-				return  float4(finalColor.rgb + glitColor.rgb, fadecol.a); 
+				return float4(finalColor.rgb + glitColor.rgb, 1) * fadecol; 
 			}
 			ENDCG
 		}
