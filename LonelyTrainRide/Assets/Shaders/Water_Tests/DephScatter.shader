@@ -89,7 +89,9 @@ SubShader
 				fixed4 col = tex2D(_MainTex, i.uv);
 
 				float si = trace(i.fragPos, _Light2World, _Object2Light , _CameraDepthTexture);
-				return exp(-si * _sigma_t) * _LightColor0;
+				float4 SSS = float4(0,0,0,0);
+				SSS *= exp(-si * _sigma_t) * _LightColor0;
+				return SSS;
 			}
 			ENDCG
 
