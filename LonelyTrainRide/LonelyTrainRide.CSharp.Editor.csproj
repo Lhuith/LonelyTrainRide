@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Editor:5</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>5.6.0f3</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -166,11 +168,13 @@
     <None Include="Assets\Shaders\Sky\newShader.shader" />
     <None Include="Assets\Shaders\Test\13_AnisotropicReflection.shader" />
     <None Include="Assets\Shaders\Test\RayCastTester.shader" />
-    <None Include="Assets\Shaders\Water_Tests\DephScatter.shader" />
-    <None Include="Assets\Shaders\Water_Tests\WaterShader_TesterV4.shader" />
-    <None Include="Assets\Shaders\Water_Tests\WaterShader_V6.shader" />
-    <None Include="Assets\Shaders\Water_Tests\Water_Shader_01.shader" />
-    <None Include="Assets\Shaders\Water_Tests\Water_Shader_Endless_Test.shader" />
+    <None Include="Assets\Shaders\Test\WaterShader_TesterV4.shader" />
+    <None Include="Assets\Shaders\Test\WaterShader_V6.shader" />
+    <None Include="Assets\Shaders\Test\Water_Shader_01.shader" />
+    <None Include="Assets\Shaders\Water\SSS\DephDist.shader" />
+    <None Include="Assets\Shaders\Water\SSS\DephScatter.shader" />
+    <None Include="Assets\Shaders\Water\SSS\ScatterTrace.cginc" />
+    <None Include="Assets\Shaders\Water\Water_Shader_Endless_Test.shader" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />
@@ -248,6 +252,10 @@
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLit.shader" />
     <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonLitOutline.shader" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water\Shaders\FXWaterPro.shader" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\FXWater4Advanced.shader" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\FXWater4Simple.shader" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\WaterInclude.cginc" />
     <None Include="Assets\SteamVR\InteractionSystem\Core\Shaders\SeeThru.shader" />
     <None Include="Assets\SteamVR\InteractionSystem\Core\Shaders\Silhouette.shader" />
     <None Include="Assets\SteamVR\InteractionSystem\Hints\Shaders\ControllerButtonHints.shader" />

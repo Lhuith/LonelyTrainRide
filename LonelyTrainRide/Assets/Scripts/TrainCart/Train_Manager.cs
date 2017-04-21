@@ -39,7 +39,7 @@ public class Train_Manager : MonoBehaviour {
         rotationRumpleQua.eulerAngles += rotationRumble;
 
         Vector3 finalSpeed = new Vector3(0, 0, 5.25f) * Time.deltaTime * speed;
-        Vector3 childSpeed = (finalSpeed + rotationRumble) * speedDamp;
+        Vector3 childSpeed = (finalSpeed + rotationRumble * speedDamp) * speedDamp;
 
         for (int i = 0; i < children.Length; i++)
             children[Random.Range(0, children.Length)].transform.GetComponent<Rigidbody>().AddForce(-childSpeed, ForceMode.Acceleration);

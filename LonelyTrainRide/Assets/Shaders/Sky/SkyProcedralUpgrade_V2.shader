@@ -861,11 +861,11 @@ float4 render_clouds(
 
 			float3 col;
 		
-			if(IN.rayDir.y < 0.0)
+			if(IN.rayDir.y < 0.1)
             {
 				float3 eye = float3(0, 1, 0);
 				float3 point_cam = float3(0, 0.91, 0);
-				float2 point_ndc = IN.pos.xy / _ScreenParams.xy;
+				float2 point_ndc = IN.pos.xy;
 				point_ndc.y = 1. - point_ndc.y;
 
                 fixed eyeCos = dot(_WorldSpaceLightPos0.xyz, normalize(float3(IN.rayDir.x, IN.rayDir.y, IN.rayDir.z)));
@@ -883,10 +883,10 @@ float4 render_clouds(
 
 				fixed mie =  getMiePhase(eyeCos, eyeCos2);
 
-                col = getRayleighPhase(eyeCos2) * IN.cIn.xyz + mie * _LightColor0 * IN.cOut;
+                col = (getRayleighPhase(eyeCos2)) * IN.cIn.xyz + cld.rgb + (mie) * _LightColor0 * IN.cOut;
 				//float3 sky = render_sky_color(eye_ray, IN.lightDirAngle);
 
-				cloudcol = lerp(col, cld.rgb/(0.000001+cld.a+mie), cld.a) * _LightColor0 ;
+				cloudcol = lerp(col, cld.rgb/(0.000001+cld.a) * mie, cld.a) * _LightColor0;
 		
             }
             else
@@ -899,7 +899,7 @@ float4 render_clouds(
 			col *= _HdrExposure;
 
 			//finalCol *= .55+0.45*pow(70.0 * xy.x * xy.y * (1.0 - xy.x ) * (1.0 - xy.y), 0.15 );
-            return float4(col,1.0) + float4(cloudcol, 1.0);
+            return  float4(cloudcol, 1.0);
  
         }
         ENDCG

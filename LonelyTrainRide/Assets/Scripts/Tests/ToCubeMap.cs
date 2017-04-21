@@ -38,11 +38,19 @@ public class ToCubeMap : MonoBehaviour
     {
         if (go)
         {
-            go.transform.position = Camera.main.transform.position - new Vector3(10, 10, 10);
-            go.transform.rotation = Quaternion.Inverse(Camera.main.transform.rotation);
-            go.transform.parent = transform.root;
+
             cam = go.GetComponent<Camera>();
-            cam.depthTextureMode = DepthTextureMode.Depth;
+
+            //Vector3 eulerA =  new Vector3(-go.transform.eulerAngles.x,
+            //                               go.transform.eulerAngles.y,
+            //                               go.transform.eulerAngles.z);
+            //
+            //go.transform.position = Camera.main.transform.position;
+
+            //go.transform.eulerAngles = eulerA;
+            //go.transform.parent = transform.root;
+
+            //cam.depthTextureMode = DepthTextureMode.Depth;
             cam.cullingMask = layerMask;
             cam.nearClipPlane = nearClip;
             cam.farClipPlane = farClip;
