@@ -7,7 +7,7 @@ public static class MeshGenerator
     public static MeshData GenerataTerrainMesh(float[,] heightMap, float heightMultiplier, AnimationCurve _heightCurve, int levelOfDetial)
     {
 
-        AnimationCurve heightCurve = new AnimationCurve(_heightCurve.keys);
+       // AnimationCurve heightCurve = new AnimationCurve(_heightCurve.keys);
         int width = heightMap.GetLength(0);
         int height = heightMap.GetLength(1);
 
@@ -26,7 +26,7 @@ public static class MeshGenerator
                 //Make a note of this as its going to be needed for 
                 //Dynamically updating water heightMap
 
-                float heightPoint = heightCurve.Evaluate(heightMap[x, y]) * (heightMultiplier);
+               // float heightPoint = heightCurve.Evaluate(heightMap[x, y]) * (heightMultiplier);
 
                 meshData.vertices[vertexIndex] = new Vector3(topLeftX + x, 1, topLeftZ - y);
                 meshData.uvs[vertexIndex] = new Vector2(x / (float)width, y / (float)height);

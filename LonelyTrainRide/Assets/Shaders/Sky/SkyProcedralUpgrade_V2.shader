@@ -861,10 +861,10 @@ float4 render_clouds(
 
 			float3 col;
 		
-			if(IN.rayDir.y < 0.0)
+			if(IN.rayDir.y < 0.01)
             {
 				float3 eye = float3(0, 1, 0);
-				float3 point_cam = float3(0, 0.91, 0);
+				float3 point_cam = float3(0, .85, 0);
 				float2 point_ndc = IN.pos.xy / _ScreenParams.xy;
 				point_ndc.y = 1. - point_ndc.y;
 
