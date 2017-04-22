@@ -8,7 +8,7 @@ Shader "Eugene/SubSurface/DephDist"
 		_ScatterTex("Scatter Trace", 2D) = "white"{}
 		_sigma_t("Depth Value", Range(-100, 100)) = 5.0
 		_Color("Color", Color) = (1,1,1,1)
-		_Grow("SSS Skin Thickness", Float) = 1.0
+		_Growth("SSS Skin Thickness", Float) = 1.0
 	}
 
 SubShader
@@ -57,9 +57,9 @@ SubShader
 			 
 			fixed4 frag (v2f i) : SV_Target
 			{
-				return float4(i.Dist.xyz, 1.0);
+				return float4(i.Dist.xyz / 100 ,1.0);
 			}
-			ENDCG
+			ENDCG 
 
 		} 
 	}

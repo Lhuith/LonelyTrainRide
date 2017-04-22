@@ -424,7 +424,7 @@ SubShader
 
 				//unity_WorldToLight
 				//_Object2Light
-				fixed si = trace(i.pos, _LightProjectionMatrix, unity_WorldToLight, _CameraDepthTexture);
+				fixed si = trace(i.fragPos, _LightProjectionMatrix, unity_WorldToLight, _CameraDepthTexture);
 
 				fixed4 SSS = float4(0,0,0,1.0);
 				float ex = 0;

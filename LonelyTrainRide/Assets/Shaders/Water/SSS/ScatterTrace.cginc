@@ -10,11 +10,11 @@
 			
 			  // get distance from light at entry point
 			  
-			 float d_i = Linear01Depth( tex2Dproj( DepthTex, UNITY_PROJ_COORD( texCoord ) ).r );
+			 float d_i = LinearEyeDepth( tex2Dproj( DepthTex, UNITY_PROJ_COORD( texCoord ) ).r );
 
 			  // transform position to light space
 			  
-			   float4 Plight = mul(lightMatrix, float4(P.xyz, 1.0));
+			   float4 Plight = mul(lightMatrix, float4(P, 1.0));
 			
 			  // distance of this pixel from light (exit)
 			  
