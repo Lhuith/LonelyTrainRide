@@ -97,7 +97,7 @@ SubShader
 
 
 
-				fixed3 h = normalize(i.lightDir.xyz + i.wPos);
+				//fixed3 h = normalize(i.lightDir.xyz + i.wPos);
 
 				fixed nDotl = dot(i.normalDir, i.lightDir.xyz);				
 				// sample the texture

@@ -20,7 +20,7 @@ Shader "Test/Water_Shader_Endless"
 		//ss_pow = 5.; 
 		//ss_scatter = 0.4;
 		//ss_offset = .5;
-		//
+		// 
 		//trols
 		//ss_intensity = 1.;
 		//ss_lerp = 1.;
@@ -72,22 +72,24 @@ Shader "Test/Water_Shader_Endless"
 		//---------------------------------------------------------------------------------
 	}
 	
-
+	 
 SubShader
 	{
-		Tags { "Queue"="Transparent"" RenderType" = "Transparent" "LightMode" = "ForwardBase"}
+		Tags {"LightMode" = "ForwardBase" "RenderType" = "Transperant" "Queue" = "Transparent" }
 		Cull Off 
-		Blend SrcAlpha OneMinusSrcAlpha
-		
-		
+		Blend SrcAlpha OneMinusSrcAlpha		
 		Pass
 		{
 			CGPROGRAM
 			#pragma glsl
 			#pragma vertex vert
 			#pragma fragment frag
-			#include "AutoLight.cginc"
 			#include "UnityCG.cginc"
+			#include "AutoLight.cginc"
+			#include "Sparkle.cginc"
+			#include "ScatterTrace.cginc"
+			#include "UnityShadowLibrary.cginc"
+
 			#pragma shader_feature _IBLMODE_OFF _IBLMODE_REFL _IBLMODE_REFR
 			uniform fixed4 _OceanColor;
 			uniform fixed4 _SubColor;
@@ -101,7 +103,6 @@ SubShader
 			half _Detail;
 			fixed _ReflectionExposure;
 			uniform float _Growth;
-			uniform fixed4 _Color;
 			uniform fixed4 _SpecColor;
 			uniform fixed _AniX;
 			uniform fixed _AniY;
@@ -128,8 +129,8 @@ SubShader
 			sampler2D _LightTexture0;
 			uniform fixed _sigma_t;
 			sampler2D _ScatterTex;
-			fixed4x4 _LightProjectionMatrix;
-			fixed4x4 _Object2Light;
+			float4x4 _LightProjectionMatrix;
+			float4x4 unity_LightToObject;
 			float4x4 unity_WorldToLight;
 			//-------------------------------------------
 			//Depth
@@ -143,7 +144,7 @@ SubShader
 				fixed2 uv : TEXCOORD0;
 				fixed4 pos : SV_POSITION;
 				fixed4 wPos : TEXCOORD1;
-				fixed eyeDepth : TEXCOORD2;
+				fixed4 Dist : TEXCOORD2;
 				fixed3 normal : NORMAL;
 				fixed3 tangent : TANGENT;
 				fixed3 normalDir : TEXCOORD3;
@@ -153,6 +154,7 @@ SubShader
 				fixed4 projPos : TEXCOORD8;
 				fixed3 rayDir : TEXCOORD9;
 				fixed4 fragPos : TEXCOORD10;
+				LIGHTING_COORDS(10,11)
 			};
 
 			sampler2D _MainTex;
@@ -181,7 +183,7 @@ SubShader
 				return reflectionFactor * cubeMapCol.rgb * (cubeMapCol.a * exposure);
 			}
 
-			fixed4 GestnerWave(fixed4 Wpos, fixed4 time)
+			fixed4 GestnerWave(in fixed4 Wpos, fixed4 time)
 			{
 				fixed2 dir = _Dir.xy;
 				dir = normalize(dir) ; 
@@ -207,142 +209,24 @@ SubShader
 				return vertex;
 			}
 
-			fixed3 mod289(fixed3 x) {
-				return x - floor(x * (1.0 / 289.0)) * 289.0;
-			}
-
-			fixed4 mod289(fixed4 x) {
-				return x - floor(x * (1.0 / 289.0)) * 289.0;
-			}
-
-			fixed4 permute(fixed4 x) {
-				return mod289(((x*34.0) + 1.0)*x);
-			}
-
-			fixed4 taylorInvSqrt(fixed4 r)
-			{
-				return 1.79284291400159 - 0.85373472095314 * r;
-			}
-
-			fixed snoise(fixed3 v)
-			{
-				const fixed2  C = fixed2(1.0 / 6.0, 1.0 / 3.0);
-				const fixed4  D = fixed4(0.0, 0.5, 1.0, 2.0);
-
-				// First corner
-				fixed3 i = floor(v + dot(v, C.yyy));
-				fixed3 x0 = v - i + dot(i, C.xxx);
-
-				// Other corners
-				fixed3 g = step(x0.yzx, x0.xyz);
-				fixed3 l = 1.0 - g;
-				fixed3 i1 = min(g.xyz, l.zxy);
-				fixed3 i2 = max(g.xyz, l.zxy);
-
-				//   x0 = x0 - 0.0 + 0.0 * C.xxx;
-				//   x1 = x0 - i1  + 1.0 * C.xxx;
-				//   x2 = x0 - i2  + 2.0 * C.xxx;
-				//   x3 = x0 - 1.0 + 3.0 * C.xxx;
-				fixed3 x1 = x0 - i1 + C.xxx;
-				fixed3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y
-				fixed3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y
-
-										   // Permutations
-				i = mod289(i);
-				fixed4 p = permute(permute(permute(
-					i.z + fixed4(0.0, i1.z, i2.z, 1.0))
-					+ i.y + fixed4(0.0, i1.y, i2.y, 1.0))
-					+ i.x + fixed4(0.0, i1.x, i2.x, 1.0));
-
-				// Gradients: 7x7 points over a square, mapped onto an octahedron.
-				// The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)
-				fixed n_ = 0.142857142857; // 1.0/7.0
-				fixed3  ns = n_ * D.wyz - D.xzx;
-
-				fixed4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  fmod(p,7*7)
-
-				fixed4 x_ = floor(j * ns.z);
-				fixed4 y_ = floor(j - 7.0 * x_);    // fmod(j,N)
-
-				fixed4 x = x_ *ns.x + ns.yyyy;
-				fixed4 y = y_ *ns.x + ns.yyyy;
-				fixed4 h = 1.0 - abs(x) - abs(y);
-
-				fixed4 b0 = fixed4(x.xy, y.xy);
-				fixed4 b1 = fixed4(x.zw, y.zw);
-
-				//fixed4 s0 = fixed4(lessThan(b0,0.0))*2.0 - 1.0;
-				//fixed4 s1 = fixed4(lessThan(b1,0.0))*2.0 - 1.0;
-				fixed4 s0 = floor(b0)*2.0 + 1.0;
-				fixed4 s1 = floor(b1)*2.0 + 1.0;
-				fixed4 sh = -step(h, fixed4(0.0, 0.0, 0.0, 0.0));
-
-				fixed4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
-				fixed4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
-
-				fixed3 p0 = fixed3(a0.xy, h.x);
-				fixed3 p1 = fixed3(a0.zw, h.y);
-				fixed3 p2 = fixed3(a1.xy, h.z);
-				fixed3 p3 = fixed3(a1.zw, h.w);
-
-				//Normalise gradients
-				fixed4 norm = taylorInvSqrt(fixed4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
-				p0 *= norm.x;
-				p1 *= norm.y;
-				p2 *= norm.z;
-				p3 *= norm.w;
-
-				// lerp final noise value
-				fixed4 m = max(0.6 - fixed4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
-				m = m * m;
-				return 42.0 * dot(m*m, fixed4(dot(p0, x0), dot(p1, x1),
-					dot(p2, x2), dot(p3, x3)));
-			}
-
-			fixed3 hsv(fixed h, fixed s, fixed v)
-			{
-				return lerp(fixed3(1.0, 1.0, 1.0), clamp((abs(frac(
-					h + fixed3(3.0, 2.0, 1.0) / 3.0) * 6.0 - 3.0) - 1.0), 0.0, 1.0), s) * v;
-			}
-
-							
-			   fixed trace(fixed3 P, uniform fixed4x4  lightTexMatrix,  uniform fixed4x4  lightMatrix, 
-			            uniform sampler2D DepthTex
-			            )
-			{
-
-			   fixed4 texCoord = mul(lightTexMatrix, float4(P, 1.0));
-			
-			  // get distance from light at entry point
-			  
-			 fixed d_i = Linear01Depth( tex2Dproj( DepthTex, UNITY_PROJ_COORD( texCoord ) ).r );
-
-			  // transform position to light space
-			  
-			   fixed4 Plight = mul(lightMatrix, float4(P, 1.0));
-			
-			  // distance of this pixel from light (exit)
-			  
-			   fixed d_o = length(Plight);
-			
-			  // calculate depth 
-			  
-			   fixed s = d_o - d_i;
-			  return s;
-			}
-
-
+		
 			v2f vert (appdata_full v)
 			{
-				v2f o;
-				
+				v2f o;	
+
+				 float4 P = v.vertex;
+				 P.xyz += v.normal * _Growth;  // scale vertex along normal
+				 o.Dist = length(UnityObjectToClipPos(P));
+
 				o.tangent = v.tangent;
 				o.normal = v.normal;
 				o.wPos =  mul(unity_ObjectToWorld, v.vertex);
 				fixed4 vertNew = GestnerWave(o.wPos, _Time.y);
 				//v.normal /= normalize((v.vertex - vertNew));
-				v.vertex += vertNew;
+
 				o.fragPos = v.vertex;
+				v.vertex += vertNew;
+		
 
 				o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
 				o.pos = UnityObjectToClipPos(v.vertex);
@@ -355,6 +239,8 @@ SubShader
 
 				half3 eyeRay = normalize(mul(unity_WorldToObject, v.vertex.xyz));
 				o.rayDir = half3(-eyeRay);
+
+				TRANSFER_VERTEX_TO_FRAGMENT(o);
 				return o;
 			}
 			
@@ -374,24 +260,7 @@ SubShader
 				fixed3 worldRefl = reflect(-i.viewDir, i.normalDir.xyz);
 
 				fixed worldReflAngle = dot(normalize(-i.viewDir), i.normalDir.xyz);
-				fixed worldReflightAngle = dot(normalize(_WorldSpaceLightPos0), i.normalDir.xyz);
-				
-		
-				fixed rawZ =  SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture,UNITY_PROJ_COORD(i.projPos));
-				fixed sceneZEye = LinearEyeDepth(rawZ);
-				fixed partZ = i.projPos.z;
-
-				fixed fade = 1.0;
-
-				if(rawZ > 0.0)
-				fade = saturate(_InvFade * ((sceneZEye) - partZ));
-
-				fixed4 fadecol = fixed4(0,0,0, 0);
-
-				if(fade < _FadeLimit)
-				{
-					 fadecol += (1 - fade);
-				}
+				fixed worldReflightAngle = dot(normalize(_WorldSpaceLightPos0), i.normalDir.xyz);				
 
 				fixed4 finalColor = fixed4(0,0,0, 1.0);
 
@@ -405,11 +274,9 @@ SubShader
 				fixed tDotHX = dot(i.tangentDir, h) / _AniX;
 				fixed bDotHY = dot(binormal, h) / _AniY;	
 
-
 				fixed3 diffuseReflection = i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
 				fixed3 specularReflection =  diffuseReflection * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess * _SpecColor;
 						
-			
 				fixed3 glitColor = fixed4(1,1,1,1.0);
 
 				fixed2 uv =  i.wPos.xy * 128;
@@ -424,23 +291,48 @@ SubShader
 
 				//unity_WorldToLight
 				//_Object2Light
-				fixed si = trace(i.fragPos, _LightProjectionMatrix, unity_WorldToLight, _CameraDepthTexture);
+				float3 objSpaceLightPos = mul(unity_WorldToObject, _WorldSpaceLightPos0).xyz;
+				
+						
+				fixed rawZ =  SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture,UNITY_PROJ_COORD(i.projPos));
+				fixed sceneZEye = EncodeFloatRGBA(LinearEyeDepth(rawZ));
+				fixed partZ = i.projPos.z;
 
-				fixed4 SSS = float4(0,0,0,1.0);
-				float ex = 0;
-				 ex =  exp(-si * _sigma_t) * _SubColor  * (fade);
-				SSS = float4(ex,ex,ex,ex);
+				fixed fade = 1.0;
+
+				if(rawZ > 0.0)
+				fade = saturate(_InvFade * ((sceneZEye) - partZ));
+
+				fixed4 fadecol = fixed4(0,0,0, 0);
+
+				if(fade < _FadeLimit)
+				{
+					 fadecol += (1 - fade);
+
+				}
+
+				
+				float zDist = dot(_WorldSpaceCameraPos - i.wPos, UNITY_MATRIX_V[2].xyz);
+				float fadeDist = UnityComputeShadowFadeDistance(i.wPos, zDist);
+
+				float si = trace(i.fragPos, i.wPos, unity_WorldToLight, unity_LightToObject, _CameraDepthTexture, nDotl, LIGHT_ATTENUATION(i), objSpaceLightPos);	
+
+				 float ex =  exp(-si * _sigma_t); //* _SubColor  * (fade);
+					 
+
+				fixed4 SSS = float4(ex,ex,ex,ex);
 
 				fixed4 lightFinal = fixed4(specularReflection + glitColor + diffuseReflection +
 								UNITY_LIGHTMODEL_AMBIENT.xyz, 1.0);
 				
 				finalColor.rgb += _OceanColor * lightFinal;
 				fixed3 reflection = IBLRefl(_Cube, _Detail, worldRefl, _ReflectionExposure, _ReflectionFactor);
+				reflection +=  specularReflection;
 				finalColor.rgb *= reflection;
 				//finalColor += SSS;
 				//Sparkle:
-
-				return fixed4(finalColor.rgb, 1.0);  
+				float4 s = (i.Dist.z) * (SSS/_Growth * _SubColor * _LightColor0);
+				return fadecol; //fixed4(finalColor.rgb, 1.0);  
 			}
 			ENDCG
 		}

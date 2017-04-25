@@ -177,7 +177,8 @@
     <None Include="Assets\Shaders\Water\SSS\DephDist.shader" />
     <None Include="Assets\Shaders\Water\SSS\DephScatter.shader" />
     <None Include="Assets\Shaders\Water\SSS\ScatterTrace.cginc" />
-    <None Include="Assets\Shaders\Water\Water_Shader_Endless_Test.shader" />
+    <None Include="Assets\Shaders\Water\SSS\Sparkle.cginc" />
+    <None Include="Assets\Shaders\Water\SSS\Water_Shader_Endless_Test.shader" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />
