@@ -11,61 +11,6 @@
 
 SubShader
 	{
-
-	//Pass
-	//{ 
-		//Tags { "LightMode" = "ForwardBase" }
-		//Cull Off 
-		//Blend One SrcColor
-		//CGPROGRAM
-		//	#pragma vertex vert
-		//	#pragma fragment frag
-		//	#include "UnityCG.cginc"
-		//	#include "AutoLight.cginc"
-		//	#include "Lighting.cginc"
-		//	#include "ScatterTrace.cginc"
-		//	#include "UnityShadowLibrary.cginc"
-		//	#pragma multi_compile_fwdbase
-		//
-		//
-		//uniform sampler2D _ScatterTex;
-		//uniform float _Growth;
-		//
-		//struct v2f
-		//{
-		//	float4 vertex : SV_POSITION;
-		//	float2 uv : TEXCOORD0;
-		//	float4 wPos : TEXCOORD1;
-		//	float3 Dist : TEXCOORD2;
-		//};
-		//
-		//sampler2D _MainTex;
-		//float4 _MainTex_ST;
-		//float4 _Color;
-		//						
-		//
-		//v2f vert (appdata_full v)
-		//{
-		//	v2f o;
-		//
-		//	o.vertex = UnityObjectToClipPos(v.vertex);
-		//	o.uv = v.texcoord;
-		//	o.wPos = mul(unity_WorldToObject, v.vertex);
-		//
-		//    float4 P = v.vertex;
-		//    P.xyz += v.normal * _Growth;  // scale vertex along normal
-		//    o.Dist = length(UnityObjectToClipPos(P));
-		//	 
-		//	return o;
-		//}
-		// 
-		//fixed4 frag (v2f i) : SV_Target
-		//{
-		//	return float4(i.Dist.xyz/ 2, 1.0);
-		//}
-		//ENDCG
-		//
-		//}
 		Pass
 		{ 
 			Tags {  "LightMode" = "ForwardBase"}
@@ -85,8 +30,8 @@ SubShader
 			uniform float4x4 _Light2World;
 			uniform float4x4 unity_LightToWorld;
 			uniform float4x4 unity_WorldToLight;
+
 			uniform sampler2D _CameraDepthTexture;
-			uniform float4 _LightColor;
 			uniform float _sigma_t;
 			uniform float _Growth;
 			uniform sampler2D _ScatterTex;
@@ -105,7 +50,8 @@ SubShader
 				float3 normalDir : TEXCOORD4;
 				float4 lightDir : TEXCOORD6;
 				float4 mvPos : TEXCOORD7;
-				LIGHTING_COORDS(8,9)
+				float4 Dist : TEXCOORD8;
+				LIGHTING_COORDS(9,10)
 			};
 
 			sampler2D _MainTex;
@@ -125,7 +71,11 @@ SubShader
 				o.uv = v.texcoord;
 				o.fragPos = v.vertex;
 				o.normalDir = normalize(mul(unity_WorldToObject, half4(o.normal, 0.0)));
-		
+				
+				 float4 P = v.vertex;
+				 P.xyz += v.normal * _Growth;  // scale vertex along normal
+				 o.Dist = length(UnityObjectToClipPos(P));
+				 
 				TRANSFER_VERTEX_TO_FRAGMENT(o);
 				return o;
 			}
@@ -158,13 +108,14 @@ SubShader
 				float zDist = dot(_WorldSpaceCameraPos - i.wPos, UNITY_MATRIX_V[2].xyz);
 				float fadeDist = UnityComputeShadowFadeDistance(i.wPos, zDist);
 
-				float si = trace(i.fragPos, i.wPos, unity_WorldToLight, unity_LightToWorld, _CameraDepthTexture, nDotl, LIGHT_ATTENUATION(i), objSpaceLightPos);	
+				float si = trace(i.fragPos, i.wPos, unity_WorldToLight, unity_ObjectToWorld, _CameraDepthTexture, nDotl, LIGHT_ATTENUATION(i), objSpaceLightPos);	
 				//si = mul(unity_ObjectToWorld, si);
 
-				float ex = exp(si * _sigma_t); 
-				float4 SSS = mul(UNITY_MATRIX_MVP, float4(ex, ex, ex, ex));
+				float ex = exp((-si) * _sigma_t); 
+				float ex2 = si;
+				float4 SSS = float4(ex, ex, ex, ex);
 				//SSS *= ex;
-				return ex; 
+				return ( i.Dist.z) * (SSS/_Growth * _Color * _LightColor0); 
 			}
 			ENDCG
 
