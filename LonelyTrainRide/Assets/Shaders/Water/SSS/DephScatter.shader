@@ -23,13 +23,13 @@ SubShader
 			#include "AutoLight.cginc"
 			#include "Lighting.cginc"
 			#include "ScatterTrace.cginc"
-			#include "UnityShadowLibrary.cginc"
 			#pragma multi_compile_fwdbase
 			//#define UNITY_SHADER_NO_UPGRADE
 
 			uniform float4x4 _Light2World;
 			uniform float4x4 unity_LightToWorld;
 			uniform float4x4 unity_WorldToLight;
+			uniform float4x4 unity_ObjectToLight;
 
 			uniform sampler2D _CameraDepthTexture;
 			uniform float _sigma_t;
@@ -51,7 +51,8 @@ SubShader
 				float4 lightDir : TEXCOORD6;
 				float4 mvPos : TEXCOORD7;
 				float4 Dist : TEXCOORD8;
-				LIGHTING_COORDS(9,10)
+				float3 viewDir : TEXCOORD9;
+				LIGHTING_COORDS(10,11)
 			};
 
 			sampler2D _MainTex;
@@ -70,8 +71,8 @@ SubShader
 			
 				o.uv = v.texcoord;
 				o.fragPos = v.vertex;
-				o.normalDir = normalize(mul(unity_WorldToObject, half4(o.normal, 0.0)));
-				
+				o.normalDir = normalize(mul(unity_WorldToObject, half4(v.normal, 0.0)));
+				o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
 				 float4 P = v.vertex;
 				 P.xyz += v.normal * _Growth;  // scale vertex along normal
 				 o.Dist = length(UnityObjectToClipPos(P));
@@ -89,7 +90,7 @@ SubShader
 
 				float4 lightPos = mul(i.wPos, unity_WorldToLight);
 
-				half3 fragmentToLightSource = (_WorldSpaceCameraPos - i.wPos.xyz);
+				half3 fragmentToLightSource = (_WorldSpaceLightPos0 - i.wPos.xyz);
 				half3 distance = length(fragmentToLightSource);
 				i.lightDir = fixed4(
 				normalize(lerp(_WorldSpaceLightPos0.xyz, fragmentToLightSource, _WorldSpaceLightPos0.w)),
@@ -103,12 +104,12 @@ SubShader
 				// sample the texture
 				fixed4 col = tex2D(_MainTex, i.uv);
 
-				float3 objSpaceLightPos = mul(unity_WorldToObject, _WorldSpaceLightPos0).xyz;
+				float3 objSpaceLightPos = mul(unity_WorldToLight, _WorldSpaceLightPos0).xyz;
 
 				float zDist = dot(_WorldSpaceCameraPos - i.wPos, UNITY_MATRIX_V[2].xyz);
 				float fadeDist = UnityComputeShadowFadeDistance(i.wPos, zDist);
 
-				float si = trace(i.fragPos, i.wPos, unity_WorldToLight, unity_ObjectToWorld, _CameraDepthTexture, nDotl, LIGHT_ATTENUATION(i), objSpaceLightPos);	
+				float si = ComputeSSS(i.normalDir, i.lightDir, i.viewDir);	
 				//si = mul(unity_ObjectToWorld, si);
 
 				float ex = exp((-si) * _sigma_t); 

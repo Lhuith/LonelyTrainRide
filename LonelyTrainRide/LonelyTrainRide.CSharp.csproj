@@ -90,6 +90,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Normal_Recalculate.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Cube.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Grid.cs" />
@@ -239,6 +240,7 @@
     <None Include="Assets\Shaders\Test\Water_Shader_01.shader" />
     <None Include="Assets\Shaders\Water\SSS\DephDist.shader" />
     <None Include="Assets\Shaders\Water\SSS\DephScatter.shader" />
+    <None Include="Assets\Shaders\Water\SSS\Optimized.shader" />
     <None Include="Assets\Shaders\Water\SSS\ScatterTrace.cginc" />
     <None Include="Assets\Shaders\Water\SSS\Sparkle.cginc" />
     <None Include="Assets\Shaders\Water\SSS\Water_Shader_Endless_Test.shader" />
