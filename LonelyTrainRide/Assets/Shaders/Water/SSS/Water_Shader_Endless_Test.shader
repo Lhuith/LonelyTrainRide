@@ -13,6 +13,8 @@ Shader "Test/Water_Shader_Endless"
 		_OceanColor("Ocean Color", Color) = (1,1,1,1)
 		_BumpMap("Normal Texture", 2D) = "bump" {}
 		_BumpDepth("Bump Depth", Range(0, 1.0)) = 1
+		_AtmosDarkColor  ("Ocean Atmosheric Dark Color", Color) = (1,1,1,1)
+		_AtmosBrightColor("Ocean Atmosheric Bright Color", Color) = (1,1,1,1)
 		//---------------------------------------------------------------------------------
 		//Depth Controls
 		_FadeLimit("Fade Limit", Float) = 1.0
@@ -44,7 +46,8 @@ Shader "Test/Water_Shader_Endless"
 		_SpecColor("Specular Color", Color) = (1.0,1.0,1.0,1.0)
 		_AniX("Anisotropic X", Range(0.0, 2.0)) = 1
 		_AniY("Anisotropic Y", Range(0.0, 2.0)) = 1
-		_Shininess("Shininess", float) = 1
+		_Shininess("Smoothness", float) = 1
+		_SpecStrength("Light Strengh", float) = 1
 		_Growth("SSS Growth", float) = 0		
 		//Lighting Controls
 		//---------------------------------------------------------------------------------
@@ -62,14 +65,11 @@ Shader "Test/Water_Shader_Endless"
 
 		//---------------------------------------------------------------------------------
 		//Ocean Controls
-		_SineAmplitude ("Amplitude", float) = 1.0
-		//the following three are vectors so we can control more than one wave easily
-		_SineFrequency ("Frequency", Vector) = (1,1,0,0)
+		_Amplitude ("Amplitude", Float) = 1.0
+		_Frequency ("Frequency", Float) = 1.0
 		_Speed ("Speed", Vector) = (1,1,0,0)
-		_Steepness ("steepness", Vector) = (1,1,0,0)
-		//two direction vectors as we are using two gerstner waves
+		_Phase ("Phase", Float) = 1.0
 		_Dir ("Wave Direction", Vector) = (1,1,0,0)
-		_Dir2 ("2nd Wave Direction", Vector) = (1,1,0,0)
 		//---------------------------------------------------------------------------------
 		//Ocean Controls
 
@@ -82,13 +82,10 @@ Shader "Test/Water_Shader_Endless"
 	 
 SubShader
 	{
-
-
-
 	// "RenderType" = "Transperant" "Queue" = "Transparent"
-		Tags {"LightMode" = "ForwardBase" }
+		Tags {"LightMode" = "ForwardBase" "RenderType" = "Transperant" "Queue" = "Transparent"}
 		Cull Off 
-		//Blend SrcAlpha OneMinusSrcAlpha		
+		Blend SrcAlpha OneMinusSrcAlpha		
 
 		Pass
 		{
@@ -107,6 +104,8 @@ SubShader
 
 			//------------
 			// Lighting Controls
+			uniform float4 _AtmosDarkColor;
+			uniform float4 _AtmosBrightColor;
 			uniform samplerCUBE _Cube;
 			uniform fixed _Quality;
 			fixed _ReflectionFactor;
@@ -117,23 +116,15 @@ SubShader
 			uniform fixed _AniX;
 			uniform fixed _AniY;
 			uniform half _Shininess;
-
-
-			uniform half4 _LightColor0;
+			uniform float _SpecStrength;
 
 			fixed _GlitterStrength;
-			//------------
-			// Lighting Controls
 			uniform sampler2D _BumpMap;
 			uniform half4 _BumpMap_ST;
 			float _BumpDepth;
-
-			fixed _SineAmplitude;
-			fixed4 _SineFrequency;
-			fixed4 _Speed;
-			fixed4 _Steepness;
-			fixed4 _Dir;
-			fixed4 _Dir2;
+			uniform half4 _LightColor0;
+			// Lighting Controls
+			//----------------------------------------------
 
 			//-------------------------------------------
 			//Depth
@@ -148,12 +139,28 @@ SubShader
 			uniform float4 _Extinction;
 			uniform float _WaterDepth;
 			uniform float _ScatterStrength;
-			//-------------------------------------------
-			//Depth
-
 			uniform fixed _InvFade;
 			//Depth
 			//-------------------------------------------
+			
+
+			//Waves
+			//------------------------------------------
+			fixed  _Amplitude;
+			fixed _Frequency;
+			fixed _Speed;
+			fixed _Phase;
+			fixed2 _Dir;
+			//Waves
+			//------------------------------------------
+
+			struct Wave
+			{
+				float  freq;
+				float  amp;
+				float  phase;
+				float2 dir;
+			};
 
 			struct v2f
 			{
@@ -166,7 +173,8 @@ SubShader
 				fixed3 normalWorld : TEXCOORD3;
 				fixed4 lightDir : TEXCOORD4;
 				fixed3 viewDir : TEXCOORD5;
-				fixed3 tangentWorld : TEXCOORD7;
+				fixed3 normalDir : TEXCOORD6;
+				fixed4 tangentWorld : TEXCOORD7;
 				float3 binormalWorld : TEXCOORD8;
 				fixed4 projPos : TEXCOORD9;
 				fixed3 rayDir : TEXCOORD10;
@@ -183,8 +191,7 @@ SubShader
 			sampler2D _FallOff;
 			sampler2D _GlitterTex;
 			uniform fixed _FadeLimit;
-
-			//uniform fixed4x4 unity_WorldToLight;
+			uniform Wave w;
 
 			fixed4 blend(fixed4 A, fixed4 B) 
 			{
@@ -194,38 +201,76 @@ SubShader
 			   return C;
 			}
 
+			// compute the gerstner offset for one wave 
+			float3 getGerstnerOffset(float2 x0, Wave w, float time)
+			{
+				float k = length(w.dir);
+				float2 x = (w.dir / k)* w.amp * sin( dot( w.dir, x0) - w.freq * time +w.phase);
+				float y = w.amp * cos( dot( w.dir, x0) - w.freq*time + w.phase);
+				return float3(x.x, y, x.y);
+			}
+
+
+		// Helper function to compute the binormal of the offset wave point
+		// This comes from the taking the derivative of the Gerstner surface in the x-direction
+		float3 computeBinormal(float2 x0, Wave w, float time)
+		{
+			float3 B = float3(0,0,0);
+			half k = length(w.dir);
+			B.x = w.amp * (pow(w.dir.x, 2) / k) * cos( dot(w.dir, x0) - w.freq * time + w.phase);
+			B.y = -w.amp * w.dir.x * sin( dot(w.dir, x0) - w.freq * time + w.phase);
+			B.z = w.amp * ((w.dir.y * w.dir.x)/ k) * cos( dot(w.dir, x0) - w.freq * time + w.phase);
+			return B;
+		}
+		
+		// Helper function to compute the tangent vector of the offset wave point
+		// This comes from the taking the derivative of the Gerstner surface in the z-direction
+		float3 computeTangent(float2 x0, Wave w, float time)
+		{
+			float3 T = float3(0, 0, 0);
+			half k = length(w.dir);
+			T.x = w.amp * ((w.dir.y * w.dir.x)/ k) * cos( dot(w.dir, x0) - w.freq * time + w.phase);
+			T.y = -w.amp * w.dir.x * sin( dot(w.dir, x0) - w.freq * time + w.phase);
+			T.z = w.amp * (pow(w.dir.y, 2) / k) * cos( dot(w.dir, x0) - w.freq * time + w.phase);
+			return T;		
+		}
+
+		
+		float fresnel(float3 V, float3 N)
+		{	
+			
+			half NdotL = max( dot(V, N), 0.0);
+			half fresnelBias = 0.4;
+			half fresnelPow = 5.0;
+			fresnelPow = _LightColor0;
+
+			half facing  = (1.0 - NdotL);
+			return max( fresnelBias + (1-fresnelBias) * pow(facing, fresnelPow), 0.0);
+		}
+		
+		
+		float3 computeSunColor(float3 V, float3 N, float3 sunDir)
+		{
+			float3 HalfVector = normalize( abs( V + (-sunDir)));
+			return _LightColor0 * pow( abs( dot(HalfVector, N)), _LightColor0);
+		}
+
+		// primitive simulation of non-uniform atmospheric fog
+		float3 CalculateFogColor(float3 pixel_to_light_vector, float3 pixel_to_eye_vector)
+		{
+			return lerp(_AtmosDarkColor,_AtmosBrightColor,0.5*dot(pixel_to_light_vector,-pixel_to_eye_vector)+0.5);
+		}
 					
-			fixed3 IBLRefl(samplerCUBE cubeMap, half detial, fixed3 worldRefl, fixed exposure, fixed reflectionFactor)
-			{
-				fixed4 cubeMapCol = texCUBElod(cubeMap, fixed4(worldRefl, detial)).rgba;
-				return reflectionFactor * cubeMapCol.rgb * (cubeMapCol.a * exposure);
-			}
+		fixed3 IBLRefl(samplerCUBE cubeMap, half detial, fixed3 worldRefl, fixed exposure, fixed reflectionFactor)
+		{
+			fixed4 cubeMapCol = texCUBElod(cubeMap, fixed4(worldRefl, detial)).rgba;
+			return reflectionFactor * cubeMapCol.rgb * (cubeMapCol.a * exposure);
+		}
 
-			fixed4 GestnerWave(fixed4 Wpos, fixed4 time)
-			{
-				fixed2 dir = _Dir.xy;
-				dir = normalize(dir) ; 
-				fixed dotprod = dot(dir, Wpos.xz);
-				fixed disp = (time.x * _Speed.x);
-				
-				//do the same for our second wave
-				fixed2 dir2 = _Dir2.xy;
-				dir2 = normalize(dir2);
-				fixed dotprod2 = dot(dir2, Wpos.xz);
-				fixed disp2 = (time.x * _Speed.y);										
-				
-				fixed4 vertex = fixed4(0,0,0,0);
-								
-				vertex.x = (_Steepness.x *_SineAmplitude) *_Dir.x * cos(_SineFrequency.x * (dotprod + disp));
-				vertex.z = (_Steepness.x *_SineAmplitude) *_Dir.y * cos(_SineFrequency.x * (dotprod + disp));
-				vertex.y = _SineAmplitude * - sin(_SineFrequency.x * (dotprod + disp));
-
-				vertex.x = (_Steepness.y *_SineAmplitude) * _Dir2.x * cos(_SineFrequency.y * (dotprod2 + disp2));
-				vertex.z = (_Steepness.y *_SineAmplitude) *_Dir2.y *  cos (_SineFrequency.y * (dotprod2 + disp2));
-				vertex.y = _SineAmplitude * sin(_SineFrequency.y * (dotprod2 + disp2));
-
-				return vertex;
-			}
+		fixed4 GestnerWave(fixed4 Wpos, fixed4 time)
+		{				
+			return float4(0,0,0,0);
+		}
 
 		float3 GetWaterColor(float accumulatedWater, float depth, float3 refractionValue, float3 incidentLight)
 		{
@@ -237,69 +282,79 @@ SubShader
 		
 		   return lerp(_SubColor, refractionAmountAtSurface, inverseScatterAmount) * incidentLight;
 		}
-			v2f vert (appdata_full v)
-			{
-				v2f o;	
 
-				// float4 P = v.vertex;
-				// P.xyz += v.normal * _Growth;  // scale vertex along normal
-				// o.Dist = length(UnityObjectToClipPos(P));
-				o.wPos =  mul(unity_ObjectToWorld, v.vertex);
-				fixed4 vertNew = GestnerWave(o.wPos, _Time.y);
-				v.vertex += vertNew;
 
-			  
-			    o.pos = UnityObjectToClipPos(v.vertex);
-				o.tangent = v.tangent;
-				o.normal = v.normal;
-				o.fragPos = v.vertex;
+		uniform StructuredBuffer<Wave> waveBuffer; // This is pretty hit
 
-				//v.normal += ((vertNew));
-
+		v2f vert (appdata_full v)
+		{
+			v2f o;
+					
+			w.freq =  _Frequency;		   
+			w.amp =   _Amplitude; 	
+			w.phase = _Phase;	
+			w.dir =   _Dir;
 			
-				o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
-				o.projPos = ComputeScreenPos (o.pos);
-				
-				COMPUTE_EYEDEPTH(o.projPos);
-				o.uv = v.texcoord;
 
-				
-				o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
-				//o.pos.xyz += v.normal * _Growth;
+				o.wPos =  mul(unity_ObjectToWorld, v.vertex);
+			    half2 x0 = o.wPos.xz;
+				float3 newPos = float3(0.0, 0.0, 0.0);
+				float3 tangent = float3(0, 0, 0);
+				float3 binormal = float3(0, 0, 0);
 
-				half3 eyeRay = normalize(mul(unity_WorldToObject, v.vertex.xyz));
-				o.rayDir = half3(-eyeRay);
-				TRANSFER_VERTEX_TO_FRAGMENT(o);
+				int nw = min(21, 12);
+
+				for(int i = 0; i < 3; i++)
+				{
+					//Wave w = w;//waveBuffer[i];
+					newPos += getGerstnerOffset(x0, w, _Time.y);
+					binormal += computeBinormal(x0, w, _Time.y);
+					tangent += computeTangent(x0, w, _Time.y);
+				}
+
+				// fix binormal and tangent
+				binormal.x = 1 - binormal.x;
+				binormal.z = 0 - binormal.z;
+
+				tangent.x = 0 - tangent.x;
+				tangent.z = 1 - tangent.z; 
+				// displace vertex 
+				v.vertex.x -= newPos.x;
+				v.vertex.z -= newPos.z;
+				v.vertex.y = newPos.y;
+
+		    o.pos = UnityObjectToClipPos(v.vertex);
+			o.tangent.xyz = tangent;
+			o.normal = v.normal;
+			o.fragPos = v.vertex;
+
+			o.tangentWorld =  normalize( mul( float4(tangent, 0.0), unity_ObjectToWorld));
+			o.binormalWorld = normalize( mul( float4(binormal.xyz, 0.0), unity_ObjectToWorld).xyz);
+			o.normalDir = normalize( cross( o.tangentWorld, o.binormalWorld) * o.tangentWorld.w);
+			//v.normal += ((vertNew));
 
 		
+			o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
+			o.projPos = ComputeScreenPos (o.pos);
+			
+			COMPUTE_EYEDEPTH(o.projPos);
+			o.uv = v.texcoord;
 
-				return o;
+			
+			o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
+			//o.pos.xyz += v.normal * _Growth;
+
+			half3 eyeRay = normalize(mul(unity_WorldToObject, v.vertex.xyz));
+			o.rayDir = half3(-eyeRay);
+			TRANSFER_VERTEX_TO_FRAGMENT(o);		
+
+			return o;
 			}
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				i.wPos =  mul(unity_ObjectToWorld, i.fragPos);
 
-				i.normalWorld = normalize(mul(half4(i.normal, 0.0), unity_WorldToObject).xyz);
-				i.tangentWorld = normalize(mul(unity_ObjectToWorld, i.tangent).xyz);
-				i.binormalWorld = normalize(cross(i.normalWorld, i.tangentWorld) * i.tangent.w);
-
-
-				half3 fragmentToLightSource = _WorldSpaceLightPos0.xyz - i.wPos.xyz;
-				i.lightDir = fixed4(
-				normalize(lerp(_WorldSpaceLightPos0.xyz, fragmentToLightSource, _WorldSpaceLightPos0.w)),
-				lerp(1.0, 1.0 / length(fragmentToLightSource), _WorldSpaceLightPos0.w));
 			
-				fixed3 worldRefl = reflect(-i.viewDir, i.normalWorld.xyz);
-				
-				fixed worldReflAngle = dot(normalize(-i.viewDir), i.normalWorld.xyz);
-				fixed worldReflightAngle = dot(normalize(_WorldSpaceLightPos0), i.normalWorld.xyz);				
-				
-				fixed4 finalColor = fixed4(0,0,0, 1.0);
-				
-				fixed3 h = normalize(i.lightDir.xyz + i.viewDir);
-				fixed3 binormal = cross(i.normalWorld, i.tangentWorld);
-
 				fixed4 texN = tex2D(_BumpMap, i.uv.xy * _BumpMap_ST.xy + _BumpMap_ST.zw);
 
 								//unpackNormal function
@@ -307,46 +362,49 @@ SubShader
 				
 				//normal transpose matrix
 				fixed3x3 local2WorldTranspose = fixed3x3(
-				i.tangentWorld,
+				i.tangentWorld.xyz,
 				i.binormalWorld,
-				i.normalWorld
+				i.normalDir
 				);
 				
 				//calculate normal direction
 				fixed3 normalDirection = normalize( mul(localCoords, local2WorldTranspose));
 
-				//dotProdoct
-				fixed nDotl = dot(i.normalWorld, i.lightDir.xyz);
-				fixed nDotH = dot(i.normalWorld, h);
-				fixed nDotV = dot(i.normalWorld, i.viewDir);
-				fixed tDotHX = dot(i.tangentWorld, h) / _AniX;
-				fixed bDotHY = dot(binormal, h) / _AniY;	
+				half3 fragmentToLightSource = _WorldSpaceLightPos0.xyz - i.wPos.xyz;
+
+				i.lightDir = fixed4(
+				normalize(lerp(_WorldSpaceLightPos0.xyz, fragmentToLightSource, _WorldSpaceLightPos0.w)),
+				lerp(1.0, 1.0 / length(fragmentToLightSource), _WorldSpaceLightPos0.w));
+			
+				fixed3 worldRefl = reflect(-i.viewDir, normalDirection);
 				
+				fixed worldReflAngle = dot(normalize(-i.viewDir), normalDirection);
+				fixed worldReflightAngle = dot(normalize(_WorldSpaceLightPos0), normalDirection);				
+				
+				fixed4 finalColor = fixed4(0,0,0, 1.0);
 
-				fixed nNdotL = saturate(dot(normalDirection, i.lightDir.xyz));
-
+				fixed nDotl = saturate(dot(normalDirection, i.lightDir.xyz));
 				
 				float waveThickness = saturate(mul(unity_WorldToObject, i.wPos).y * _ScatterStrength);
 				
 				float scatterFactor = saturate(-dot(normalDirection * waveThickness, float3(i.lightDir.x, 0, i.lightDir.y)));
 				
+				float r = (1.2-1-0)/(1.2+1.0);
+				float fresnelFactor = max(0.0, min(1.0, r+(1.0-r)*pow(1.0-dot( normalDirection, i.viewDir), 4)));
+
+				fresnelFactor *= min(length(_WorldSpaceCameraPos.xyz - i.wPos.xyz)/10.0, 1.0);
 
 				fixed3 diffuseReflection = i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
-				fixed3 specularAniReflection =  diffuseReflection * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess * _SpecColor;
-
-
-				
-			   fixed3 diffuseReflection2 = i.lightDir.w * _LightColor0.xyz * nNdotL;
-			   fixed3 specularReflection2 = diffuseReflection2 * _SpecColor.xyz * pow(saturate(dot(reflect(-i.lightDir.xyz, 
-											normalDirection), i.viewDir)) , _Shininess); 
+			    fixed3 specularReflection = (diffuseReflection * _SpecColor.xyz * pow(saturate(dot(reflect(-i.lightDir.xyz, 
+											normalDirection), i.viewDir)) , _Shininess) * fresnelFactor) * _SpecStrength; 
 
 				fixed3 glitColor = fixed4(1,1,1,1.0);
 				
 				fixed2 uv =  i.wPos.xy * 128;
-				fixed fadeLR = specularAniReflection.x;
+				fixed fadeLR = specularReflection.x;
 				fixed fadeTB = i.normalWorld + uv.y;
 				fadeTB /= 4;
-				fixed3 pos = fixed3(uv * fixed2(3., 1.) - fixed2(0., _Time.x * nDotV), _Time.x   * nDotH);
+				fixed3 pos = fixed3(uv * fixed2(3., 1.) - fixed2(0., _Time.x * nDotl), _Time.x   * nDotl);
 				fixed n =  (fadeLR * fadeTB * smoothstep(.8, 1., snoise(pos)) * nDotl );
 				fixed col = hsv(n * .1 + .7, .4, 1.);			
 							
@@ -366,17 +424,15 @@ SubShader
 				if(rawZ > 0.0)
 				fade = (_InvFade * ((sceneZEye) - partZ));
 				
-				fixed4 fadecol = fixed4(0,0,0, 0);
+				fixed4 fadecol = fixed4(0,0,0, 0);				
 				
-				
-				
-				float zDist = dot(_WorldSpaceCameraPos - i.wPos, UNITY_MATRIX_V[2].xyz);
+				float zDist = dot(_WorldSpaceCameraPos - i.wPos, UNITY_MATRIX_M[1].xyz);
 				float fadeDist = UnityComputeShadowFadeDistance(i.wPos, zDist);
 				
 				float si = ComputeSSS(i.normalWorld, i.lightDir, i.viewDir);	
 				
 				 float ex = 0;
-				 ex =  exp(si * _sigma_t) ; //* _SubColor  * (fade);
+				 ex =  exp(si * _sigma_t);
 					 
 				
 				fixed4 SSS = float4(ex,ex,ex,ex);
@@ -387,21 +443,17 @@ SubShader
 				
 				}
 				
-				fixed3 reflection = IBLRefl(_Cube, _Detail, worldRefl, _ReflectionExposure, _ReflectionFactor);
+				fixed3 reflection = IBLRefl(_Cube, _Detail, saturate(worldRefl), _ReflectionExposure, _ReflectionFactor);
 
-				fixed4 lightFinal = fixed4(specularAniReflection + diffuseReflection +
-								UNITY_LIGHTMODEL_AMBIENT.xyz, 1.0);
-				
-				finalColor.rgb += _OceanColor * lightFinal;
-				finalColor.rgb *= reflection;
+				fixed4 lightFinal = fixed4(specularReflection * fresnelFactor, 1.0);
 
-				float4 s =  (SSS * _SubColor);
-				
-				float3 waterColor = GetWaterColor(zDist, _WaterDepth, float3(1,2,1),  specularReflection2); 
-				
-				float3 Scol =  lerp (waterColor.rgb, finalColor.rgb, scatterFactor);			
+				float4 subSurface =  (SSS * _SubColor);
 
-				return float4(finalColor.rgb, fade);  
+				float waterDepth = max(0, length(_WorldSpaceCameraPos.xyz - i.wPos.xyz) * _WaterDepth);
+
+				float3 waterColor = GetWaterColor(1.0 - fadeDist / 100, waterDepth, float3(1,2,1), (nDotl * 2)); 
+				
+				return float4(waterColor + lightFinal + reflection, 1.0);  
 			}
 			ENDCG
 		}
