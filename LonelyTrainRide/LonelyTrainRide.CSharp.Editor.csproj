@@ -154,6 +154,7 @@
     <None Include="Assets\Shaders\CustomDiffuse.shader" />
     <None Include="Assets\Shaders\DynamicTest\Invert.shader" />
     <None Include="Assets\Shaders\DynamicTest\Smoke.shader" />
+    <None Include="Assets\Shaders\SSS_OutPut.shader" />
     <None Include="Assets\Shaders\Sky\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\Sky\EquirectangularDisplay.shader" />
     <None Include="Assets\Shaders\Sky\Groundfromspace_Shader.shader" />
@@ -166,6 +167,7 @@
     <None Include="Assets\Shaders\Sky\newShader.shader" />
     <None Include="Assets\Shaders\Test\13_AnisotropicReflection.shader" />
     <None Include="Assets\Shaders\Test\RayCastTester.shader" />
+    <None Include="Assets\Shaders\Test\ThickGlass.shader" />
     <None Include="Assets\Shaders\Test\WaterShader_TesterV4.shader" />
     <None Include="Assets\Shaders\Test\WaterShader_V6.shader" />
     <None Include="Assets\Shaders\Test\Water_Shader_01.shader" />
@@ -174,6 +176,7 @@
     <None Include="Assets\Shaders\Water\SSS\Optimized.shader" />
     <None Include="Assets\Shaders\Water\SSS\ScatterTrace.cginc" />
     <None Include="Assets\Shaders\Water\SSS\Sparkle.cginc" />
+    <None Include="Assets\Shaders\Water\SSS\StencilTest.shader" />
     <None Include="Assets\Shaders\Water\SSS\Water_Shader_Endless_Test.shader" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />

@@ -25,6 +25,7 @@ Shader "Test/Water_Shader_Endless"
 		_ScatterTex ("Scatter Texture", 2D) = "white" {}
 		_WaterDepth("Depth Of Water", Float) = 1.0
 		_ScatterStrength("ScatterStrength", Float) = 1.0
+		_FresnelPower("Frezzy Power", Float) = 1.0
 		//density = 8.;
 		//ss_pow = 5.; 
 		//ss_scatter = 0.4;
@@ -79,16 +80,25 @@ Shader "Test/Water_Shader_Endless"
 		//---------------------------------------------------------------------------------
 	}
 	
-	 
+Category {
+	 	Tags { "Queue"="Transparent" "RenderType"="Opaque" }
 SubShader
 	{
-	// "RenderType" = "Transperant" "Queue" = "Transparent"
-		Tags {"LightMode" = "ForwardBase" "RenderType" = "Transperant" "Queue" = "Transparent"}
-		Cull Off 
-		Blend SrcAlpha OneMinusSrcAlpha		
 
+			GrabPass
+			 {
+				Name "BASE"
+				Tags { "LightMode" = "Always" }
+			  } 
+		  
+	// "RenderType" = "Transperant" "Queue" = "Transparent"
 		Pass
 		{
+				Name "BASE"
+		Tags {"LightMode" = "Always"}
+		 Cull Off 
+		//Blend SrcAlpha OneMinusSrcAlpha		
+
 			CGPROGRAM
 			#pragma glsl
 			#pragma vertex vert
@@ -140,6 +150,7 @@ SubShader
 			uniform float _WaterDepth;
 			uniform float _ScatterStrength;
 			uniform fixed _InvFade;
+			uniform float _FresnelPower;
 			//Depth
 			//-------------------------------------------
 			
@@ -164,12 +175,10 @@ SubShader
 
 			struct v2f
 			{
-				fixed2 uv : TEXCOORD0;
 				fixed4 pos : SV_POSITION;
+				fixed2 uv : TEXCOORD0;
 				fixed4 wPos : TEXCOORD1;
 				fixed4 Dist : TEXCOORD2;
-				fixed3 normal : NORMAL;
-				fixed4 tangent : TANGENT;
 				fixed3 normalWorld : TEXCOORD3;
 				fixed4 lightDir : TEXCOORD4;
 				fixed3 viewDir : TEXCOORD5;
@@ -180,7 +189,10 @@ SubShader
 				fixed3 rayDir : TEXCOORD10;
 				fixed4 fragPos : TEXCOORD11;
 				float4 depth : TEXCOORD12;
-				LIGHTING_COORDS(13,14)
+				float4 uvgrab : TEXCOORD13;
+				float2 uvbump : TEXCOORD14;
+
+				//LIGHTING_COORDS(14,15)
 			};
 
 			sampler2D _MainTex;
@@ -192,6 +204,9 @@ SubShader
 			sampler2D _GlitterTex;
 			uniform fixed _FadeLimit;
 			uniform Wave w;
+
+			sampler2D _GrabTexture;
+			float4 _GrabTexture_TexelSize;
 
 			fixed4 blend(fixed4 A, fixed4 B) 
 			{
@@ -304,13 +319,13 @@ SubShader
 
 				int nw = min(21, 12);
 
-				for(int i = 0; i < 3; i++)
-				{
-					//Wave w = w;//waveBuffer[i];
-					newPos += getGerstnerOffset(x0, w, _Time.y);
-					binormal += computeBinormal(x0, w, _Time.y);
-					tangent += computeTangent(x0, w, _Time.y);
-				}
+				//for(int i = 0; i < 3; i++)
+				//{
+				//	//Wave w = w;//waveBuffer[i];
+				//	newPos += getGerstnerOffset(x0, w, _Time.y);
+				//	binormal += computeBinormal(x0, w, _Time.y);
+				//	tangent += computeTangent(x0, w, _Time.y);
+				//}
 
 				// fix binormal and tangent
 				binormal.x = 1 - binormal.x;
@@ -324,8 +339,8 @@ SubShader
 				v.vertex.y = newPos.y;
 
 		    o.pos = UnityObjectToClipPos(v.vertex);
-			o.tangent.xyz = tangent;
-			o.normal = v.normal;
+			//o.tangent.xyz = tangent;
+			//o.normal = v.normal;
 			o.fragPos = v.vertex;
 
 			o.tangentWorld =  normalize( mul( float4(tangent, 0.0), unity_ObjectToWorld));
@@ -338,12 +353,20 @@ SubShader
 			o.projPos = ComputeScreenPos (o.pos);
 			
 			COMPUTE_EYEDEPTH(o.projPos);
+
 			o.uv = v.texcoord;
 
-			
+			#if UNITY_UV_STARTS_AT_TOP
+			float scale = -1.0;
+			#else
+			float scale = 1.0;
+			#endif
+			o.uvgrab.xy = (float2(o.pos.x, o.pos.y*scale) + o.pos.w) * 0.5;
+			o.uvgrab.zw = o.pos.zw;
+			o.uvbump = TRANSFORM_TEX( v.texcoord, _BumpMap );
 			o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
 			//o.pos.xyz += v.normal * _Growth;
-
+	
 			half3 eyeRay = normalize(mul(unity_WorldToObject, v.vertex.xyz));
 			o.rayDir = half3(-eyeRay);
 			TRANSFER_VERTEX_TO_FRAGMENT(o);		
@@ -443,6 +466,18 @@ SubShader
 				
 				}
 				
+				#if UNITY_SINGLE_PASS_STEREO
+				i.uvgrab.xy = TransformStereoScreenSpaceTex(i.uvgrab.xy, i.uvgrab.w);
+				#endif
+
+
+				half2 bump = UnpackNormal(tex2D( _BumpMap, i.uvbump)).rg; // we could optimize this by just reading the x & y without reconstructing the Z
+				float2 offset = bump * 50  * _GrabTexture_TexelSize.xy;
+
+				i.uvgrab.xy = offset * UNITY_Z_0_FAR_FROM_CLIPSPACE(i.uvgrab.z) + i.uvgrab.xy + normalDirection.xz;
+	
+				half4 Fraccol = tex2Dproj( _GrabTexture, UNITY_PROJ_COORD(i.uvgrab));
+
 				fixed3 reflection = IBLRefl(_Cube, _Detail, saturate(worldRefl), _ReflectionExposure, _ReflectionFactor);
 
 				fixed4 lightFinal = fixed4(specularReflection * fresnelFactor, 1.0);
@@ -451,11 +486,15 @@ SubShader
 
 				float waterDepth = max(0, length(_WorldSpaceCameraPos.xyz - i.wPos.xyz) * _WaterDepth);
 
+	
 				float3 waterColor = GetWaterColor(1.0 - fadeDist / 100, waterDepth, float3(1,2,1), (nDotl * 2)); 
-				
-				return float4(waterColor + lightFinal + reflection, 1.0);  
+				//float4(waterColor + Fraccol + lightFinal + reflection, 1.0);  
+
+				return float4(waterColor + Fraccol + lightFinal + reflection, 1.0);  
+
 			}
 			ENDCG
+		}
 		}
 
 	}

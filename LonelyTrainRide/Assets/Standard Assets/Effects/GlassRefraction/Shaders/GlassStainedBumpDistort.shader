@@ -14,7 +14,7 @@ Properties {
 Category {
 
 	// We must be transparent, so other objects are drawn before this one.
-	Tags { "Queue"="Transparent" "RenderType"="Opaque" }
+	Tags { "Queue"="Transparent"  "Queue" = "Transparent" }
 
 
 	SubShader {
