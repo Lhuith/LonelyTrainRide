@@ -1,4 +1,4 @@
-﻿Shader "Test/Invert"
+﻿Shader "Eugene/ShaderDemos/Invert"
 {
 	Properties
 	{

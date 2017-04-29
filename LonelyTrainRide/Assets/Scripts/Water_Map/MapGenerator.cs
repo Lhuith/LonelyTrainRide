@@ -41,7 +41,7 @@ public class MapGenerator : MonoBehaviour {
         MapData mapData = GenerateMapData(Vector2.zero);
 
         MapDisplay display = FindObjectOfType<MapDisplay>();
-        display.DrawMesh(MeshGenerator.GenerataTerrainMesh(mapData.heightMap, meshHeightMultiplier, meshHeightCurve, EditorPreviewLOD), TextureGenerator.TextureFromHeightMap(mapData.heightMap, mapData.colA, mapData.colB));
+        display.DrawMesh(MeshGenerator.GenerataTerrainMesh(mapData.heightMap, meshHeightMultiplier, meshHeightCurve, EditorPreviewLOD, false), TextureGenerator.TextureFromHeightMap(mapData.heightMap, mapData.colA, mapData.colB));
     }
 
 
@@ -65,19 +65,19 @@ public class MapGenerator : MonoBehaviour {
         }
     }
 
-    public void RequestMeshData(MapData mapData, int lod,  Action<MeshData> callback)
+    public void RequestMeshData(MapData mapData, int lod,  Action<MeshData> callback, bool isTerrain)
     {
         ThreadStart threadStart = delegate
         {
-            MeshDataThread(mapData, lod, callback);
+            MeshDataThread(mapData, lod, callback, isTerrain);
         };
 
         new Thread(threadStart).Start();
     }
 
-    void MeshDataThread(MapData mapData, int lod, Action<MeshData> callback)
+    void MeshDataThread(MapData mapData, int lod, Action<MeshData> callback, bool isTerrain)
     {
-        MeshData meshData = MeshGenerator.GenerataTerrainMesh(mapData.heightMap, meshHeightMultiplier, meshHeightCurve, lod);
+        MeshData meshData = MeshGenerator.GenerataTerrainMesh(mapData.heightMap, meshHeightMultiplier, meshHeightCurve, lod, isTerrain);
 
         lock(meshDataThreadInfoQueue)
         {

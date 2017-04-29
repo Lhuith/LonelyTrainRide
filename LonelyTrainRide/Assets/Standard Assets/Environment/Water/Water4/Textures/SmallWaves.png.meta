@@ -5,7 +5,7 @@ TextureImporter:
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 1
+    enableMipMap: 0
     sRGBTexture: 0
     linearTexture: 1
     fadeOut: 0
@@ -15,8 +15,8 @@ TextureImporter:
   bumpmap:
     convertToNormalMap: 1
     externalNormalMap: 1
-    heightScale: 0.3
-    normalMapFilter: 0
+    heightScale: 0.09
+    normalMapFilter: 1
   isReadable: 1
   grayScaleToAlpha: 0
   generateCubemap: 6
@@ -25,8 +25,8 @@ TextureImporter:
   textureFormat: -1
   maxTextureSize: 256
   textureSettings:
-    filterMode: 1
-    aniso: 16
+    filterMode: 2
+    aniso: 0
     mipBias: -1
     wrapMode: 0
   nPOTScale: 1

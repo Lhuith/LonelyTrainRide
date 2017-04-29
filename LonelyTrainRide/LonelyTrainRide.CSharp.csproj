@@ -90,7 +90,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\ObjectThickness.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Cube.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Grid.cs" />
@@ -102,11 +101,14 @@
     <Compile Include="Assets\Scripts\Camera\Camera_Imageing_Controls.cs" />
     <Compile Include="Assets\Scripts\Camera\RenderMaterial.cs" />
     <Compile Include="Assets\Scripts\InputControlls.cs" />
+    <Compile Include="Assets\Scripts\ObjectThickness.cs" />
     <Compile Include="Assets\Scripts\Sky\Sky_Shader_Manager.cs" />
     <Compile Include="Assets\Scripts\Tests\Atmosphere_Manager.cs" />
     <Compile Include="Assets\Scripts\Tests\ToCubeMap.cs" />
+    <Compile Include="Assets\Scripts\ThickGlassImageEffect.cs" />
     <Compile Include="Assets\Scripts\TrainCart\Train_Manager.cs" />
     <Compile Include="Assets\Scripts\Water_Map\DynamicApplyShader.cs" />
+    <Compile Include="Assets\Scripts\Water_Map\EndlessOcean.cs" />
     <Compile Include="Assets\Scripts\Water_Map\EndlessTerrain.cs" />
     <Compile Include="Assets\Scripts\Water_Map\HeightMap.cs" />
     <Compile Include="Assets\Scripts\Water_Map\InterActiveWaves.cs" />
@@ -217,36 +219,31 @@
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_TrackedObject.cs" />
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_UpdatePoses.cs" />
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_Utils.cs" />
-    <Compile Include="Assets\ThickGlassImageEffect.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Shaders\CustomDiffuse.shader" />
+    <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
+    <None Include="Assets\Shaders\Depth\Depth.shader" />
+    <None Include="Assets\Shaders\Depth\DepthImageEffect.shader" />
+    <None Include="Assets\Shaders\Depth\Trace.cginc" />
     <None Include="Assets\Shaders\DynamicTest\Invert.shader" />
     <None Include="Assets\Shaders\DynamicTest\Smoke.shader" />
-    <None Include="Assets\Shaders\SSS_OutPut.shader" />
-    <None Include="Assets\Shaders\Sky\Atmospheric_Scatter_Shader.shader" />
-    <None Include="Assets\Shaders\Sky\EquirectangularDisplay.shader" />
-    <None Include="Assets\Shaders\Sky\Groundfromspace_Shader.shader" />
-    <None Include="Assets\Shaders\Sky\SkyDisplay.shader" />
-    <None Include="Assets\Shaders\Sky\SkyDomeShader.shader" />
-    <None Include="Assets\Shaders\Sky\SkyFromSpace_Shader.shader" />
-    <None Include="Assets\Shaders\Sky\SkyGen.shader" />
+    <None Include="Assets\Shaders\Optimized_Diffused.shader" />
+    <None Include="Assets\Shaders\Sky\Old\Atmospheric_Scatter_Shader.shader" />
+    <None Include="Assets\Shaders\Sky\Old\EquirectangularDisplay.shader" />
+    <None Include="Assets\Shaders\Sky\Old\Groundfromspace_Shader.shader" />
+    <None Include="Assets\Shaders\Sky\Old\SkyFromSpace_Shader.shader" />
+    <None Include="Assets\Shaders\Sky\Old\SkyGen.shader" />
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade.shader" />
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade_V2.shader" />
-    <None Include="Assets\Shaders\Sky\newShader.shader" />
     <None Include="Assets\Shaders\Test\13_AnisotropicReflection.shader" />
     <None Include="Assets\Shaders\Test\RayCastTester.shader" />
-    <None Include="Assets\Shaders\Test\ThickGlass.shader" />
+    <None Include="Assets\Shaders\Test\StencilTest.shader" />
     <None Include="Assets\Shaders\Test\WaterShader_TesterV4.shader" />
     <None Include="Assets\Shaders\Test\WaterShader_V6.shader" />
     <None Include="Assets\Shaders\Test\Water_Shader_01.shader" />
-    <None Include="Assets\Shaders\Water\SSS\DephDist.shader" />
-    <None Include="Assets\Shaders\Water\SSS\DephScatter.shader" />
-    <None Include="Assets\Shaders\Water\SSS\Optimized.shader" />
-    <None Include="Assets\Shaders\Water\SSS\ScatterTrace.cginc" />
-    <None Include="Assets\Shaders\Water\SSS\Sparkle.cginc" />
-    <None Include="Assets\Shaders\Water\SSS\StencilTest.shader" />
-    <None Include="Assets\Shaders\Water\SSS\Water_Shader_Endless_Test.shader" />
+    <None Include="Assets\Shaders\Water\SparkNoise.cginc" />
+    <None Include="Assets\Shaders\Water\Trace.cginc" />
+    <None Include="Assets\Shaders\Water\WaterShader.shader" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />

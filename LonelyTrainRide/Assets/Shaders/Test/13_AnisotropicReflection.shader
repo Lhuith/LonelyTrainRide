@@ -1,19 +1,18 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
-
-Shader"EugeneShader/ShaderTestDemos/13_AnisotropicReflection"{
-Properties{
-	_Color("Color_Tint", Color) = (1.0,1.0,1.0,1.0)
+﻿Shader"Eugene/ShaderDemos/Basic/13_AnisotropicReflection"
+{
+Properties
+{
+		_Color("Color_Tint", Color) = (1.0,1.0,1.0,1.0)
 		_SpecColor("Specular Color", Color) = (1.0,1.0,1.0,1.0)
 		_AniX("Anisotropic X", Range(0.0, 2.0)) = 1.0
 		_AniY("Anisotropic Y", Range(0.0, 2.0)) = 1.0
 		_Shininess("Shininess", Float) = 1.0
 	
 }
-	SubShader{
-		Pass{
+	SubShader
+	{
+		Pass
+		{
 			Tags{"LightMode" = "ForwardBase"}
 			CGPROGRAM
 			#pragma vertex vert

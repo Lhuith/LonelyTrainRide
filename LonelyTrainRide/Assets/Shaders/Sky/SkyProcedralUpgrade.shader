@@ -2,7 +2,7 @@
 
 // Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
-Shader "Skybox/ProceduralUpgrade" {
+Shader "Eugene/Enviroment/Sky/ProceduralUpgrade" {
 Properties {
     _HdrExposure("HDR Exposure", Float) = 1.3
     _GroundColor ("Ground", Color) = (.369, .349, .341, 1)

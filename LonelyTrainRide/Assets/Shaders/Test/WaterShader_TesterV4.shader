@@ -1,11 +1,4 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
-
-// Upgrade NOTE: replaced 'PositionFog()' with multiply of UNITY_MATRIX_MVP by position
-
-Shader "Eugene/WaterShader_TesterV4" {
+﻿Shader "Eugene/Tests/WaterShader_TesterV4" {
 Properties{
 
 	_Color("Color_Tint", Color) = (1.0,1.0,1.0,1.0)

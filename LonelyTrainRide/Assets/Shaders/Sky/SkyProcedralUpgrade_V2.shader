@@ -1,8 +1,4 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
-Shader "Skybox/ProceduralUpgrade_V2" {
+﻿Shader "Eugene/Enviroment/Sky/ProceduralUpgrade_V2" {
 Properties {
     _HdrExposure("HDR Exposure", float) = 1.3
     _GroundColor ("Ground", Color) = (.369, .349, .341, 1)

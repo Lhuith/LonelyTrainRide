@@ -2,23 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-[System.Serializable]
-public class DynamicInformation
-{
-    public Material mat;
-    public Texture quadTexture;
-    public Texture intialTexture;
-    public float updateInterval;
-
-    DynamicInformation(Material _mat, Texture _intialTex, float _interval)
-    {
-        mat = _mat;
-        intialTexture = _intialTex;
-        updateInterval = _interval;
-    }
-
-}
-[System.Serializable]
 public class EndlessTerrain : MonoBehaviour {
 
     const float viewerMoveThresholdforChunkUpdate = 25f;
@@ -29,7 +12,7 @@ public class EndlessTerrain : MonoBehaviour {
 
     public Transform viewer;
 
-    public Material OceanMaterial;
+    public Material TerrainMaterial;
 
     public static Vector2 viewerPosition;
     Vector2 viewerPositionOld;
@@ -41,8 +24,6 @@ public class EndlessTerrain : MonoBehaviour {
 
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
     static List<TerrainChunk> terrainChunksVisableLastUpdate = new List<TerrainChunk>();
-
-    public DynamicInformation dynamicInfo;
 
     void Start()
     {
@@ -90,7 +71,7 @@ public class EndlessTerrain : MonoBehaviour {
                 }
                 else
                 {
-                    terrainChunkDictionary.Add(viewedChunkCoord, new TerrainChunk(viewedChunkCoord, chunksize, detialLevels, transform, OceanMaterial, dynamicInfo));
+                    terrainChunkDictionary.Add(viewedChunkCoord, new TerrainChunk(viewedChunkCoord, chunksize, detialLevels, transform, TerrainMaterial));
                 }
             }
         }
@@ -118,15 +99,15 @@ public class EndlessTerrain : MonoBehaviour {
 
         
 
-        public TerrainChunk(Vector2 coord, int size, LODinfo[] detailLevels, Transform parent, Material mat, DynamicInformation _dynamicInfo)
+        public TerrainChunk(Vector2 coord, int size, LODinfo[] detailLevels, Transform parent, Material mat)
         {
             this.detailLevels = detailLevels;
 
             position = coord * size;
             bounds = new Bounds(position, Vector2.one * size);
-            Vector3 postionV3 = new Vector3(position.x, 0, position.y);
+            Vector3 postionV3 = new Vector3(position.x, -50f, position.y);
 
-            meshObject = new GameObject("Ocean Chunk");
+            meshObject = new GameObject("Terrain Chunk");
             meshObject.layer = 4;
             meshRenderer = meshObject.AddComponent<MeshRenderer>();
             meshFilter = meshObject.AddComponent<MeshFilter>();
@@ -159,8 +140,8 @@ public class EndlessTerrain : MonoBehaviour {
             mapDataRecieved = true;
 
             Texture2D texture = TextureGenerator.TextureFromHeightMap(mapData.heightMap, mapData.colA, mapData.colB);
-          //  meshRenderer.material.mainTexture = texture;
-           // UpdateTerrainChunk();
+            meshRenderer.material.mainTexture = texture;
+            UpdateTerrainChunk();
         }
 
         public void UpdateTerrainChunk()
@@ -247,7 +228,7 @@ public class EndlessTerrain : MonoBehaviour {
         public void RequestMesh(MapData mapData)
         {
             hasRequested = true;
-            mapGenerator.RequestMeshData(mapData, lod, OnMeshDataRecieved);
+            mapGenerator.RequestMeshData(mapData, lod, OnMeshDataRecieved, true);
         }
     }
 

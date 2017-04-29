@@ -1,14 +1,7 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
-
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
-// Upgrade NOTE: replaced 'glstate.matrix.mvp' with 'UNITY_MATRIX_MVP'
-
-Shader "Eugene/WaterShaderV6" {
-Properties{
-
+﻿Shader "Eugene/Tests/WaterShaderV6"
+ {
+Properties
+{
 	_Color("Color_Tint", Color) = (1.0,1.0,1.0,1.0)
 	_MainTex("Diffuse Texture", 2D) = "white" {}
 	_SpecColor("Specular Color", Color) = (1.0,1.0,1.0,1.0)

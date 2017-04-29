@@ -1,4 +1,4 @@
-﻿Shader "Test/Smoke"
+﻿Shader "Eugene/ShaderDemos/Fluid/Smoke"
 {
 	Properties
 	{
