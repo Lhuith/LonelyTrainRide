@@ -36,6 +36,8 @@
 		//Reflection Controls
 		//---------------------------------------------------------------------------------
 		[KeywordEnum(Off, Refl, Refr)] _IBLMode ("IBL Mode", Float) = 1.0
+		//#pragma shader_feature _IBLMODE_OFF _IBLMODE_REFL _IBLMODE_REFR
+
 		_ReflectionFactor("Specular %", Range(0,1)) = 1
 		_Cube("Cube Map", Cube) = "" {}
 		_Detail("Reflection Detail", Range(1, 9)) = 1.0
@@ -393,13 +395,13 @@ SubShader
 				float scatterFactor = saturate(-dot(normalDirection * waveThickness, float3(i.lightDir.x, 0, i.lightDir.y)));
 				
 				float r = (1.2-1-0)/(1.2+1.0);
-				float fresnelFactor = max(0.0, min(1.0, r+(1.0-r)*pow(1.0-dot( normalDirection, i.viewDir), 4)));
+				float fresnelFactor = max(0.0, min(1.0, r+(1.0-r)*pow(1.0-dot( normalDirection, i.viewDir), _FresnelPower)));
 
 				fresnelFactor *= min(length(_WorldSpaceCameraPos.xyz - i.wPos.xyz)/10.0, 1.0);
 
 				fixed3 diffuseReflection = i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
 			    fixed3 specularReflection = (diffuseReflection * _SpecColor.xyz * pow(saturate(dot(reflect(-i.lightDir.xyz, 
-											normalDirection), i.viewDir)) , _Shininess * fresnelFactor)) * _SpecStrength; 
+											normalDirection), i.viewDir)) , _Shininess)) * _SpecStrength; 
 
 				fixed3 glitColor = fixed4(1,1,1,1.0);
 				
@@ -455,15 +457,13 @@ SubShader
 	
 				half4 Fraccol = tex2Dproj( _GrabTexture, UNITY_PROJ_COORD(i.uvgrab));
 
-				fixed3 reflection = IBLRefl(_Cube, _Detail, (worldRefl), _ReflectionExposure, _ReflectionFactor);
-
-				fixed4 lightFinal = fixed4((specularReflection + diffuseReflection * reflection) * fresnelFactor, 1.0);
+				fixed3 reflection = IBLRefl(_Cube, _Detail * fresnelFactor, (worldRefl * fresnelFactor), _ReflectionExposure, _ReflectionFactor) * fresnelFactor;
+			
+				fixed4 lightFinal = fixed4((specularReflection + diffuseReflection * reflection), 1.0);
 
 				float4 subSurface =  (SSS * _SubColor);
 
-				float waterDepth = max(0, length(_WorldSpaceCameraPos.xyz - i.wPos.xyz) * _WaterDepth) * (nDotl) ;
-
-			
+				float waterDepth = max(0, length(_WorldSpaceCameraPos.xyz - i.wPos.xyz) * _WaterDepth) * (nDotl) ;			
 	
 				float3 waterColor = GetWaterColor(1.0 - fadeDist / 50, waterDepth, float3(1,2,1), (nDotl) + specularReflection ); 
 				//float4(waterColor + Fraccol + lightFinal + reflection, 1.0);  
@@ -471,7 +471,9 @@ SubShader
 				//waterColor *= lightFinal;
 				float lightAlpha = (1.0 - (waterColor.g * waterColor.b) * nDotl);
 
-				return float4((waterColor.rgb) + lightFinal + glitColor, lightAlpha);  
+				reflection = lerp(waterColor, reflection, fresnelFactor);
+
+				return float4((waterColor.rgb) + lightFinal + scatterFactor + glitColor, lightAlpha);  
 
 			}
 			ENDCG
