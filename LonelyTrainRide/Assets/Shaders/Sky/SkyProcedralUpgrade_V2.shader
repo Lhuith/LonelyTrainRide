@@ -857,9 +857,9 @@ float4 render_clouds(
 
 			float3 col;
 		
-			if(IN.rayDir.y < 0.1)
+			if(IN.rayDir.y < 0.01)
             {
-				float3 eye = float3(0, 1, 0);
+				float3 eye = float3(0, 1.02, 0);
 				float3 point_cam = float3(0, 0.91, 0);
 				float2 point_ndc = IN.pos.xy;
 				point_ndc.y = 1. - point_ndc.y;
@@ -882,7 +882,8 @@ float4 render_clouds(
                 col = (getRayleighPhase(eyeCos2)) * IN.cIn.xyz + cld.rgb + (mie) * _LightColor0 * IN.cOut;
 				//float3 sky = render_sky_color(eye_ray, IN.lightDirAngle);
 
-				cloudcol = lerp(col, cld.rgb/(0.000001+cld.a) * mie, cld.a) * _LightColor0;
+				cloudcol = lerp(col, cld.rgb/(0.000001+cld.a), cld.a) * _LightColor0;
+				//cloudcol *= mie + getRayleighPhase(eyeCos2);
 		
             }
             else
@@ -893,7 +894,7 @@ float4 render_clouds(
             //Adjust color from HDR
 
 			col *= _HdrExposure;
-
+			cloudcol *=  _HdrExposure;
 			//finalCol *= .55+0.45*pow(70.0 * xy.x * xy.y * (1.0 - xy.x ) * (1.0 - xy.y), 0.15 );
             return  float4(cloudcol, 1.0);
  

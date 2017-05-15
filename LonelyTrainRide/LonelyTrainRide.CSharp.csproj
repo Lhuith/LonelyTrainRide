@@ -90,6 +90,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\FrameSampler.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Cube.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Grid.cs" />
