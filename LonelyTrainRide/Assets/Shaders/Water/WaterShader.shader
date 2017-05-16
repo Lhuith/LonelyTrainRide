@@ -248,19 +248,19 @@ SubShader
 			return T;		
 		}
 		
-		//
-		//fixed4 glitter(float3 wPos, float3 normalDir, float3 specularReflection, float nDotl)
-		//{
-		//	fixed2 uv =  wPos.xy * 128;
-		//	fixed fadeLR = specularReflection.x;
-		//	fixed fadeTB = normalDir + uv.y;
-		//	fadeTB /= 4;
-		//	fixed3 pos = fixed3(uv * fixed2(3., 1.) - fixed2(0., _Time.x * nDotl), _Time.x   * nDotl);
-		//	fixed n =  (fadeLR * fadeTB * smoothstep(.8, 1., snoise(pos)) * nDotl );
-		//	fixed col = hsv(n * .1 + .7, .4, 1.);			
-		//				
-		//	return ((fixed4(col * fixed3(n, n, n), n)) * _GlitterStrength) * _LightColor0;						
-		//}
+		
+		fixed4 glitter(float3 wPos, float3 normalDir, float3 specularReflection, float nDotl)
+		{
+			fixed2 uv =  wPos.xy * 128;
+			fixed fadeLR = specularReflection.x;
+			fixed fadeTB = normalDir + uv.y;
+			fadeTB /= 4;
+			fixed3 pos = fixed3(uv * fixed2(3., 1.) - fixed2(0., _Time.x * nDotl), _Time.x   * nDotl);
+			fixed n =  (fadeLR * fadeTB * smoothstep(.8, 1., snoise(pos)) * nDotl );
+			fixed col = hsv(n * .1 + .7, .4, 1.);			
+						
+			return ((fixed4(col * fixed3(n, n, n), n)) * _GlitterStrength) * _LightColor0;						
+		}
 		
 		float fresnel(float3 V, float3 N)
 		{	
@@ -430,7 +430,7 @@ SubShader
 				fixed3 worldRefl = reflect(-i.viewDir, normalDirection);
 		
 				float r = (1.2-1-0)/(1.2+1.0);
-				float fresnelFactor = max(0.0, min(1.0, r+(1.0-r)*pow(1.0-dot( i.normalDir, i.viewDir), _FresnelPower)));
+				float fresnelFactor = max(0.0, min(1.0, r+(1.0-r)*pow(1.0-dot( normalDirection, i.viewDir), _FresnelPower)));
 		
 				fresnelFactor *= min(length(_WorldSpaceCameraPos.xyz - i.wPos.xyz)/10.0, 1.0);
 		
@@ -462,8 +462,9 @@ SubShader
 		
 				fixed4 lightFinal = fixed4((specularReflection), 1.0) * fresnelFactor;		
 
+				float3 glitterSpec = glitter(i.wPos, normalDirection , specularReflection, nDotl);
 
-			     return float4((waterColor + reflection * fresnelFactor) + lightFinal, fade);//float4(refraction * SSS, 1.0);  
+			     return float4((waterColor + reflection * fresnelFactor) + lightFinal + glitterSpec, fade);//float4(refraction * SSS, 1.0);  
 		
 			}
 			ENDCG
