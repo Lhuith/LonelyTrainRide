@@ -464,7 +464,7 @@ SubShader
 
 				float3 glitterSpec = glitter(i.wPos, normalDirection , specularReflection, nDotl);
 
-			     return float4((waterColor + reflection * fresnelFactor) + lightFinal + glitterSpec, fade);//float4(refraction * SSS, 1.0);  
+			    return float4((waterColor + reflection * fresnelFactor) + lightFinal + glitterSpec, fade);//float4(refraction * SSS, 1.0);  
 		
 			}
 			ENDCG

@@ -147,6 +147,7 @@
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade.shader" />
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade_V2.shader" />
     <None Include="Assets\Shaders\Test\13_AnisotropicReflection.shader" />
+    <None Include="Assets\Shaders\Test\CloudyWater.shader" />
     <None Include="Assets\Shaders\Test\RayCastTester.shader" />
     <None Include="Assets\Shaders\Test\StencilTest.shader" />
     <None Include="Assets\Shaders\Test\WaterShader_TesterV4.shader" />
