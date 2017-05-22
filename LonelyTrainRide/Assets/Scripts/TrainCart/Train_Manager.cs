@@ -31,9 +31,6 @@ public class Train_Manager : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-
-
-
         Vector3 rotationRumble = new Vector3(Random.Range(0, rumbleX), Random.Range(0, rumbleY), Random.Range(0, rumbleZ));
         Quaternion rotationRumpleQua = new Quaternion(0, 0, 0, 0);
         rotationRumpleQua.eulerAngles += rotationRumble;

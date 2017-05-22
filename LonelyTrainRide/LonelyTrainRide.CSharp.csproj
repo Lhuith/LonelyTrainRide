@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\FrameSampler.cs" />
+    <Compile Include="Assets\Gem_Bloom.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Cube.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Grid.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Assets\Scripts\Water_Map\MeshGenerator.cs" />
     <Compile Include="Assets\Scripts\Water_Map\PaintTest.cs" />
     <Compile Include="Assets\Scripts\Water_Map\TextureGenerator.cs" />
+    <Compile Include="Assets\Sparkle_Replacement_Shader.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_GazeTracker.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_LaserPointer.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_Teleporter.cs" />
@@ -228,6 +230,8 @@
     <None Include="Assets\Shaders\Depth\Trace.cginc" />
     <None Include="Assets\Shaders\DynamicTest\Invert.shader" />
     <None Include="Assets\Shaders\DynamicTest\Smoke.shader" />
+    <None Include="Assets\Shaders\GemBloom_Replacment.shader" />
+    <None Include="Assets\Shaders\Gem_Sparkle.shader" />
     <None Include="Assets\Shaders\Optimized_Diffused.shader" />
     <None Include="Assets\Shaders\Sky\Old\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\Sky\Old\EquirectangularDisplay.shader" />
@@ -246,6 +250,7 @@
     <None Include="Assets\Shaders\Water\SparkNoise.cginc" />
     <None Include="Assets\Shaders\Water\Trace.cginc" />
     <None Include="Assets\Shaders\Water\WaterShader.shader" />
+    <None Include="Assets\Shaders\Water\WaterShaderReplacment.shader" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />

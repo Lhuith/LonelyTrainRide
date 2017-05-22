@@ -1,15 +1,13 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
-// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
-
-// Upgrade NOTE: replaced '_LightMatrix0' with 'unity_WorldToLight'
-
-Shader "Unlit/CloudyWater"
+﻿Shader "Unlit/CloudyWater"
 {
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
 		_NoiseTex("Noise Texture", 2D)  = "white" {}
+		_X("X Rotation", Float) = 1.0
+		_XDir("X Direction", Float) = 1.0
+		_Y("Y Rotation", Float) = 1.0
+		_Z("Z Rotation", Float) = 1.0
 	}
 	SubShader
 	{
@@ -23,8 +21,6 @@ Shader "Unlit/CloudyWater"
 			#pragma fragment frag
 			
 			#include "UnityCG.cginc"
-			// make fog work
-			//#pragma multi_compile_fog
 			
 
 			/*
@@ -39,12 +35,6 @@ Shader "Unlit/CloudyWater"
 #define D_DEMO_SHOW_IMPROVEMENT_NOISE
 #define D_DEMO_SHOW_IMPROVEMENT_FLAT_NOVOLUMETRICSHADOW
 #define D_DEMO_SHOW_IMPROVEMENT_NOISE_NOVOLUMETRICSHADOW
-
-
-#define TANGENT_SPACE_ROTATION \
-     float3 binormal = cross( i.normal, i.tangent.xyz ) * i.tangent.w; \
-     float3x3 rotation = float3x3( i.tangent.xyz, binormal, i.normal )
-
 
 #ifdef D_DEMO_FREE
 	// Apply noise on top of the height fog?
@@ -91,17 +81,14 @@ Shader "Unlit/CloudyWater"
 // If 0 strongly scattering participating media will not be energy conservative
 // If 1 participating media will look too dark especially for strong extinction (as compared to what it should be)
 // Toggle only visible zhen not using the improved scattering integration.
-#define D_UPDATE_TRANS_FIRST 0
-
-// Apply bump mapping on walls
-#define D_DETAILED_WALLS 0
+#define D_UPDATE_TRANS_FIRST 1
 
 // Use to restrict ray marching length. Needed for volumetric evaluation.
 #define D_MAX_STEP_LENGTH_ENABLE 1
 
 // Light position and color
-#define LPOS float3( 20, 10, -20) //_WorldSpaceLightPos0.xyz//
-#define LCOL (600.0*float3( 1.0, 0.9, 0.5))
+#define LPOS float3( 20 + _X, 8 + _Y, -20 + _Z)
+#define LCOL (200.0*float3( 1.0, 0.9, 0.5))
 
 
 			struct v2f
@@ -124,25 +111,23 @@ Shader "Unlit/CloudyWater"
 			float4 _NoiseTex_ST;
 
 			float4x4 unity_WorldToLight;
-
+			//float4 _LightPositionRange;
 			float4 _LightColor0;
+
+			uniform float _X;
+			uniform float _XDir;
+			uniform float _Y;
+			uniform float _Z;
 
 float displacementSimple( float2 p )
 {
     float f;
-    f  = 0.5000* tex2Dlod( _NoiseTex, float4( p, 0.0, 0.0) ).y; p = p*2.0;
-    f += 0.2500* tex2Dlod( _NoiseTex, float4( p, 0.0, 0.0) ).y; p = p*2.0;
-    f += 0.1250* tex2Dlod( _NoiseTex, float4( p, 0.0, 0.0) ).y; p = p*2.0;
-    f += 0.0625* tex2Dlod( _NoiseTex, float4( p, 0.0, 0.0) ).y; p = p*2.0;
+    f  = 0.5000* tex2Dlod( _NoiseTex, float4( p, 0.0, 0.0) ).x; p = p*2.0;
+    f += 0.2500* tex2Dlod( _NoiseTex, float4( p, 0.0, 0.0) ).x; p = p*2.0;
+    f += 0.1250* tex2Dlod( _NoiseTex, float4( p, 0.0, 0.0) ).x; p = p*2.0;
+    f += 0.0625* tex2Dlod( _NoiseTex, float4( p, 0.0, 0.0) ).x; p = p*2.0;
     
     return f;
-}
-
-float getClosestDistance(float3 p, out float material)
-{
-	float d = 0.0;
-	material = 0.0;
-	return 1;
 }
 
 float3 evaluateLight(in float3 pos, float3 lightDir)
@@ -166,17 +151,19 @@ float3 evaluateLight(in float3 pos, in float3 normal, float3 lightDir)
 // To simplify: wavelength independent scattering and extinction
 void getParticipatingMedia(out float muS, out float muE, in float3 pos)
 {
-    float heightFog = 7.0 + D_FOG_NOISE*3.0*clamp(displacementSimple(pos.xz*0.005 + _Time.x*0.01),0.0,1.0);
-    heightFog = 0.3*clamp((heightFog - pos.y)*1.0, 0.0, 1.0);
+    float heightFog = 7.0 + D_FOG_NOISE * 2.0 * clamp(displacementSimple(pos.xz * 0.5 + _Time.y * 0.02), 0.0, 1.0);
+
+    heightFog = 0.5 * clamp((heightFog - pos.y) * 1.0, 0.0, 1.0);
     
-    const float fogFactor = 1.0 + D_STRONG_FOG * 5.0;
+    const float fogFactor = 1.0 + D_STRONG_FOG * 1.0;
     
     const float sphereRadius = 5.0;
+
     float sphereFog = clamp((sphereRadius-length(pos-float3(20.0,19.0,-17.0)))/sphereRadius, 0.0,1.0);
     
-    const float constantFog = 0.02;
+    const float constantFog = 0.01;
 
-    muS = constantFog + sphereFog + heightFog*fogFactor;
+    muS = constantFog + heightFog*fogFactor;
    
     const float muA = 0.0;
     muE = max(0.000000001, muA + muS); // to avoid division by zero extinction
@@ -208,9 +195,9 @@ float volumetricShadow(in float3 from, in float3 to)
 }
 
 void traceScene(bool improvedScattering, float3 rO, float3 rD, inout float3 finalPos, 
-					inout float3 normal, inout float3 albedo, inout float4 scatTrans, float3 lightDir)
+					inout float3 normal, inout float4 scatTrans, float3 lightDir)
 {
-	const int numIter = 100;
+	const int numIter = 300;
 	
     float muS = 0.0;
     float muE = 0.0;
@@ -221,14 +208,13 @@ void traceScene(bool improvedScattering, float3 rO, float3 rD, inout float3 fina
     float transmittance = 1.0;
     float3 scatteredLight = float3(0.0, 0.0, 0.0);
     
-	float d = 1.0; // hack: always have a first step of 1 unit to go further
-	float material = 0.0;
+	float d = 0; // hack: always have a first step of 1 unit to go further
 	float3 p = float3(0.0, 0.0, 0.0);
     float dd = 0.0;
 
 	for(int i=0; i<numIter;++i)
 	{
-		float3 p = rO + d*rD;
+		float3 p = (rO + d * rD) ;
         
         
     	getParticipatingMedia(muS, muE, p);
@@ -260,17 +246,14 @@ void traceScene(bool improvedScattering, float3 rO, float3 rD, inout float3 fina
         }
         
 		
-        dd = 1;
-        if(dd<0.2)
+        dd = 2;
+        if(dd<0.1)
             break; // give back a lot of performance without too much visual loss
 		d += dd;
 	}
     
     scatTrans = float4(scatteredLight, transmittance);
 }
-
-
-
 			v2f vert (appdata_full v)
 			{
 				v2f o;
@@ -287,7 +270,7 @@ void traceScene(bool improvedScattering, float3 rO, float3 rD, inout float3 fina
 			{
 
 		   float3 normalDirection =	normalize( mul(float4(i.normal, 0.0), unity_WorldToObject).xyz);
-		   float3 viewDirection = normalize(float3(float4(_WorldSpaceCameraPos.xyz, 1.0) - mul(unity_ObjectToWorld,i.fragPos).xyz));
+		   float3 viewDirection = normalize(float3(float4(_WorldSpaceCameraPos.xyz, 1.0) - mul(unity_ObjectToWorld,i.wPos).xyz));
 		   float3 lightDirection;
 		   float atten = 1.0;
 		   
@@ -305,39 +288,36 @@ void traceScene(bool improvedScattering, float3 rO, float3 rD, inout float3 fina
 		    //_ScreenParams
 		    
 			float2 uv = i.uv;
-			float2 uv2 = 2.0*i.uv.xy- 1.0;
-			
-			float3 camPos = float3( 20.0, 18.0,-50.0);
-			float3 camX   = float3( 1.0, 0.0, 0.0) *0.75;
-			float3 camY   = float3( 0.0, 1.0, 0.0) *0.5;
-			float3 camZ   = float3( 0.0, 0.0, 1.0);
-			
+			float2 uv2 = 2 * i.uv.xy - 1.0; 
+						float3 nSpec =   lightDirection = normalize(mul(unity_LightPosition[0],UNITY_MATRIX_IT_MV).xyz);
+
+			float3 camPos = float3( 1.0, 1.0,-150.0);
+
+			float3 camX   = float3  (1, 0.0, 0.0) * 1.75;
+			float3 camY   = float3( 0.0, 1, 0.0) * 0.5;
+			float3 camZ   = float3( 0.0, 0.0, 1) ;
+				
+						
 			float3 rO = camPos;
-			float3 rD = normalize(uv2.x*camX + uv2.y*camY + camZ);
+
+			float3 rD = nSpec;//normalize(uv2.x * camX + uv2.y * camY + camZ);
 			
 			float3 finalPos = float3(0,0,0);
-			float3 albedo = float3( 0.0, 0.0, 0.0 );
 			float3 normal = float3( 0.0, 0.0, 0.0 );
 		    float4 scatTrans = float4( 0.0, 0.0, 0.0, 0.0 );
 			
 			float3 nDotl = dot(normalDirection, lightDirection);
 
-			float3 nSpec =   (_WorldSpaceLightPos0.xyz - i.wPos.xyz);
-
-		    traceScene( i.uv.x>(_ScreenParams.x/2.0),
-		        rO, rD, finalPos, i.normal, albedo, scatTrans, LPOS);
+		    traceScene( i.uv.y>(_ScreenParams.y), rO, rD, finalPos, normalDirection, scatTrans, nSpec);
 			
 		    //lighting
-		    float3 color = evaluateLight(finalPos, i.normal, LPOS ) * volumetricShadow(finalPos, LPOS);
+		    float3 color = evaluateLight(finalPos, i.normal, nSpec ) * volumetricShadow(finalPos,nSpec);
 		    // Apply scattering/transmittance
 		    color = color * scatTrans.w + scatTrans.xyz;
 		    
 		    // Gamma correction
 			color = pow(color, float3(1.0/2.2,1.0/2.2,1.0/2.2)); // simple linear to gamma, exposure of 1.0
 		    
-			if(abs(i.uv.x-(_ScreenParams.x*0.5))<0.6)
-		        color.r = 0.5;
-
 				//color
 			return float4(color, 1.0);
 			}
