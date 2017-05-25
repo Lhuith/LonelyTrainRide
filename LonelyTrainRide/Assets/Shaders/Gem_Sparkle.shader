@@ -72,12 +72,12 @@
 				    const float a2 = -5.;
 				    float2 uv = i.uv;
 				    float3 color = float3(0,0,0);
-				    float2 colorShift = float2(.001,.003);
+				    float2 colorShift = float2(.0001,.0002);
 				    float2 uv1 = uv+colorShift;
 				    float2 uv2 = uv;
 				    float2 uv3 = uv-colorShift;
-				    float2 axis1 = rot(float2(0, 1.105/_ScreenParams.y),-15.);
-				    float2 axis2 = rot(float2(0, 0.953/_ScreenParams.y),+65.);
+				    float2 axis1 = rot(float2(0,1.105/_ScreenParams.y),-15.);
+				    float2 axis2 = rot(float2(0,0.953/_ScreenParams.y),+65.);
 
 				    for(float delta = 0.; delta< n;delta++)
 					{
