@@ -240,6 +240,7 @@
     <None Include="Assets\Shaders\Sky\Old\SkyGen.shader" />
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade.shader" />
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade_V2.shader" />
+    <None Include="Assets\Shaders\Sky\SparkNoiseSky.cginc" />
     <None Include="Assets\Shaders\Test\13_AnisotropicReflection.shader" />
     <None Include="Assets\Shaders\Test\CloudyWater.shader" />
     <None Include="Assets\Shaders\Test\RayCastTester.shader" />

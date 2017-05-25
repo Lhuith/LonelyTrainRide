@@ -306,7 +306,7 @@ SubShader
 		
 		v2f vert (appdata_base v)
 		{
-			v2f o;
+					v2f o;
 					
 			w[0].freq =  _Frequency;		   
 			w[0].amp =   _Amplitude; 	
@@ -326,7 +326,7 @@ SubShader
 			o.wPos =  mul(unity_ObjectToWorld, v.vertex);
 			half2 x0 = o.wPos.xz;
 			float3 newPos = float3(0.0, 0.0, 0.0);
-			float3 tangent = float3(0.0, 0.0, 0.0);
+			float4 tangent = float4(0.0, 0.0, 0.0, 0.0);
 			float3 binormal = float3(0.0, 0.0,0.0);
 		
 			for(int i = 0; i < 3; i++)
@@ -334,7 +334,7 @@ SubShader
 				//Wave w = w;//waveBuffer[i];
 				newPos += getGerstnerOffset(x0, w[i], _Time.y);
 				binormal += computeBinormal(x0, w[i], _Time.y);
-				tangent += computeTangent(x0, w[i], _Time.y);
+				tangent += float4(computeTangent(x0, w[i], _Time.y).xyz, 1.0);
 			}
 		
 			// fix binormal and tangent
@@ -350,10 +350,12 @@ SubShader
 		
 		    o.pos = UnityObjectToClipPos(v.vertex);
 			o.fragPos = v.vertex;
-		
-			o.tangentWorld =  normalize( mul( float4(tangent, 0.0), unity_ObjectToWorld));
+
+			//o.tangentWorld =  normalize( mul( float4(tangent, 0.0), unity_ObjectToWorld));
+			o.tangentWorld = normalize(mul(unity_ObjectToWorld, half4(tangent.xyz, 0.0)));
+
 			o.binormalWorld = normalize( mul( float4(binormal.xyz, 0.0), unity_ObjectToWorld).xyz);
-			o.normalDir = normalize( cross( o.tangentWorld, o.binormalWorld) * o.tangentWorld.w);
+			o.normalDir = normalize( cross( o.tangentWorld, o.binormalWorld));
 		
 			o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
 			o.projPos = ComputeScreenPos (o.pos);
@@ -385,7 +387,7 @@ SubShader
 				//Normal Calculations
 				//------------------------------------------
 				fixed4 texN = tex2D(_BumpMap, i.uv.xy * _BumpMap_ST.xy + _BumpMap_ST.zw);
-		
+				fixed4 texBloom = tex2D(_FrameSampler, i.uv.xy);
 								//unpackNormal function
 				fixed3 localCoords = float3(2.0 * texN.ag - float2(1.0, 1.0),	_BumpDepth);
 				
@@ -413,10 +415,27 @@ SubShader
 		
 				fixed nDotl = saturate(dot(normalDirection, i.lightDir.xyz));	
 				
+
+				//Lighting
+				fixed3 h = normalize(i.lightDir.xyz + i.viewDir);
+				fixed3 binormalDir = cross(i.normalDir, i.tangentWorld);
+				
+				//dotProduct
+				fixed nDotL = dot(normalDirection, i.lightDir.xyz);
+				fixed nDotH = dot(normalDirection, h);
+				fixed nDotV = dot(normalDirection, i.viewDir);
+				fixed tDotHX = dot(i.tangentWorld, h)/ _AniX;
+				fixed bDotHY = dot(binormalDir, h)/ _AniY;
+
+
 				fixed3 diffuseReflection = i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
 			    fixed3 specularReflection = (diffuseReflection * _SpecColor.xyz * pow(saturate(dot(reflect(-i.lightDir.xyz, 
 											normalDirection), i.viewDir)) , _Shininess)) * _SpecStrength; 
-		
+				
+				fixed3 specularAniReflection = diffuseReflection * _SpecColor.xyz * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess;
+
+
+				
 				//------------------------------------------
 				
 								
@@ -451,19 +470,24 @@ SubShader
 		
 				half3 refraction = tex2Dproj( _GrabTexture, UNITY_PROJ_COORD(i.uvgrab));
 		        //refraction *= fade;
-		
-				fixed3 reflection = IBLRefl(_Cube, _Detail, worldRefl, _ReflectionExposure, _ReflectionFactor, fresnelFactor);
+				
+				//float3 gloss =  pow(clamp(dot(reflect(i.wPos, normalDirection), i.lightDir), 0.0, 1.0), 64.0);;
+
+				fixed3 reflection = IBLRefl(_Cube, _Detail, worldRefl, _ReflectionExposure * fresnelFactor, 
+				_ReflectionFactor * fresnelFactor, fresnelFactor);
 		
 				float waterDepth = max(0, i.wPos.y * fade * _WaterDepth); 		
 					
 				refraction = lerp(refraction, float3(1,1,1), fade);
 		
-				fixed4 lightFinal = fixed4((specularReflection), 1.0) * fresnelFactor;		
-		
-				float3 waterColor = GetWaterColor(fadeDist / 25, waterDepth, refraction, diffuseReflection + specularReflection);		
-		
+				//float3 refRaf = lerp(reflection , refraction , fresnelFactor);
+
+				fixed4 lightFinal = fixed4((specularReflection + specularAniReflection), 1.0) * fresnelFactor;		
+
+				float3 waterColor = GetWaterColor(fadeDist / 25, waterDepth, refraction, reflection + lightFinal + diffuseReflection);		
+
 				float3 glitterSpec = glitter(i.wPos, normalDirection , 
-				i.lightDir, ((diffuseReflection + specularReflection) * fresnelFactor / 24) + specularReflection, i.viewDir) * fresnelFactor;
+				i.lightDir, ((diffuseReflection) / 24) + specularAniReflection + specularReflection, i.viewDir) * fresnelFactor;
 		
 				glitterSpec *= _GlitterStrength * 12;
 			    return float4(glitterSpec,1) ; 

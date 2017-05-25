@@ -29,7 +29,7 @@ SubShader {
 
         #include "UnityCG.cginc"
         #include "Lighting.cginc"
-
+		#include "SparkNoiseSky.cginc"
  		uniform half gTime;
 		uniform half _SUN;
         uniform half _HdrExposure,_RL,_MIE;        // HDR exposure
@@ -856,9 +856,14 @@ float4 render_clouds(
 	float3 cloudcol = float3(0, 0, 0);
 
 			float3 col;
-		
+			float3 stars = float3(0,0,0);
+
 			if(IN.rayDir.y < 0.01)
             {
+						    // Add stars.
+				float s = pow(max(0.0, snoise(IN.tex * 1e2)), 18.0);
+				 stars += float3(s, s, s);
+				
 				float3 eye = float3(0, 1.02, 0);
 				float3 point_cam = float3(0, 0.91, 0);
 				float2 point_ndc = IN.pos.xy;
@@ -875,14 +880,21 @@ float4 render_clouds(
 				 fixed lightCos = dot(_WorldSpaceLightPos0.xyz , normalize(float3(IN.rayDir.x, -IN.rayDir.y, IN.rayDir.z)));
                 fixed lightCos2 = lightCos * lightCos;
 
-				float4 cld = render_clouds(eye_ray, lightCos);
+				float4 cld = render_clouds(eye_ray, _WorldSpaceLightPos0);
 
 				fixed mie =  getMiePhase(eyeCos, eyeCos2);
 
-                col = (getRayleighPhase(eyeCos2)) * IN.cIn.xyz + cld.rgb + (mie) * _LightColor0 * IN.cOut;
+
+				cloudcol = lerp(cld, mie, mie);
+
+				stars -= cld;
+
+                col = (getRayleighPhase(eyeCos2)) * IN.cIn.xyz + cld.rgb + (mie) * _LightColor0 * IN.cOut + stars;
 				//float3 sky = render_sky_color(eye_ray, IN.lightDirAngle);
 
-				cloudcol = lerp(col, cld.rgb/(0.000001+cld.a), cld.a) * _LightColor0;
+
+				col = lerp(col, cld,  cld.a);
+				//cloudcol = lerp(col, cld.rgb/(0.000001+cld.a), cld.a) * _LightColor0;
 				//cloudcol *= mie + getRayleighPhase(eyeCos2);
 		
             }
@@ -896,7 +908,7 @@ float4 render_clouds(
 			col *= _HdrExposure;
 			cloudcol *=  _HdrExposure;
 			//finalCol *= .55+0.45*pow(70.0 * xy.x * xy.y * (1.0 - xy.x ) * (1.0 - xy.y), 0.15 );
-            return  float4(cloudcol, 1.0);
+            return  float4(col, 1.0);
  
         }
         ENDCG
