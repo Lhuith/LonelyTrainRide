@@ -132,6 +132,10 @@
     <Compile Include="Assets\Standard Assets\Environment\Water\Water\Scripts\WaterTile.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\DepthScatterExport\ApplyLightShafts.shader" />
+    <None Include="Assets\DepthScatterExport\Blur.shader" />
+    <None Include="Assets\DepthScatterExport\CalculateLightshafts.shader" />
+    <None Include="Assets\DepthScatterExport\DownscaleDepth.shader" />
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
     <None Include="Assets\Shaders\Depth\DepthImageEffect.shader" />

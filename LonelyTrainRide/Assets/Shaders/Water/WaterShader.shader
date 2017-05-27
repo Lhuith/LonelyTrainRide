@@ -468,10 +468,10 @@ SubShader
 
 				fixed4 lightFinal = fixed4((specularReflection + specularAniReflection), 1.0) * fresnelFactor;		
 
-				float3 waterColor = GetWaterColor(fadeDist / 25, waterDepth, refraction, 
-				reflection + lightFinal + diffuseReflection + specularAniReflection);		
+				float3 waterColor = GetWaterColor(fade, waterDepth, refraction, 
+				specularReflection + specularAniReflection + diffuseReflection);		
 
-			    return float4((waterColor + (reflection)) + lightFinal, fade);
+			    return float4(waterColor + reflection + lightFinal, fade);
 		
 			}
 			ENDCG

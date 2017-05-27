@@ -433,12 +433,9 @@ SubShader
 											normalDirection), i.viewDir)) , _Shininess)) * _SpecStrength; 
 				
 				fixed3 specularAniReflection = diffuseReflection * _SpecColor.xyz * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess;
-
-
 				
 				//------------------------------------------
-				
-								
+												
 				float si = ComputeSSS(normalDirection, i.lightDir, i.viewDir);	
 		
 				float ex =  exp(-si * _sigma_t);	
@@ -484,7 +481,8 @@ SubShader
 
 				fixed4 lightFinal = fixed4((specularReflection + specularAniReflection), 1.0) * fresnelFactor;		
 
-				float3 waterColor = GetWaterColor(fadeDist / 25, waterDepth, refraction, reflection + lightFinal + diffuseReflection);		
+				float3 waterColor = GetWaterColor(fade, waterDepth, refraction, 
+				lightFinal + diffuseReflection);	
 
 				float3 glitterSpec = glitter(i.wPos, normalDirection , 
 				i.lightDir, ((diffuseReflection) / 24) + specularAniReflection + specularReflection, i.viewDir) * fresnelFactor;

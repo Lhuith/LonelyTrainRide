@@ -90,6 +90,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\DepthScatterExport\LightDepthScatter.cs" />
+    <Compile Include="Assets\DepthScatterExport\ShadowCopySetup.cs" />
     <Compile Include="Assets\FrameSampler.cs" />
     <Compile Include="Assets\Gem_Bloom.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
@@ -224,6 +226,10 @@
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_Utils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\DepthScatterExport\ApplyLightShafts.shader" />
+    <None Include="Assets\DepthScatterExport\Blur.shader" />
+    <None Include="Assets\DepthScatterExport\CalculateLightshafts.shader" />
+    <None Include="Assets\DepthScatterExport\DownscaleDepth.shader" />
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
     <None Include="Assets\Shaders\Depth\DepthImageEffect.shader" />
