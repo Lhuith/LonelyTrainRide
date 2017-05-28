@@ -1,4 +1,6 @@
-﻿Shader "Eugene/Enviroment/Sky/ProceduralUpgrade_V2" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Eugene/Enviroment/Sky/ProceduralUpgrade_V2" {
 Properties {
     _HdrExposure("HDR Exposure", float) = 1.3
     _GroundColor ("Ground", Color) = (.369, .349, .341, 1)
@@ -17,11 +19,11 @@ Properties {
 }
  
 SubShader {
-    Tags { "Queue"="Background" "RenderType"="Background" "PreviewType"="Skybox" }
-    Cull Off ZWrite Off
- 
-    Pass {
-       
+
+    Tags { "Queue"="Background" "RenderType"="Sky" "PreviewType"="Skybox" }
+    Pass 
+	{
+       Name "CLOUDS"
         CGPROGRAM
 		//#pragma pack_matrix(row_major)
         #pragma vertex vert

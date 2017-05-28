@@ -121,6 +121,7 @@
     <Compile Include="Assets\Scripts\Water_Map\MeshGenerator.cs" />
     <Compile Include="Assets\Scripts\Water_Map\PaintTest.cs" />
     <Compile Include="Assets\Scripts\Water_Map\TextureGenerator.cs" />
+    <Compile Include="Assets\Sky_Replacement_Shader.cs" />
     <Compile Include="Assets\Sparkle_Replacement_Shader.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_GazeTracker.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_LaserPointer.cs" />
@@ -230,6 +231,7 @@
     <None Include="Assets\DepthScatterExport\Blur.shader" />
     <None Include="Assets\DepthScatterExport\CalculateLightshafts.shader" />
     <None Include="Assets\DepthScatterExport\DownscaleDepth.shader" />
+    <None Include="Assets\Shaders\Clouds_Replacment.shader" />
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
     <None Include="Assets\Shaders\Depth\DepthImageEffect.shader" />
@@ -246,6 +248,7 @@
     <None Include="Assets\Shaders\Sky\Old\SkyGen.shader" />
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade.shader" />
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade_V2.shader" />
+    <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade_V2_ReplacmentShader.shader" />
     <None Include="Assets\Shaders\Sky\SparkNoiseSky.cginc" />
     <None Include="Assets\Shaders\Test\13_AnisotropicReflection.shader" />
     <None Include="Assets\Shaders\Test\CloudyWater.shader" />

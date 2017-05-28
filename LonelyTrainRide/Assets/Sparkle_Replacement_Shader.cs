@@ -11,8 +11,6 @@ public class Sparkle_Replacement_Shader : MonoBehaviour
         // Use this for initialization
 	void OnEnable ()
     {
-
-        Debug.Log(Screen.height);
         this.GetComponent<Camera>().SetReplacementShader(replacementShader, "RenderType");
 	}
 

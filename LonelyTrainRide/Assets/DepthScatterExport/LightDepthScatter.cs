@@ -12,8 +12,8 @@ namespace UnityStandardAssets.ImageEffects
 		public Shader DownscaleDepthShader = null;
 		public Shader ApplyFogShader = null;
 		public Texture2D NoiseTexture = null;
-
-		public float FogDensity = 0.2f;
+        public RenderTexture SkyCloudsDepthTexture = null;
+        public float FogDensity = 0.2f;
 		public float ScatteringCoeff = 0.25f;
 		public float ExtinctionCoeff = 0.01f;
 		public float MaxRayDistance = 300;
@@ -82,8 +82,11 @@ namespace UnityStandardAssets.ImageEffects
 
 			CalculateFogMaterial.SetTexture ("LowResDepth", lowresDepthRT);
 			CalculateFogMaterial.SetTexture ("NoiseTexture", NoiseTexture);
+           // CalculateFogMaterial.SetTexture("SkyCloudsDepthTexture", SkyCloudsDepthTexture);
 
-			CalculateFogMaterial.SetMatrix( "InverseViewMatrix", camera.cameraToWorldMatrix);
+            Shader.SetGlobalTexture("_SkyCloudsDepthTexture", SkyCloudsDepthTexture);
+
+            CalculateFogMaterial.SetMatrix( "InverseViewMatrix", camera.cameraToWorldMatrix);
 			CalculateFogMaterial.SetMatrix( "InverseProjectionMatrix", camera.projectionMatrix.inverse);
 			CalculateFogMaterial.SetFloat ("FogDensity", FogDensity);
 			CalculateFogMaterial.SetFloat ("ScatteringCoeff", ScatteringCoeff);
@@ -93,7 +96,6 @@ namespace UnityStandardAssets.ImageEffects
 			CalculateFogMaterial.SetFloat ("LightIntensity", light.intensity);
 			CalculateFogMaterial.SetColor ("ShadowedFogColour", ShadowedFogColour);
 			CalculateFogMaterial.SetVector ("TerrainSize", new Vector3(100,50,100));
-
 			//render fog, quarter resolution
 			Graphics.Blit (source, fogRT1, CalculateFogMaterial);
 

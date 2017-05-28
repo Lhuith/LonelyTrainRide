@@ -14,7 +14,8 @@ Shader "Custom/DownscaleDepth" {
 	
 	sampler2D _CameraDepthTexture;
 	float4 _CameraDepthTexture_TexelSize; // (1.0/width, 1.0/height, width, height)
-	
+	sampler2D _SkyCloudsDepthTexture;
+
 	v2f vert( appdata_img v ) 
 	{
 		v2f o = (v2f)0; 
@@ -37,9 +38,17 @@ Shader "Custom/DownscaleDepth" {
 		float depth3 = tex2D(_CameraDepthTexture, taps[2]);
 		float depth4 = tex2D(_CameraDepthTexture, taps[3]);
 		
+
+		float skydepth1 = tex2D(_SkyCloudsDepthTexture, taps[0]);
+		float skydepth2 = tex2D(_SkyCloudsDepthTexture, taps[1]);
+		float skydepth3 = tex2D(_SkyCloudsDepthTexture, taps[2]);
+		float skydepth4 = tex2D(_SkyCloudsDepthTexture, taps[3]);
+
 		float result = min(depth1, min(depth2, min(depth3, depth4)));
-		
-		return result;
+
+		float result2 = min(skydepth1, min(skydepth2, min(skydepth3, skydepth4)));
+
+		return result2;
 	}
 	
 	ENDCG

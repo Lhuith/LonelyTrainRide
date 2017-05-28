@@ -17,7 +17,6 @@ Shader "Custom/PostProcess"
 	UNITY_DECLARE_SHADOWMAP(MyShadowMap);
  	sampler2D LowResDepth;
  	sampler2D NoiseTexture;
- 	
  	float4x4 InverseProjectionMatrix;
  	float4x4 InverseViewMatrix;
 
@@ -56,13 +55,13 @@ Shader "Custom/PostProcess"
 	#define GRID_SIZE_SQR_RCP (1.0/(GRID_SIZE*GRID_SIZE))
 		
 	float4 frag(v2f i) : SV_Target 
-	{				
+	{
 		// read low res depth and reconstruct world position
 		float depth = SAMPLE_DEPTH_TEXTURE(LowResDepth, i.uv);
 		
 		//linearise depth		
-		float lindepth = Linear01Depth (depth);
-		
+		float lindepth =  (Linear01Depth (depth));
+
 		//get view and then world positions		
 		float4 viewPos = float4(i.cameraRay.xyz * lindepth,1);
 		float3 worldPos = mul(InverseViewMatrix, viewPos).xyz;	
@@ -97,6 +96,7 @@ Shader "Custom/PostProcess"
 		
 		float transmittance = 1;
 		
+		float2 uv = i.uv;
 		for(int i = 0 ; i < NUM_SAMPLES ; i++ )
 		{					
 			float2 noiseUV = currentPos.xz / TerrainSize.xz;
@@ -107,14 +107,15 @@ Shader "Custom/PostProcess"
 
 			float scattering =  ScatteringCoeff * fogDensity;
 			float extinction = ExtinctionCoeff * fogDensity;
-				
-			//calculate shadow at this sample position
-			float3 shadowCoord0 = mul(unity_WorldToShadow[0], float4(currentPos,1)).xyz; 
-			float3 shadowCoord1 = mul(unity_WorldToShadow[1], float4(currentPos,1)).xyz; 
-			float3 shadowCoord2 = mul(unity_WorldToShadow[2], float4(currentPos,1)).xyz; 
-			float3 shadowCoord3 = mul(unity_WorldToShadow[3], float4(currentPos,1)).xyz;
 			
-			float4 shadowCoord = float4(shadowCoord0 * weights[0] + shadowCoord1 * weights[1] + shadowCoord2 * weights[2] + shadowCoord3 * weights[3],1); 
+			//calculate shadow at this sample position
+			float3 shadowCoord0 = mul(unity_WorldToShadow[0], float4(currentPos,1)).xyz ; 
+			float3 shadowCoord1 = mul(unity_WorldToShadow[1], float4(currentPos,1)).xyz ; 
+			float3 shadowCoord2 = mul(unity_WorldToShadow[2], float4(currentPos,1)).xyz ; 
+			float3 shadowCoord3 = mul(unity_WorldToShadow[3], float4(currentPos,1)).xyz ;
+			
+			float4 shadowCoord = float4(shadowCoord0 * weights[0] + shadowCoord1 * weights[1] + 
+			shadowCoord2 * weights[2] + shadowCoord3 * weights[3], 1); 
 			 
 			//do shadow test and store the result			
 			float shadowTerm = UNITY_SAMPLE_SHADOW(MyShadowMap, shadowCoord);				

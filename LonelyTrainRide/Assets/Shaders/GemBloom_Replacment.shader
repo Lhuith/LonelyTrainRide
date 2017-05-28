@@ -39,10 +39,10 @@ SubShader {
     }
 }
 
-				SubShader 
-		{
-			Tags { "RenderType"="Sparkle""LightMode" = "ForwardBase" }
-			UsePass "Eugene/Enviroment/Water/WaterShaderReplacment/SPARKLE"
-		}
+SubShader 
+	{
+		Tags {"RenderType"="Sparkle" "LightMode" = "ForwardBase"}
+		UsePass "Eugene/Enviroment/Water/WaterShaderReplacment/SPARKLE"
+	}
 
 }

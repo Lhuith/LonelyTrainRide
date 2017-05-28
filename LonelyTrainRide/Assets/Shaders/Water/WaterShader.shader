@@ -84,9 +84,8 @@ SubShader
 		GrabPass { Name "BASE" Tags { "LightMode" = "Always" }} 
 		
 		Tags { "Queue" = "Transparent" "RenderType" = "Sparkle" "LightMode" = "ForwardBase"}
-		Name "SPARKLE"
 		Pass
-		{		
+		{			
 			//Blend One One
 			CGPROGRAM
 			//#pragma glsl

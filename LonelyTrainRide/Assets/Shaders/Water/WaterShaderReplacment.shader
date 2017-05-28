@@ -77,10 +77,11 @@
 
 SubShader
 	{
-		Name "Sparkle"
+	
+		Tags { "Queue"="Transparent" "RenderType" = "Sparkle" "LightMode" = "ForwardBase"}
 		Pass
 		{
-			Tags { "Queue"="Transparent" "RenderType" = "Sparkler" "LightMode" = "ForwardBase"}
+			Name "SPARKLE"
 			CGPROGRAM
 			#pragma glsl
 			#pragma vertex vert
