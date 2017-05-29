@@ -2,12 +2,15 @@
 {
 	SubShader 
 	{
-		Tags { "RenderType"="Opaque" "Queue"="Geometry-100"}
+		Tags { "RenderType"="Opaque" "Queue"="Geometry"}
+		
+		Cull back
 		ColorMask 0
 		ZWrite off
+
 		Stencil 
 		{
-			Ref 4
+			Ref 1
 			Comp always
 			Pass replace
 		}
@@ -37,7 +40,7 @@
 			
 			half4 frag(v2f i) : COLOR 
 			{
-				return half4(1,1,0,1);
+				return half4(1,0,0,1);
 			}
 		ENDCG
 		}

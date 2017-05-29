@@ -1,10 +1,11 @@
-﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
-Shader "Eugene/Enviroment/Sky/SkyProcedralUpgrade_V2_ReplacmentShader" 
+﻿Shader "Eugene/Enviroment/Sky/SkyProcedralUpgrade_V2_ReplacmentShader" 
 {
-Properties {
+Properties 
+{
     _HdrExposure("HDR Exposure", float) = 1.3
+	[Space]
     _GroundColor ("Ground", Color) = (.369, .349, .341, 1)
+	[Space]
 	_SkyAddColor ("Additional Sky Color Add", Color) = (.369, .349, .341, 1)
 
     _RL("Rayleigh", float) = 0.0025
@@ -94,7 +95,8 @@ SubShader
 		
 		//#define SIMULATE_LIGHT
 		//#define FAKE_LIGHT
-		
+		sampler2D _CameraDepthTexture;
+
 		#define STEPS			_IterationSteps
 		/******************************************************************************/
 
@@ -690,6 +692,7 @@ float4 render_clouds(_in(ray_t) eye, fixed lightAngle)
 				half3 tex : TEXCOORD4;
 				half lightDirAngle : TEXCOORD5;
 				float depth : SV_Depth;
+				float4 scrPos:TEXCOORD6;
 
            };
 		
@@ -711,7 +714,8 @@ float4 render_clouds(_in(ray_t) eye, fixed lightAngle)
             half3 eyeRay = normalize(mul((half3x3)unity_ObjectToWorld, v.vertex.xyz));
 			OUT.depth = -mul(UNITY_MATRIX_MV, v.vertex).z * _ProjectionParams.w;
             OUT.rayDir = half3(-eyeRay);        
- 
+			OUT.scrPos=ComputeScreenPos(OUT.pos);
+			OUT.scrPos.y = 1 - OUT.scrPos.y;
             return OUT;
  
         } 
@@ -722,6 +726,15 @@ float4 render_clouds(_in(ray_t) eye, fixed lightAngle)
 			float3 cloudcol = float3(0, 0, 0);
 			float invert = 1 - IN.depth;
 			float4 depthCol = float4(invert, invert, invert, 1.0);
+
+			float depthValue = Linear01Depth (tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(IN.scrPos)).r);
+			half4 depth;
+
+			depth.r = depthValue;
+			depth.g = depthValue;
+			depth.b = depthValue;
+
+			depth.a = 1;
 
 			if(IN.rayDir.y < 0.01)
             {
@@ -749,10 +762,14 @@ float4 render_clouds(_in(ray_t) eye, fixed lightAngle)
             }
             else
             {
-				cloudcol = IN.cIn.xyz + _GroundColor * IN.cOut;
+				cloudcol = IN.cIn.xyz + _GroundColor * depth;
             }
 			//IN.depth = cloudcol;
-            return float4(cloudcol, 1);
+
+
+			float3 finalCol = lerp(depth.rgb, cloudcol, depthValue);
+
+            return float4(finalCol, 1);
  
         }
         ENDCG

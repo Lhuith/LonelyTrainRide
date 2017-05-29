@@ -85,7 +85,18 @@ SubShader
 		
 		Tags { "Queue" = "Transparent" "RenderType" = "Sparkle" "LightMode" = "ForwardBase"}
 		Pass
-		{			
+		{	
+		Cull Off		
+		//ColorMask 0
+		//Caster
+		//Stencil 
+		//{
+		//	    Ref 2
+        //        Comp equal
+        //        Pass keep 
+        //        ZFail decrWrap
+		//}
+		
 			//Blend One One
 			CGPROGRAM
 			//#pragma glsl

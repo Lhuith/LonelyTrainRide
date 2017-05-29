@@ -31,6 +31,15 @@
 		Cull Off
 		Blend SrcAlpha OneMinusSrcAlpha
 		Fog { Mode Off }
+		//Reciever
+		Stencil 
+		{
+			    Ref 1
+                Comp equal
+                Pass keep 
+                ZFail decrWrap
+		}
+		
 		Pass
 		{
 			CGPROGRAM

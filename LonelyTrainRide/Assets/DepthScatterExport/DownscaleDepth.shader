@@ -48,7 +48,7 @@ Shader "Custom/DownscaleDepth" {
 
 		float result2 = min(skydepth1, min(skydepth2, min(skydepth3, skydepth4)));
 
-		return result2;
+		return result;
 	}
 	
 	ENDCG

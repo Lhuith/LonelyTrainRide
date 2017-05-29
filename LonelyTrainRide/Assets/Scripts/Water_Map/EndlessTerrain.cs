@@ -93,6 +93,8 @@ public class EndlessTerrain : MonoBehaviour {
         LODinfo[] detailLevels;
         LODMesh[] lodMeshes;
 
+        renderque renderQ;
+
         MapData mapData;
         bool mapDataRecieved;
         int prevoisLODIndex = -1;
@@ -111,6 +113,7 @@ public class EndlessTerrain : MonoBehaviour {
             meshRenderer = meshObject.AddComponent<MeshRenderer>();
             meshFilter = meshObject.AddComponent<MeshFilter>();
             meshCollider = meshObject.AddComponent<MeshCollider>();
+            renderQ = meshObject.AddComponent<renderque>();
            // dynamicApply = meshObject.AddComponent<DynamicApplyShader>();
 
             //dynamicApply.mat = _dynamicInfo.mat;
