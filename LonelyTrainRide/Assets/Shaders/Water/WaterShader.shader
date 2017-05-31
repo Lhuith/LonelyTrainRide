@@ -86,7 +86,7 @@ SubShader
 		Tags { "Queue" = "Transparent" "RenderType" = "Sparkle" "LightMode" = "ForwardBase"}
 		Pass
 		{	
-		Cull Off		
+		Cull Off	
 		//ColorMask 0
 		//Caster
 		//Stencil 
@@ -421,7 +421,7 @@ SubShader
 				fixed tDotHX = dot(i.tangentWorld, h)/ _AniX;
 				fixed bDotHY = dot(binormalDir, h)/ _AniY;
 
-
+				float attenuation = LIGHT_ATTENUATION(i);
 				fixed3 diffuseReflection = i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
 			    fixed3 specularReflection = (diffuseReflection * _SpecColor.xyz * pow(saturate(dot(reflect(-i.lightDir.xyz, 
 											normalDirection), i.viewDir)) , _Shininess)) * _SpecStrength; 
@@ -481,7 +481,7 @@ SubShader
 				float3 waterColor = GetWaterColor(fade, waterDepth, refraction, 
 				specularReflection + specularAniReflection + diffuseReflection);		
 
-			    return float4(waterColor + reflection + lightFinal, fade);
+			    return float4(waterColor + reflection + lightFinal, fade) ;
 		
 			}
 			ENDCG
@@ -490,6 +490,6 @@ SubShader
 
 	
 		}
-	   //FallBack "VertexLit"
+	   //Fallback "Diffuse"
 }
  

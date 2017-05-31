@@ -133,7 +133,7 @@ Shader "Custom/PostProcess"
 			currentPos += rayDir * stepSize;	
 		}
 						
-		return float4(result, transmittance);		
+		return float4(result, transmittance) ;		
 	}
 	
 	ENDCG

@@ -44,6 +44,9 @@ public class EndlessOcean: MonoBehaviour {
 
     public DynamicInformation dynamicInfo;
 
+
+    public TerrainChunk ClippingMesh;
+
     void Start()
     {
         mapGenerator = FindObjectOfType<MapGenerator>();
@@ -53,11 +56,19 @@ public class EndlessOcean: MonoBehaviour {
         chunksVisibleInViewDistance = Mathf.RoundToInt(maxViewDist / chunksize);
 
         UpdateVisibleChunks();
+
+        int curentChunkCoordX = Mathf.RoundToInt(viewerPosition.x / chunksize);
+        int curentChunkCoordY = Mathf.RoundToInt(viewerPosition.y / chunksize);
+
+        Vector2 viewedChunkCoord = new Vector2(curentChunkCoordX, curentChunkCoordY);
+
+        //ClippingMesh = new TerrainChunk(viewedChunkCoord, chunksize, detialLevels, viewer.gameObject.transform, OceanMaterial, dynamicInfo, "clipper");
     }
 
     void Update()
     {
         viewerPosition = new Vector2(viewer.position.x, viewer.position.z);
+       // ClippingMesh.UpdateTerrainChunk();
 
         if ((viewerPositionOld - viewerPosition).sqrMagnitude > sqrViewerMoveThresholdforChunkUpdate)
         {
@@ -98,7 +109,7 @@ public class EndlessOcean: MonoBehaviour {
 
     public class TerrainChunk
     {
-        GameObject meshObject;
+        public GameObject meshObject;
         Vector2 position;
         Bounds bounds;
 
@@ -118,7 +129,7 @@ public class EndlessOcean: MonoBehaviour {
 
         
 
-        public TerrainChunk(Vector2 coord, int size, LODinfo[] detailLevels, Transform parent, Material mat, DynamicInformation _dynamicInfo)
+        public TerrainChunk(Vector2 coord, int size, LODinfo[] detailLevels, Transform parent, Material mat, DynamicInformation _dynamicInfo, string name = "")
         {
             this.detailLevels = detailLevels;
 
@@ -126,7 +137,7 @@ public class EndlessOcean: MonoBehaviour {
             bounds = new Bounds(position, Vector2.one * size);
             Vector3 postionV3 = new Vector3(position.x, 0, position.y);
 
-            meshObject = new GameObject("Ocean Chunk");
+            meshObject = new GameObject((name == "") ? "OceanChunk" : name);
             meshObject.layer = 4;
             meshRenderer = meshObject.AddComponent<MeshRenderer>();
             meshFilter = meshObject.AddComponent<MeshFilter>();

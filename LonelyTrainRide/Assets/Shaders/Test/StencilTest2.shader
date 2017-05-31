@@ -2,47 +2,19 @@
 {
 	SubShader 
 	{
-		Tags { "RenderType"="Opaque" "Queue"="Geometry-100"}
-		
-		ColorMask 0
-		ZWrite off
+				// Render the mask after regular geometry, but before masked geometry and
+		// transparent things.
+ 
+		Tags {"Queue" = "Geometry+10" "RenderType"="Depth"}
 
-		Stencil 
-		{
-			Ref 2
-			Comp always
-			Pass replace
-		}
-		 
+		// Don't draw in the RGBA channels; just the depth buffer
+		Cull Off
+		ColorMask 0
+		ZWrite On
+		// Do nothing specific in the pass:
 		Pass
-		{
-		CGPROGRAM
-			#pragma vertex vert
-			#pragma fragment frag
-			
-			struct appdata 
-			{
-				float4 vertex : POSITION;
-			};
-			
-			struct v2f 
-			{
-				float4 pos : SV_POSITION;
-			};
-			
-			v2f vert(appdata v) 
-			{
-				v2f o;
-				o.pos = UnityObjectToClipPos(v.vertex);
-				return o;
-			}
-			
-			half4 frag(v2f i) : COLOR 
-			{
-				return half4(1,0,0,1);
-			}
-		ENDCG
-		}
+		 {	
+		 }
 	}
 }
 
