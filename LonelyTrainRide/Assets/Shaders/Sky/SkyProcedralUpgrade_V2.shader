@@ -24,6 +24,7 @@ SubShader {
     Pass 
 	{
        Name "CLOUDS"
+	   		Cull Off
         CGPROGRAM
 		//#pragma pack_matrix(row_major)
         #pragma vertex vert

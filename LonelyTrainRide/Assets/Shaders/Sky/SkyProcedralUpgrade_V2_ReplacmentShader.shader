@@ -18,14 +18,25 @@ Properties
 	_CloudAborbsion("Cloud Light Absorbstion Factor", Range(0.0000, 2.0000)) = 1.030725
 	_IterationSteps("Cloud Resolution", Range(1, 200)) = 55
 	_FBMFrequency("Cloud SmoothNess", Range(0,5)) = 2.76434
+	
+
+		_AlphaCutoff ("Alpha Cutoff", Range(0, 1)) = 0.5
+
+		[HideInInspector] _SrcBlend ("_SrcBlend", Float) = 1
+		[HideInInspector] _DstBlend ("_DstBlend", Float) = 0
+		[HideInInspector] _ZWrite ("_ZWrite", Float) = 1
 }
  
 SubShader 
 {
-    Tags { "Queue"="Background" "RenderType"="Sky" "PreviewType"="Skybox" }
+
+    Tags {"LightMode" = "ForwardBase"}
     Pass 	
-	{
-       Name "CLOUDS"
+	{	
+	
+		Blend [_SrcBlend] [_DstBlend]
+		ZWrite [_ZWrite]
+		Cull Off
         CGPROGRAM
 		//#pragma pack_matrix(row_major)
         #pragma vertex vert
@@ -224,7 +235,7 @@ float3 corect_gamma(
 	fixed p = 1.0 / gamma;
 	return float3(pow(color.r, p), pow(color.g, p), pow(color.b, p));
 }
-
+ 
 fixed checkboard_pattern(
 	_in(float2) pos,
 	_in(fixed) scale
@@ -270,7 +281,7 @@ void intersect_sphere(
 
 	if (t0 < 0.) t0 = t1;
 	if (t0 > hit.t)
-		return;
+		return; 
 
 	float3 impact = ray.origin + ray.direction * t0;
 
@@ -686,8 +697,6 @@ float4 render_clouds(_in(ray_t) eye, fixed lightAngle)
         struct v2f {
                 half4 pos : SV_POSITION;
                 half3 rayDir : TEXCOORD0;    // Vector for incoming ray, normalized ( == -eyeRay )
-                half3 cIn : TEXCOORD1;         // In-scatter coefficient
-                half3 cOut : TEXCOORD2;        // Out-scatter coefficient
 				half3 viewDir : TEXCOORD3;
 				half3 tex : TEXCOORD4;
 				half lightDirAngle : TEXCOORD5;
@@ -696,8 +705,6 @@ float4 render_clouds(_in(ray_t) eye, fixed lightAngle)
 
            };
 		
-	
-
         half scale(half inCos)
         {
             half x = 1.0 - inCos;
@@ -708,6 +715,7 @@ float4 render_clouds(_in(ray_t) eye, fixed lightAngle)
         {
             v2f OUT;
             OUT.pos = UnityObjectToClipPos(v.vertex);
+
             half3 cameraPos = half3(0,kInnerRadius + kCameraHeight,0);     // The camera's current position
 			OUT.tex = v.texcoord;
             // Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
@@ -716,6 +724,8 @@ float4 render_clouds(_in(ray_t) eye, fixed lightAngle)
             OUT.rayDir = half3(-eyeRay);        
 			OUT.scrPos=ComputeScreenPos(OUT.pos);
 			OUT.scrPos.y = 1 - OUT.scrPos.y;
+
+		
             return OUT;
  
         } 
@@ -741,7 +751,7 @@ float4 render_clouds(_in(ray_t) eye, fixed lightAngle)
 				
 				float3 eye = float3(0, 1.02, 0);
 				float3 point_cam = float3(0, 0.91, 0);
-				float2 point_ndc = IN.pos.xy;
+				float2 point_ndc = IN.pos.xy + _WorldSpaceCameraPos.xy;
 				point_ndc.y = 1. - point_ndc.y;
 
                 fixed eyeCos = dot(_WorldSpaceLightPos0.xyz, normalize(float3(IN.rayDir.x, IN.rayDir.y, IN.rayDir.z)));
@@ -762,21 +772,24 @@ float4 render_clouds(_in(ray_t) eye, fixed lightAngle)
             }
             else
             {
-				cloudcol = IN.cIn.xyz + _GroundColor * depth;
+				cloudcol = _GroundColor * depth;
             }
 			//IN.depth = cloudcol;
 
 
 			float3 finalCol = lerp(depth.rgb, cloudcol, depthValue);
 
+			if(finalCol.g <= 0)
+			discard;
+
             return float4(finalCol, 1);
  
         }
         ENDCG
     }
+
 }    
  
  
 Fallback Off
- 
 }

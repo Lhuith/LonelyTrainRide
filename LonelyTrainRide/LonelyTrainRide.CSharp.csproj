@@ -90,8 +90,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\DepthScatterExport\LightDepthScatter.cs" />
-    <Compile Include="Assets\DepthScatterExport\ShadowCopySetup.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Cube.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Grid.cs" />
@@ -101,19 +99,23 @@
     <Compile Include="Assets\Prefabs\MusicTech\isActive.cs" />
     <Compile Include="Assets\Scripts\Camera\CamLook.cs" />
     <Compile Include="Assets\Scripts\Camera\Camera_Imageing_Controls.cs" />
+    <Compile Include="Assets\Scripts\Camera\Gem_Bloom.cs" />
+    <Compile Include="Assets\Scripts\Camera\LightDepthScatter.cs" />
+    <Compile Include="Assets\Scripts\Camera\ObjectThickness.cs" />
     <Compile Include="Assets\Scripts\Camera\RenderMaterial.cs" />
-    <Compile Include="Assets\Scripts\FrameSampler.cs" />
-    <Compile Include="Assets\Scripts\Gem_Bloom.cs" />
-    <Compile Include="Assets\Scripts\InputControlls.cs" />
-    <Compile Include="Assets\Scripts\ObjectThickness.cs" />
+    <Compile Include="Assets\Scripts\Camera\ShadowCopySetup.cs" />
+    <Compile Include="Assets\Scripts\Camera\Sky_Replacement_Shader.cs" />
+    <Compile Include="Assets\Scripts\Camera\Sparkle_Replacement_Shader.cs" />
+    <Compile Include="Assets\Scripts\Camera\TangentSpaceVisualizer.cs" />
+    <Compile Include="Assets\Scripts\Camera\ThickGlassImageEffect.cs" />
+    <Compile Include="Assets\Scripts\Camera\Underwater_Mask.cs" />
+    <Compile Include="Assets\Scripts\Camera\Water_Masking_Replacment_Shader.cs" />
+    <Compile Include="Assets\Scripts\Camera\renderque.cs" />
+    <Compile Include="Assets\Scripts\Input\InputControlls.cs" />
     <Compile Include="Assets\Scripts\Sky\Sky_Shader_Manager.cs" />
-    <Compile Include="Assets\Scripts\Sky_Replacement_Shader.cs" />
-    <Compile Include="Assets\Scripts\Sparkle_Replacement_Shader.cs" />
     <Compile Include="Assets\Scripts\Tests\Atmosphere_Manager.cs" />
     <Compile Include="Assets\Scripts\Tests\ToCubeMap.cs" />
-    <Compile Include="Assets\Scripts\ThickGlassImageEffect.cs" />
     <Compile Include="Assets\Scripts\TrainCart\Train_Manager.cs" />
-    <Compile Include="Assets\Scripts\Underwater_Mask.cs" />
     <Compile Include="Assets\Scripts\Water_Map\DynamicApplyShader.cs" />
     <Compile Include="Assets\Scripts\Water_Map\EndlessOcean.cs" />
     <Compile Include="Assets\Scripts\Water_Map\EndlessTerrain.cs" />
@@ -124,8 +126,6 @@
     <Compile Include="Assets\Scripts\Water_Map\MeshGenerator.cs" />
     <Compile Include="Assets\Scripts\Water_Map\PaintTest.cs" />
     <Compile Include="Assets\Scripts\Water_Map\TextureGenerator.cs" />
-    <Compile Include="Assets\Scripts\Water_Masking_Replacment_Shader.cs" />
-    <Compile Include="Assets\Scripts\renderque.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_GazeTracker.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_LaserPointer.cs" />
     <Compile Include="Assets\SteamVR\Extras\SteamVR_Teleporter.cs" />
@@ -228,20 +228,21 @@
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_TrackedObject.cs" />
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_UpdatePoses.cs" />
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_Utils.cs" />
+    <Compile Include="Assets\hemisphere_Position_Manager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\DepthScatterExport\ApplyLightShafts.shader" />
-    <None Include="Assets\DepthScatterExport\Blur.shader" />
-    <None Include="Assets\DepthScatterExport\CalculateLightshafts.shader" />
-    <None Include="Assets\DepthScatterExport\DownscaleDepth.shader" />
-    <None Include="Assets\Shaders\Clouds_Replacment.shader" />
+    <None Include="Assets\Shaders\Depth\Blur.shader" />
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
     <None Include="Assets\Shaders\Depth\DepthImageEffect.shader" />
+    <None Include="Assets\Shaders\Depth\DownscaleDepth.shader" />
     <None Include="Assets\Shaders\Depth\Trace.cginc" />
     <None Include="Assets\Shaders\DynamicTest\Invert.shader" />
     <None Include="Assets\Shaders\DynamicTest\Smoke.shader" />
+    <None Include="Assets\Shaders\Light\ApplyLightShafts.shader" />
+    <None Include="Assets\Shaders\Light\CalculateLightshafts.shader" />
     <None Include="Assets\Shaders\Optimized_Diffused.shader" />
+    <None Include="Assets\Shaders\Sky\Clouds_Replacment.shader" />
     <None Include="Assets\Shaders\Sky\Old\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\Sky\Old\EquirectangularDisplay.shader" />
     <None Include="Assets\Shaders\Sky\Old\Groundfromspace_Shader.shader" />

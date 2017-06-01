@@ -156,18 +156,18 @@
     <Compile Include="Assets\Standard Assets\Editor\ImageEffects\VignetteAndChromaticAberrationEditor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\DepthScatterExport\ApplyLightShafts.shader" />
-    <None Include="Assets\DepthScatterExport\Blur.shader" />
-    <None Include="Assets\DepthScatterExport\CalculateLightshafts.shader" />
-    <None Include="Assets\DepthScatterExport\DownscaleDepth.shader" />
-    <None Include="Assets\Shaders\Clouds_Replacment.shader" />
+    <None Include="Assets\Shaders\Depth\Blur.shader" />
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
     <None Include="Assets\Shaders\Depth\DepthImageEffect.shader" />
+    <None Include="Assets\Shaders\Depth\DownscaleDepth.shader" />
     <None Include="Assets\Shaders\Depth\Trace.cginc" />
     <None Include="Assets\Shaders\DynamicTest\Invert.shader" />
     <None Include="Assets\Shaders\DynamicTest\Smoke.shader" />
+    <None Include="Assets\Shaders\Light\ApplyLightShafts.shader" />
+    <None Include="Assets\Shaders\Light\CalculateLightshafts.shader" />
     <None Include="Assets\Shaders\Optimized_Diffused.shader" />
+    <None Include="Assets\Shaders\Sky\Clouds_Replacment.shader" />
     <None Include="Assets\Shaders\Sky\Old\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\Sky\Old\EquirectangularDisplay.shader" />
     <None Include="Assets\Shaders\Sky\Old\Groundfromspace_Shader.shader" />

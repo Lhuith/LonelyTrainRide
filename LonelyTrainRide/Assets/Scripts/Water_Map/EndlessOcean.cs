@@ -57,10 +57,10 @@ public class EndlessOcean: MonoBehaviour {
 
         UpdateVisibleChunks();
 
-        int curentChunkCoordX = Mathf.RoundToInt(viewerPosition.x / chunksize);
-        int curentChunkCoordY = Mathf.RoundToInt(viewerPosition.y / chunksize);
-
-        Vector2 viewedChunkCoord = new Vector2(curentChunkCoordX, curentChunkCoordY);
+        //int curentChunkCoordX = Mathf.RoundToInt(viewerPosition.x / chunksize);
+        //int curentChunkCoordY = Mathf.RoundToInt(viewerPosition.y / chunksize);
+        //
+        //Vector2 viewedChunkCoord = new Vector2(curentChunkCoordX, curentChunkCoordY);
 
         //ClippingMesh = new TerrainChunk(viewedChunkCoord, chunksize, detialLevels, viewer.gameObject.transform, OceanMaterial, dynamicInfo, "clipper");
     }
@@ -169,7 +169,7 @@ public class EndlessOcean: MonoBehaviour {
             this.mapData = mapData;
             mapDataRecieved = true;
 
-            Texture2D texture = TextureGenerator.TextureFromHeightMap(mapData.heightMap, mapData.colA, mapData.colB);
+            //Texture2D texture = TextureGenerator.TextureFromHeightMap(mapData.heightMap, mapData.colA, mapData.colB);
           //  meshRenderer.material.mainTexture = texture;
            // UpdateTerrainChunk();
         }

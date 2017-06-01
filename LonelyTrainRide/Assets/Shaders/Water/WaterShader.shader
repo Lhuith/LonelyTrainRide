@@ -87,16 +87,7 @@ SubShader
 		Pass
 		{	
 		Cull Off	
-		//ColorMask 0
-		//Caster
-		//Stencil 
-		//{
-		//	    Ref 2
-        //        Comp equal
-        //        Pass keep 
-        //        ZFail decrWrap
-		//}
-		
+		ZWrite On
 			//Blend One One
 			CGPROGRAM
 			//#pragma glsl
@@ -490,6 +481,6 @@ SubShader
 
 	
 		}
-	   //Fallback "Diffuse"
+	   Fallback "Diffuse"
 }
  

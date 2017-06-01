@@ -42,19 +42,19 @@ public class Train_Manager : MonoBehaviour {
             transform.position += new Vector3(0, 1, 0);
         }
 
-       //
-       // Vector3 rotationRumble = new Vector3(Random.Range(0, rumbleX), Random.Range(0, rumbleY), Random.Range(0, rumbleZ));
-       // Quaternion rotationRumpleQua = new Quaternion(0, 0, 0, 0);
-       // rotationRumpleQua.eulerAngles += rotationRumble;
-       //
-       // Vector3 finalSpeed = new Vector3(0, 0, 5.25f) * Time.deltaTime * speed;
-       // Vector3 childSpeed = (finalSpeed + rotationRumble * speedDamp) * speedDamp;
-       //
-       // for (int i = 0; i < children.Length; i++)
-       //     children[Random.Range(0, children.Length)].transform.GetComponent<Rigidbody>().AddForce(-childSpeed, ForceMode.Acceleration);
-       //
-       // transform.position += new Vector3(0, 0, 5.25f) * Time.deltaTime * speed;
-       //
-       // transform.rotation = rotationRumpleQua;
+        
+        Vector3 rotationRumble = new Vector3(Random.Range(0, rumbleX), Random.Range(0, rumbleY), Random.Range(0, rumbleZ));
+        Quaternion rotationRumpleQua = new Quaternion(0, 0, 0, 0);
+        rotationRumpleQua.eulerAngles += rotationRumble;
+        
+        Vector3 finalSpeed = new Vector3(0, 0, 5.25f) * Time.deltaTime * speed;
+        Vector3 childSpeed = (finalSpeed + rotationRumble * speedDamp) * speedDamp;
+        
+        for (int i = 0; i < children.Length; i++)
+            children[Random.Range(0, children.Length)].transform.GetComponent<Rigidbody>().AddForce(-childSpeed, ForceMode.Acceleration);
+        
+        transform.position += new Vector3(0, 0, 5.25f) * Time.deltaTime * speed;
+        
+        transform.rotation = rotationRumpleQua;
     }
 }

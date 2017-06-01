@@ -93,14 +93,11 @@ public class EndlessTerrain : MonoBehaviour {
         LODinfo[] detailLevels;
         LODMesh[] lodMeshes;
 
-        renderque renderQ;
-
+        //renderque renderQ;
         MapData mapData;
         bool mapDataRecieved;
         int prevoisLODIndex = -1;
-
-        
-
+      
         public TerrainChunk(Vector2 coord, int size, LODinfo[] detailLevels, Transform parent, Material mat)
         {
             this.detailLevels = detailLevels;
@@ -113,7 +110,7 @@ public class EndlessTerrain : MonoBehaviour {
             meshRenderer = meshObject.AddComponent<MeshRenderer>();
             meshFilter = meshObject.AddComponent<MeshFilter>();
             meshCollider = meshObject.AddComponent<MeshCollider>();
-            renderQ = meshObject.AddComponent<renderque>();
+           // renderQ = meshObject.AddComponent<renderque>();
            // dynamicApply = meshObject.AddComponent<DynamicApplyShader>();
 
             //dynamicApply.mat = _dynamicInfo.mat;
