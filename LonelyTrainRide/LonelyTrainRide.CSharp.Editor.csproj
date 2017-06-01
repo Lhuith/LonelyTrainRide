@@ -143,6 +143,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Editor\AtmosphericScatteringEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\MyLightingShaderGUI.cs" />
     <Compile Include="Assets\SteamVR\Editor\SteamVR_Editor.cs" />
     <Compile Include="Assets\SteamVR\Editor\SteamVR_Preferences.cs" />
@@ -152,6 +153,10 @@
     <Compile Include="Assets\SteamVR\Editor\SteamVR_Update.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\AtmosphericScattering.cginc" />
+    <None Include="Assets\Shaders\AtmosphericScattering.compute" />
+    <None Include="Assets\Shaders\AtmosphericScattering.shader" />
+    <None Include="Assets\Shaders\AtmosphericScatteringSkybox.shader" />
     <None Include="Assets\Shaders\Depth\Blur.shader" />
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
@@ -162,6 +167,7 @@
     <None Include="Assets\Shaders\DynamicTest\Smoke.shader" />
     <None Include="Assets\Shaders\Light\ApplyLightShafts.shader" />
     <None Include="Assets\Shaders\Light\CalculateLightshafts.shader" />
+    <None Include="Assets\Shaders\LightShafts.shader" />
     <None Include="Assets\Shaders\Optimized_Diffused.shader" />
     <None Include="Assets\Shaders\Sky\Clouds_Replacment.shader" />
     <None Include="Assets\Shaders\Sky\Old\Atmospheric_Scatter_Shader.shader" />

@@ -97,6 +97,7 @@
     <Compile Include="Assets\Prefabs\MusicTech\MusicUI.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\SpectrumAnalyzer.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\isActive.cs" />
+    <Compile Include="Assets\Scripts\AtmosphericScattering.cs" />
     <Compile Include="Assets\Scripts\Camera\CamLook.cs" />
     <Compile Include="Assets\Scripts\Camera\Camera_Imageing_Controls.cs" />
     <Compile Include="Assets\Scripts\Camera\Gem_Bloom.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Assets\Scripts\Camera\renderque.cs" />
     <Compile Include="Assets\Scripts\Input\InputControlls.cs" />
     <Compile Include="Assets\Scripts\Sky\Sky_Shader_Manager.cs" />
+    <Compile Include="Assets\Scripts\SunController.cs" />
     <Compile Include="Assets\Scripts\Tests\Atmosphere_Manager.cs" />
     <Compile Include="Assets\Scripts\Tests\ToCubeMap.cs" />
     <Compile Include="Assets\Scripts\TrainCart\Train_Manager.cs" />
@@ -231,6 +233,10 @@
     <Compile Include="Assets\hemisphere_Position_Manager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\AtmosphericScattering.cginc" />
+    <None Include="Assets\Shaders\AtmosphericScattering.compute" />
+    <None Include="Assets\Shaders\AtmosphericScattering.shader" />
+    <None Include="Assets\Shaders\AtmosphericScatteringSkybox.shader" />
     <None Include="Assets\Shaders\Depth\Blur.shader" />
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
@@ -241,6 +247,7 @@
     <None Include="Assets\Shaders\DynamicTest\Smoke.shader" />
     <None Include="Assets\Shaders\Light\ApplyLightShafts.shader" />
     <None Include="Assets\Shaders\Light\CalculateLightshafts.shader" />
+    <None Include="Assets\Shaders\LightShafts.shader" />
     <None Include="Assets\Shaders\Optimized_Diffused.shader" />
     <None Include="Assets\Shaders\Sky\Clouds_Replacment.shader" />
     <None Include="Assets\Shaders\Sky\Old\Atmospheric_Scatter_Shader.shader" />
