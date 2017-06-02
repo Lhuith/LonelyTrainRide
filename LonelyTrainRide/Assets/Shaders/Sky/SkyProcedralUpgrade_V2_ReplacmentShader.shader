@@ -90,8 +90,6 @@ SubShader
 
         static const fixed u_time = _Time.x * 10;
 
-
-
 		
 		/**** TWEAK *****************************************************************/
 		#define COVERAGE		_CloudCoverage

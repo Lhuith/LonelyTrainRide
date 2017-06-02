@@ -467,7 +467,7 @@ SubShader
 		
 				//float3 refRaf = lerp(reflection , refraction , fresnelFactor);
 
-				fixed4 lightFinal = fixed4((specularReflection + specularAniReflection), 1.0) * fresnelFactor;		
+				fixed4 lightFinal = fixed4((specularReflection + specularAniReflection ), 1.0) * fresnelFactor;		
 
 				float3 waterColor = GetWaterColor(fade, waterDepth, refraction, 
 				specularReflection + specularAniReflection + diffuseReflection);		

@@ -143,6 +143,23 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Clouds3\CloudSkybox\Editor\NoiseVolumeEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Editor\GUIHelper.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Editor\ImageSequenceWindow.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Math\Editor\InterpolatorConfigDrawer.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Motion\Editor\BrownianMotionEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Motion\Editor\ConstantMotionEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Motion\Editor\SmoothFollowEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\System\Editor\GlobalConfigEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\Editor\ColorMapEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\Editor\EnvelopeGeneratorEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\Editor\KeyInputEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\Editor\MultiStateToggleEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\Editor\SystemPropertyMapEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\Editor\ThresholdTriggerEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\Editor\TransformMapEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\Editor\ValueAnimationEditor.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\Editor\ValueMapEditor.cs" />
     <Compile Include="Assets\Editor\AtmosphericScatteringEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\MyLightingShaderGUI.cs" />
     <Compile Include="Assets\SteamVR\Editor\SteamVR_Editor.cs" />
@@ -157,6 +174,7 @@
     <None Include="Assets\Shaders\AtmosphericScattering.compute" />
     <None Include="Assets\Shaders\AtmosphericScattering.shader" />
     <None Include="Assets\Shaders\AtmosphericScatteringSkybox.shader" />
+    <None Include="Assets\Shaders\CloudSkybox.shader" />
     <None Include="Assets\Shaders\Depth\Blur.shader" />
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
@@ -169,6 +187,7 @@
     <None Include="Assets\Shaders\Light\CalculateLightshafts.shader" />
     <None Include="Assets\Shaders\LightShafts.shader" />
     <None Include="Assets\Shaders\Optimized_Diffused.shader" />
+    <None Include="Assets\Shaders\ProceduralSky.cginc" />
     <None Include="Assets\Shaders\Sky\Clouds_Replacment.shader" />
     <None Include="Assets\Shaders\Sky\Old\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\Sky\Old\EquirectangularDisplay.shader" />
@@ -181,6 +200,7 @@
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade_V2_ReplacmentShader.shader" />
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade_V3.shader" />
     <None Include="Assets\Shaders\Sky\SparkNoiseSky.cginc" />
+    <None Include="Assets\Shaders\SparkNoiseSky.cginc" />
     <None Include="Assets\Shaders\Test\13_AnisotropicReflection.shader" />
     <None Include="Assets\Shaders\Test\CloudyWater.shader" />
     <None Include="Assets\Shaders\Test\DepthMask.shader" />

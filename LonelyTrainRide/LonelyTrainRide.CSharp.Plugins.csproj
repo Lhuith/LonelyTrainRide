@@ -136,6 +136,7 @@
     <None Include="Assets\Shaders\AtmosphericScattering.compute" />
     <None Include="Assets\Shaders\AtmosphericScattering.shader" />
     <None Include="Assets\Shaders\AtmosphericScatteringSkybox.shader" />
+    <None Include="Assets\Shaders\CloudSkybox.shader" />
     <None Include="Assets\Shaders\Depth\Blur.shader" />
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
@@ -148,6 +149,7 @@
     <None Include="Assets\Shaders\Light\CalculateLightshafts.shader" />
     <None Include="Assets\Shaders\LightShafts.shader" />
     <None Include="Assets\Shaders\Optimized_Diffused.shader" />
+    <None Include="Assets\Shaders\ProceduralSky.cginc" />
     <None Include="Assets\Shaders\Sky\Clouds_Replacment.shader" />
     <None Include="Assets\Shaders\Sky\Old\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\Sky\Old\EquirectangularDisplay.shader" />
@@ -160,6 +162,7 @@
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade_V2_ReplacmentShader.shader" />
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade_V3.shader" />
     <None Include="Assets\Shaders\Sky\SparkNoiseSky.cginc" />
+    <None Include="Assets\Shaders\SparkNoiseSky.cginc" />
     <None Include="Assets\Shaders\Test\13_AnisotropicReflection.shader" />
     <None Include="Assets\Shaders\Test\CloudyWater.shader" />
     <None Include="Assets\Shaders\Test\DepthMask.shader" />

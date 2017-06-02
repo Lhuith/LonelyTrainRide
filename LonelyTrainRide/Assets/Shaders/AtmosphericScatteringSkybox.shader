@@ -31,6 +31,46 @@
 
 Shader "Skybox/AtmosphericScattering"
 {
+
+    Properties
+    {
+        _SampleCount0("Sample Count (min)", Float) = 30
+        _SampleCount1("Sample Count (max)", Float) = 90
+        _SampleCountL("Sample Count (light)", Int) = 16
+
+        [Space]
+        _NoiseTex1("Noise Volume", 3D) = ""{}
+        _NoiseTex2("Noise Volume", 3D) = ""{}
+        _NoiseFreq1("Frequency 1", Float) = 3.1
+        _NoiseFreq2("Frequency 2", Float) = 35.1
+        _NoiseAmp1("Amplitude 1", Float) = 5
+        _NoiseAmp2("Amplitude 2", Float) = 1
+        _NoiseBias("Bias", Float) = -0.2
+
+        [Space]
+        _Scroll1("Scroll Speed 1", Vector) = (0.01, 0.08, 0.06, 0)
+        _Scroll2("Scroll Speed 2", Vector) = (0.01, 0.05, 0.03, 0)
+
+        [Space]
+        _Altitude0("Altitude (bottom)", Float) = 1500
+        _Altitude1("Altitude (top)", Float) = 3500
+        _FarDist("Far Distance", Float) = 30000
+
+        [Space]
+        _Scatter("Scattering Coeff", Float) = 0.008
+        _HGCoeff("Henyey-Greenstein", Float) = 0.5
+        _Extinct("Extinction Coeff", Float) = 0.01
+
+        [Space]
+        _SunSize ("Sun Size", Range(0,1)) = 0.04
+        _AtmosphereThickness ("Atmoshpere Thickness", Range(0,5)) = 1.0
+        _SkyTint ("Sky Tint", Color) = (.5, .5, .5, 1)
+        _GroundColor ("Ground", Color) = (.369, .349, .341, 1)
+        _Exposure("Exposure", Range(0, 8)) = 1.3
+    }
+
+
+
 	SubShader
 	{
 		Tags{ "Queue" = "Background" "RenderType" = "Background" "PreviewType" = "Skybox" }
@@ -52,29 +92,34 @@ Shader "Skybox/AtmosphericScattering"
 			#include "AtmosphericScattering.cginc"
 
 			float3 _CameraPos;
-			
-			struct appdata
-			{
-				float4 vertex : POSITION;
-			};
 
 			struct v2f
 			{
 				float4	pos		: SV_POSITION;
 				float3	vertex	: TEXCOORD0;
+				float2 uv : TEXCOORD1;
+				float3 rayDir : TEXCOORD2;
+				float3 groundColor : TEXCOORD3;
+				float3 skyColor : TEXCOORD4;
+				float3 sunColor : TEXCOORD5; 
 			};
-			
-			v2f vert (appdata v)
+
+			v2f vert (appdata_base v)
 			{
 				v2f o;
 				o.pos = UnityObjectToClipPos(v.vertex);
 				o.vertex = v.vertex;
 				return o;
 			}
+
+
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
+
 #ifdef ATMOSPHERE_REFERENCE
+					
+									
 				float3 rayStart = _CameraPos;
 				float3 rayDir = normalize(mul((float3x3)unity_ObjectToWorld, i.vertex));
 
@@ -84,7 +129,7 @@ Shader "Skybox/AtmosphericScattering"
 				planetCenter = float3(0, -_PlanetRadius, 0);
 
 				float2 intersection = RaySphereIntersection(rayStart, rayDir, planetCenter, _PlanetRadius + _AtmosphereHeight);		
-				float rayLength = intersection.y;
+				float rayLength = intersection.y ;
 
 				intersection = RaySphereIntersection(rayStart, rayDir, planetCenter, _PlanetRadius);
 				if (intersection.x > 0)
@@ -92,6 +137,8 @@ Shader "Skybox/AtmosphericScattering"
 
 				float4 extinction;
 				float4 inscattering = IntegrateInscattering(rayStart, rayDir, rayLength, planetCenter, 1, lightDir, 16, extinction);
+
+				
 				return float4(inscattering.xyz, 1);
 #else
 				float3 rayStart = _CameraPos;

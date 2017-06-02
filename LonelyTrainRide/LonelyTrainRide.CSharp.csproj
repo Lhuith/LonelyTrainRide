@@ -90,6 +90,32 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Clouds3\CloudSkybox\NoiseVolume.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Extension\MaterialExtension.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Extension\VectorMathExtension.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Math\BasicMath.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Math\Interpolator.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Math\NoiseGenerator.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Math\Perlin.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Math\Tween.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Math\XXHash.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Motion\BrownianMotion.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Motion\ConstantMotion.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Motion\SmoothFollow.cs" />
+    <Compile Include="Assets\Clouds3\Klak\System\GlobalConfig.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\ColorMap.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\EnvelopeGenerator.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\KeyInput.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\MultiStateToggle.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\SystemPropertyMap.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\ThresholdTrigger.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\TransformMap.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\ValueAnimation.cs" />
+    <Compile Include="Assets\Clouds3\Klak\Wiring\ValueMap.cs" />
+    <Compile Include="Assets\Clouds3\NoiseTools\NoiseGeneratorBase.cs" />
+    <Compile Include="Assets\Clouds3\NoiseTools\PerlinNoise.cs" />
+    <Compile Include="Assets\Clouds3\NoiseTools\WorleyNoise.cs" />
+    <Compile Include="Assets\Clouds3\NoiseTools\XXHash.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Cube.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Grid.cs" />
@@ -237,6 +263,7 @@
     <None Include="Assets\Shaders\AtmosphericScattering.compute" />
     <None Include="Assets\Shaders\AtmosphericScattering.shader" />
     <None Include="Assets\Shaders\AtmosphericScatteringSkybox.shader" />
+    <None Include="Assets\Shaders\CloudSkybox.shader" />
     <None Include="Assets\Shaders\Depth\Blur.shader" />
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
@@ -249,6 +276,7 @@
     <None Include="Assets\Shaders\Light\CalculateLightshafts.shader" />
     <None Include="Assets\Shaders\LightShafts.shader" />
     <None Include="Assets\Shaders\Optimized_Diffused.shader" />
+    <None Include="Assets\Shaders\ProceduralSky.cginc" />
     <None Include="Assets\Shaders\Sky\Clouds_Replacment.shader" />
     <None Include="Assets\Shaders\Sky\Old\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\Sky\Old\EquirectangularDisplay.shader" />
@@ -261,6 +289,7 @@
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade_V2_ReplacmentShader.shader" />
     <None Include="Assets\Shaders\Sky\SkyProcedralUpgrade_V3.shader" />
     <None Include="Assets\Shaders\Sky\SparkNoiseSky.cginc" />
+    <None Include="Assets\Shaders\SparkNoiseSky.cginc" />
     <None Include="Assets\Shaders\Test\13_AnisotropicReflection.shader" />
     <None Include="Assets\Shaders\Test\CloudyWater.shader" />
     <None Include="Assets\Shaders\Test\DepthMask.shader" />
