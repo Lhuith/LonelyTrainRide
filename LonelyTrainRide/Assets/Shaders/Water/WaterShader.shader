@@ -415,7 +415,7 @@ SubShader
 				float attenuation = LIGHT_ATTENUATION(i);
 				fixed3 diffuseReflection = i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
 			    fixed3 specularReflection = (diffuseReflection * _SpecColor.xyz * pow(saturate(dot(reflect(-i.lightDir.xyz, 
-											normalDirection), i.viewDir)) , _Shininess)) * _SpecStrength; 
+											normalDirection), i.viewDir)) , _Shininess)) * _SpecStrength * _LightColor0; 
 				
 				fixed3 specularAniReflection = diffuseReflection * _SpecColor.xyz * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess;
 

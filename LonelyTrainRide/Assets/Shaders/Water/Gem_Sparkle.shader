@@ -65,14 +65,14 @@
 					 float4 screen = tex2D(_MainTex, i.uv);
 					 float4 TrainAlpha = tex2D(_TrainAlphaTex, i.uv); //BEtter To do Depth Testing for this
 
-					 float dist = distance(i.vertex, _WorldSpaceCameraPos);
+					 float dist = 1.0 - (distance(i.vertex, _WorldSpaceCameraPos));
 
 				    const float n = 12;
 				    const float a1 = -1.;
 				    const float a2 = -5.;
 				    float2 uv = i.uv;
 				    float3 color = float3(0,0,0);
-				    float2 colorShift = float2(.0001,.0002);
+				    float2 colorShift = float2(.001,.002);
 				    float2 uv1 = uv+colorShift;
 				    float2 uv2 = uv;
 				    float2 uv3 = uv-colorShift;

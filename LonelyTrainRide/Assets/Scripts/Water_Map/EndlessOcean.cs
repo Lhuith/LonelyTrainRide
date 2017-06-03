@@ -135,7 +135,7 @@ public class EndlessOcean: MonoBehaviour {
 
             position = coord * size;
             bounds = new Bounds(position, Vector2.one * size);
-            Vector3 postionV3 = new Vector3(position.x, 0, position.y);
+            Vector3 postionV3 = new Vector3(position.x, 0f, position.y);
 
             meshObject = new GameObject((name == "") ? "OceanChunk" : name);
             meshObject.layer = 4;

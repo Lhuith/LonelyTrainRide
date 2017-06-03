@@ -263,6 +263,7 @@
     <None Include="Assets\Shaders\AtmosphericScattering.compute" />
     <None Include="Assets\Shaders\AtmosphericScattering.shader" />
     <None Include="Assets\Shaders\AtmosphericScatteringSkybox.shader" />
+    <None Include="Assets\Shaders\AtmosphericScatteringSkybox_CloudMask.shader" />
     <None Include="Assets\Shaders\CloudSkybox.shader" />
     <None Include="Assets\Shaders\Depth\Blur.shader" />
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
@@ -275,6 +276,10 @@
     <None Include="Assets\Shaders\Light\ApplyLightShafts.shader" />
     <None Include="Assets\Shaders\Light\CalculateLightshafts.shader" />
     <None Include="Assets\Shaders\LightShafts.shader" />
+    <None Include="Assets\Shaders\My First Lighting Shader.shader" />
+    <None Include="Assets\Shaders\My First Shader.shader" />
+    <None Include="Assets\Shaders\My Lighting.cginc" />
+    <None Include="Assets\Shaders\My Shadows.cginc" />
     <None Include="Assets\Shaders\Optimized_Diffused.shader" />
     <None Include="Assets\Shaders\ProceduralSky.cginc" />
     <None Include="Assets\Shaders\Sky\Clouds_Replacment.shader" />
@@ -301,6 +306,8 @@
     <None Include="Assets\Shaders\Test\WaterShader_TesterV4.shader" />
     <None Include="Assets\Shaders\Test\WaterShader_V6.shader" />
     <None Include="Assets\Shaders\Test\Water_Shader_01.shader" />
+    <None Include="Assets\Shaders\Texture Splatting.shader" />
+    <None Include="Assets\Shaders\Textured With Detail.shader" />
     <None Include="Assets\Shaders\Water\GemBloom_Replacment.shader" />
     <None Include="Assets\Shaders\Water\Gem_Sparkle.shader" />
     <None Include="Assets\Shaders\Water\SparkNoise.cginc" />
