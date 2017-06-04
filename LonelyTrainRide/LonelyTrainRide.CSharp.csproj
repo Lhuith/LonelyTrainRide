@@ -116,6 +116,7 @@
     <Compile Include="Assets\Clouds3\NoiseTools\PerlinNoise.cs" />
     <Compile Include="Assets\Clouds3\NoiseTools\WorleyNoise.cs" />
     <Compile Include="Assets\Clouds3\NoiseTools\XXHash.cs" />
+    <Compile Include="Assets\Head_Movement.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Cube.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\GOF_Grid.cs" />
@@ -123,6 +124,7 @@
     <Compile Include="Assets\Prefabs\MusicTech\MusicUI.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\SpectrumAnalyzer.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\isActive.cs" />
+    <Compile Include="Assets\Reflection_Probe_Update.cs" />
     <Compile Include="Assets\Scripts\AtmosphericScattering.cs" />
     <Compile Include="Assets\Scripts\Camera\CamLook.cs" />
     <Compile Include="Assets\Scripts\Camera\Camera_Imageing_Controls.cs" />
