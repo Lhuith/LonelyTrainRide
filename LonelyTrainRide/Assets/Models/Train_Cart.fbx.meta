@@ -17,6 +17,8 @@ ModelImporter:
     100018: Handle_Ring
     100020: Handle_Strap
     100022: //RootNode
+    100024: Cart.001
+    100026: Cart.002
     400000: Bone.002
     400002: Bone.003
     400004: Bone.004
@@ -29,16 +31,24 @@ ModelImporter:
     400018: Handle_Ring
     400020: Handle_Strap
     400022: //RootNode
+    400024: Cart.001
+    400026: Cart.002
     2300000: Canvas
     2300002: Cart
     2300004: Handle_Ring
+    2300006: Cart.001
+    2300008: Cart.002
     3300000: Canvas
     3300002: Cart
     3300004: Handle_Ring
+    3300006: Cart.001
+    3300008: Cart.002
     4300000: Handle_Strap
     4300002: Handle_Ring
     4300004: Canvas
     4300006: Cart
+    4300008: Cart.002
+    4300010: Cart.001
     9500000: //RootNode
     13700000: Handle_Strap
   materials:
@@ -51,6 +61,8 @@ ModelImporter:
     resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 

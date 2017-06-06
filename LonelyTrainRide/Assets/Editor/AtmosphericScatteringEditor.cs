@@ -15,6 +15,7 @@ class AtmosphericScatteringEditor : Editor
     SerializedProperty RenderingMode;
     SerializedProperty ScatteringComputeShader;
     SerializedProperty Sun;
+    SerializedProperty Moon;
     SerializedProperty RenderAtmosphericFog;
     SerializedProperty IncomingLight;
     SerializedProperty RayleighScatterCoef;
@@ -61,6 +62,7 @@ class AtmosphericScatteringEditor : Editor
         RenderingMode = serializedObject.FindProperty("RenderingMode");
         ScatteringComputeShader = serializedObject.FindProperty("ScatteringComputeShader");
         Sun = serializedObject.FindProperty("Sun");
+        Moon = serializedObject.FindProperty("Moon");
         RenderAtmosphericFog = serializedObject.FindProperty("RenderAtmosphericFog");
         IncomingLight = serializedObject.FindProperty("IncomingLight");
         RayleighScatterCoef = serializedObject.FindProperty("RayleighScatterCoef");
@@ -104,6 +106,7 @@ class AtmosphericScatteringEditor : Editor
             RenderingMode.enumValueIndex = (int)rm;
             ScatteringComputeShader.objectReferenceValue = (ComputeShader)EditorGUILayout.ObjectField("Compute Shader", ScatteringComputeShader.objectReferenceValue, typeof(ComputeShader));
             Sun.objectReferenceValue = (Light)EditorGUILayout.ObjectField("Sun", Sun.objectReferenceValue, typeof(Light));
+            Moon.objectReferenceValue = (Light)EditorGUILayout.ObjectField("Moon", Moon.objectReferenceValue, typeof(Light));
         }
 
         a.ScatteringFoldout = EditorGUILayout.Foldout(a.ScatteringFoldout, "Atmospheric Scattering");

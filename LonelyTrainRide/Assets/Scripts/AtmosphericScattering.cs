@@ -51,7 +51,7 @@ public class AtmosphericScattering : MonoBehaviour
     public RenderMode RenderingMode = RenderMode.Optimized;
     public LightShaftsQuality LightShaftQuality = LightShaftsQuality.Medium;
     public ComputeShader ScatteringComputeShader;
-    public Light Sun;
+    public Light Sun, Moon;
 
     private RenderTexture _particleDensityLUT = null;
     private Texture2D _randomVectorsLUT = null;
@@ -112,6 +112,14 @@ public class AtmosphericScattering : MonoBehaviour
     [Range(0.5f, 3.0f)]
     public float AmbientColorIntensity = 1.0f;
 
+    private float sunintenseSave;
+
+    private float  RayleighScatterCoefSave;
+    private float  RayleighExtinctionCoefSave ;
+    private float  MieScatterCoefSave ;
+    private float  MieExtinctionCoefSave;
+    private float  MieGSave;
+
     public bool RenderSun = true;
     public float SunIntensity = 1;
     public bool RenderLightShafts = false;
@@ -143,6 +151,13 @@ public class AtmosphericScattering : MonoBehaviour
     /// </summary>
     void Start()
     {
+        sunintenseSave = SunIntensity;
+        RayleighScatterCoefSave     = RayleighScatterCoef;
+        RayleighExtinctionCoefSave =  RayleighExtinctionCoef ;
+        MieScatterCoefSave =          MieScatterCoef ;
+        MieExtinctionCoefSave =    MieExtinctionCoef;
+        MieGSave =                MieG;
+        
         Shader shader = Shader.Find("Hidden/AtmosphericScattering");
         if (shader == null)
             throw new Exception("Critical Error: \"Hidden/AtmosphericScattering\" shader is missing. Make sure it is included in \"Always Included Shaders\" in ProjectSettings/Graphics.");
@@ -639,11 +654,49 @@ public class AtmosphericScattering : MonoBehaviour
 #endif
     }
 
+
+
+    public void GoMoon()
+    {
+        Moon.enabled = true;
+        SunIntensity = (SunIntensity / 100) * 196;
+        RayleighScatterCoef = (RayleighScatterCoef / 100) * 192;
+        RayleighExtinctionCoef = (RayleighExtinctionCoef / 100) * 192;
+        MieScatterCoef = (MieScatterCoef / 100) * 192;
+        MieExtinctionCoef = (MieExtinctionCoef / 100) * 192;
+        //MieG = (MieG / 100) * 12;
+    }
+
     /// <summary>
     /// 
     /// </summary>
     void Update()
     {
+
+        float cosAngle = Vector3.Dot(Vector3.up, -Sun.transform.forward);
+
+        if (cosAngle < 0)
+        {
+            //GoMoon();
+        }
+        else
+        {
+            //Moon.enabled = false;
+            //SunIntensity = sunintenseSave;
+            //
+            //SunIntensity = sunintenseSave;
+            //RayleighScatterCoef = RayleighScatterCoefSave;
+            //RayleighExtinctionCoef = RayleighExtinctionCoefSave;
+            //MieScatterCoef =  MieScatterCoefSave;
+            //MieExtinctionCoef = MieExtinctionCoefSave ;
+            //MieG = MieGSave;
+
+        }
+
+
+
+
+
         _sunColor = ComputeLightColor();
         if (UpdateLightColor)
             UpdateDirectionalLightColor(_sunColor);

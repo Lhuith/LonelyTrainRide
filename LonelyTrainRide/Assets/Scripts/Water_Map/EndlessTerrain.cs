@@ -139,7 +139,7 @@ public class EndlessTerrain : MonoBehaviour {
             mapDataRecieved = true;
 
             Texture2D texture = TextureGenerator.TextureFromHeightMap(mapData.heightMap, mapData.colA, mapData.colB);
-            meshRenderer.material.mainTexture = texture;
+            //meshRenderer.material.mainTexture = texture;
             UpdateTerrainChunk();
         }
 

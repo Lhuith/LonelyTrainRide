@@ -156,6 +156,7 @@
     <None Include="Assets\Shaders\Optimized_Diffused.shader" />
     <None Include="Assets\Shaders\ProceduralSky.cginc" />
     <None Include="Assets\Shaders\Sky\Clouds_Replacment.shader" />
+    <None Include="Assets\Shaders\Sky\MoonClipFade.shader" />
     <None Include="Assets\Shaders\Sky\Old\Atmospheric_Scatter_Shader.shader" />
     <None Include="Assets\Shaders\Sky\Old\EquirectangularDisplay.shader" />
     <None Include="Assets\Shaders\Sky\Old\Groundfromspace_Shader.shader" />
@@ -183,6 +184,7 @@
     <None Include="Assets\Shaders\Textured With Detail.shader" />
     <None Include="Assets\Shaders\Water\GemBloom_Replacment.shader" />
     <None Include="Assets\Shaders\Water\Gem_Sparkle.shader" />
+    <None Include="Assets\Shaders\Water\Shadow_Replacment.shader" />
     <None Include="Assets\Shaders\Water\SparkNoise.cginc" />
     <None Include="Assets\Shaders\Water\Trace.cginc" />
     <None Include="Assets\Shaders\Water\Underwater_Mask.shader" />
@@ -190,6 +192,7 @@
     <None Include="Assets\Shaders\Water\WaterShader.shader" />
     <None Include="Assets\Shaders\Water\WaterShaderMaskReplacment.shader" />
     <None Include="Assets\Shaders\Water\WaterShaderReplacment.shader" />
+    <None Include="Assets\Shaders\Water\WaterShaderShadowReplacment.shader" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />

@@ -70,29 +70,31 @@
 		//---------------------------------------------------------------------------------
 		//Glitter Controls
 		_GlitterStrength("Glitter Strength", Range(-100 , 100)) = .5
-		 _GlitDistanceFade("Glitter Distance Strengh", Range(-100 , 100)) = .5
+		_GlitDistanceFade("Glitter Distance Strengh", Range(-100 , 100)) = .5
 		//---------------------------------------------------------------------------------
 	}
 	
 
 SubShader
 	{
-	
-		Tags { "Queue"="Transparent" "RenderType" = "Sparkle" "LightMode" = "ForwardBase"}
+
+		Tags {"Queue" = "AlphaTest" "RenderType" = "Sparkle" "LightMode" = "ForwardBase"}
 		Pass
 		{
 			Name "SPARKLE"
+			Cull Off	
+			ZWrite On
 			CGPROGRAM
-			#pragma glsl
+			//#pragma glsl
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
 			#include "AutoLight.cginc"
 			#include "SparkNoise.cginc"
 			#include "Trace.cginc"
-			#pragma fragmentoption ARB_precision_hint_fastest
+
 			#pragma shader_feature _IBLMODE_OFF _IBLMODE_REFL _IBLMODE_REFR
-		
+			#pragma multi_compile_fwdbase
 			uniform fixed4 _OceanColor;
 			uniform fixed4 _SubColor;
 		
@@ -185,7 +187,7 @@ SubShader
 			struct v2f
 			{
 				fixed4 pos : SV_POSITION;
-				fixed2 uv : TEXCOORD0;
+				fixed2 tex : TEXCOORD0;
 				fixed4 wPos : TEXCOORD1;
 				fixed4 Dist : TEXCOORD2;
 				fixed3 normalWorld : TEXCOORD3;
@@ -197,10 +199,8 @@ SubShader
 				fixed4 projPos : TEXCOORD9;
 				fixed3 rayDir : TEXCOORD10;
 				fixed4 fragPos : TEXCOORD11;
-				float4 uvgrab : TEXCOORD12;
-		
-		
-				//LIGHTING_COORDS(14,15)
+				float4 uvgrab : TEXCOORD12;		
+				LIGHTING_COORDS(13,14)
 			};
 		
 			uniform Wave w[3];
@@ -307,7 +307,7 @@ SubShader
 		
 		v2f vert (appdata_base v)
 		{
-					v2f o;
+			v2f o;
 					
 			w[0].freq =  _Frequency;		   
 			w[0].amp =   _Amplitude; 	
@@ -363,7 +363,7 @@ SubShader
 			
 			COMPUTE_EYEDEPTH(o.projPos.z);
 		
-			o.uv = v.texcoord; 
+			o.tex = v.texcoord; 
 		
 			o.uvgrab.xy = (float2(o.pos.x, o.pos.y*-1) + o.pos.w) * 0.5;
 			o.uvgrab.zw = o.pos.zw;
@@ -373,6 +373,7 @@ SubShader
 			half3 eyeRay = normalize(mul(unity_WorldToObject, v.vertex.xyz));
 			o.rayDir = half3(-eyeRay);
 			TRANSFER_VERTEX_TO_FRAGMENT(o);		
+		
 		
 			return o;
 			}
@@ -387,8 +388,8 @@ SubShader
 				fixed3 glitColor = fixed4(1,1,1,1.0);
 				//Normal Calculations
 				//------------------------------------------
-				fixed4 texN = tex2D(_BumpMap, i.uv.xy * _BumpMap_ST.xy + _BumpMap_ST.zw);
-				fixed4 texBloom = tex2D(_FrameSampler, i.uv.xy);
+				fixed4 texN = tex2D(_BumpMap, i.tex.xy * _BumpMap_ST.xy + _BumpMap_ST.zw);
+				fixed4 texBloom = tex2D(_FrameSampler, i.tex.xy);
 								//unpackNormal function
 				fixed3 localCoords = float3(2.0 * texN.ag - float2(1.0, 1.0),	_BumpDepth);
 				
@@ -401,13 +402,7 @@ SubShader
 				
 				//calculate normal direction
 				fixed3 normalDirection = normalize( mul(localCoords, local2WorldTranspose));
-		
-				//------------------------------------------
-		
-		
-		
-				//Light Calculations
-				//------------------------------------------
+
 				half3 fragmentToLightSource = _WorldSpaceLightPos0.xyz - i.wPos.xyz;
 		
 				i.lightDir = fixed4(
@@ -416,7 +411,6 @@ SubShader
 		
 				fixed nDotl = saturate(dot(normalDirection, i.lightDir.xyz));	
 				
-
 				//Lighting
 				fixed3 h = normalize(i.lightDir.xyz + i.viewDir);
 				fixed3 binormalDir = cross(i.normalDir, i.tangentWorld);
@@ -428,15 +422,13 @@ SubShader
 				fixed tDotHX = dot(i.tangentWorld, h)/ _AniX;
 				fixed bDotHY = dot(binormalDir, h)/ _AniY;
 
-
+				float attenuation = LIGHT_ATTENUATION(i);
 				fixed3 diffuseReflection = i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
 			    fixed3 specularReflection = (diffuseReflection * _SpecColor.xyz * pow(saturate(dot(reflect(-i.lightDir.xyz, 
-											normalDirection), i.viewDir)) , _Shininess)) * _SpecStrength; 
+											normalDirection), i.viewDir)) , _Shininess)) * _SpecStrength * _LightColor0; 
 				
 				fixed3 specularAniReflection = diffuseReflection * _SpecColor.xyz * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess;
-				
-				//------------------------------------------
-												
+
 				float si = ComputeSSS(normalDirection, i.lightDir, i.viewDir);	
 		
 				float ex =  exp(-si * _sigma_t);	
@@ -461,15 +453,12 @@ SubShader
 		
 				i.uvgrab.xy = TransformStereoScreenSpaceTex(i.uvgrab.xy, i.uvgrab.w);
 		
-				half2 bump = UnpackNormal(tex2D( _BumpMap, TRANSFORM_TEX( i.uv, _BumpMap ))).rg; // we could optimize this by just reading the x & y without reconstructing the Z
+				half2 bump = UnpackNormal(tex2D( _BumpMap, TRANSFORM_TEX( i.tex, _BumpMap ))).rg; // we could optimize this by just reading the x & y without reconstructing the Z
 				float2 offset = bump * 50 * _GrabTexture_TexelSize.xy;
 		
 				i.uvgrab.xy = offset * UNITY_Z_0_FAR_FROM_CLIPSPACE(i.uvgrab.z) + i.uvgrab.xy + normalDirection.xz;
 		
 				half3 refraction = tex2Dproj( _GrabTexture, UNITY_PROJ_COORD(i.uvgrab));
-		        //refraction *= fade;
-				
-				//float3 gloss =  pow(clamp(dot(reflect(i.wPos, normalDirection), i.lightDir), 0.0, 1.0), 64.0);;
 
 				fixed3 reflection = IBLRefl(_Cube, _Detail, worldRefl, _ReflectionExposure * fresnelFactor, 
 				_ReflectionFactor * fresnelFactor, fresnelFactor);
@@ -477,19 +466,20 @@ SubShader
 				float waterDepth = max(0, i.wPos.y * fade * _WaterDepth); 		
 					
 				refraction = lerp(refraction, float3(1,1,1), fade);
-		
-				//float3 refRaf = lerp(reflection , refraction , fresnelFactor);
 
-				fixed4 lightFinal = fixed4((specularReflection + specularAniReflection), 1.0) * fresnelFactor;		
+				fixed4 lightFinal = (fixed4((specularReflection + specularAniReflection ), 1.0) * fresnelFactor) * attenuation;		
 
 				float3 waterColor = GetWaterColor(fade, waterDepth, refraction, 
-				lightFinal + diffuseReflection);	
+				specularReflection + specularAniReflection + diffuseReflection);		
+
+			   // return float4(waterColor + reflection + lightFinal, fade);
 
 				float3 glitterSpec = glitter(i.wPos, normalDirection , 
-				i.lightDir, ((diffuseReflection) / 24) + specularAniReflection + specularReflection, i.viewDir) * fresnelFactor;
+				i.lightDir, (((diffuseReflection) / 24) + specularAniReflection + specularReflection), i.viewDir) * fresnelFactor;
 		
 				glitterSpec *= _GlitterStrength * 12;
-			    return float4(glitterSpec,1) ; 
+
+			    return float4(glitterSpec, 1.0); 
 		
 			}
 			ENDCG
@@ -497,6 +487,7 @@ SubShader
 	
 
 	}
-	   //FallBack "VertexLit"
+
+	  Fallback "VertexLit"
 }
  

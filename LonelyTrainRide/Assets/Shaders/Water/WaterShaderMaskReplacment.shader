@@ -81,11 +81,8 @@ SubShader
 		Tags { "Queue"="Transparent" "RenderType" = "Water" "LightMode" = "ForwardBase"}
 
 		
-		// Don't draw in the RGBA channels; just the depth buffer
 		Cull Back
-		//ColorMask 1
 		ZWrite On
-		// Do nothing specific in the pass:
 
 		Pass
 		{
@@ -476,9 +473,6 @@ SubShader
 				i.uvgrab.xy = offset * UNITY_Z_0_FAR_FROM_CLIPSPACE(i.uvgrab.z) + i.uvgrab.xy + normalDirection.xz;
 		
 				half3 refraction = tex2Dproj( _GrabTexture, UNITY_PROJ_COORD(i.uvgrab));
-		        //refraction *= fade;
-				
-				//float3 gloss =  pow(clamp(dot(reflect(i.wPos, normalDirection), i.lightDir), 0.0, 1.0), 64.0);;
 
 				fixed3 reflection = IBLRefl(_Cube, _Detail, worldRefl, _ReflectionExposure * fresnelFactor, 
 				_ReflectionFactor * fresnelFactor, fresnelFactor);

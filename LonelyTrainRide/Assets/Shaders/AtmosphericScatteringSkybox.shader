@@ -67,6 +67,9 @@ Shader "Skybox/AtmosphericScattering"
         _SkyTint ("Sky Tint", Color) = (.5, .5, .5, 1)
         _GroundColor ("Ground", Color) = (.369, .349, .341, 1)
         _Exposure("Exposure", Range(0, 8)) = 1.3
+
+		_NoiseTex("Star Noise Texture", 2D) = "white"{}
+		_MoonPos("Moon Position", Vector) = (1,1,1)
     }
 
 
@@ -90,6 +93,7 @@ Shader "Skybox/AtmosphericScattering"
 			
 			#include "UnityCG.cginc"
 			#include "AtmosphericScattering.cginc"
+			#include "SparkNoiseSky.cginc"
 
 			float3 _CameraPos;
 
@@ -127,6 +131,9 @@ Shader "Skybox/AtmosphericScattering"
 
 			sampler3D _NoiseTex1;
 			sampler3D _NoiseTex2;
+					
+			sampler2D _NoiseTex;
+
 			float _NoiseFreq1;
 			float _NoiseFreq2;
 			float _NoiseAmp1;
@@ -144,7 +151,7 @@ Shader "Skybox/AtmosphericScattering"
 			float _HGCoeff;
 			float _Extinct;
 
-
+			float3 _MoonPos;
 
 	float UVRandom(float2 uv)
     {
@@ -215,11 +222,20 @@ Shader "Skybox/AtmosphericScattering"
 
 #ifdef ATMOSPHERE_REFERENCE
 					
-									
+			
 				float3 rayStart = _CameraPos;
 				float3 rayDir = normalize(mul((float3x3)unity_ObjectToWorld, i.vertex));
 
+				float3 testlightDir = _WorldSpaceLightPos0.xyz;
+
 				float3 lightDir = -_WorldSpaceLightPos0.xyz;
+				
+				float3 lightDir2 = -_MoonPos.xyz;
+
+				if(	testlightDir.y < 0)
+				lightDir = lightDir2;
+				else
+				lightDir = lightDir;
 
 				float3 planetCenter = _CameraPos;
 				planetCenter = float3(0, -_PlanetRadius - 125, 0);
@@ -233,19 +249,33 @@ Shader "Skybox/AtmosphericScattering"
 
 				float4 extinction;
 				float4 inscattering = IntegrateInscattering(rayStart, rayDir, rayLength, planetCenter, 1, lightDir, 16, extinction);
-
 			
 				float3 ray = rayDir;
 				int samples = lerp(_SampleCount1, _SampleCount0, rayDir.y);
-			
+
+
 				float dist0 = _Altitude0 / ray.y;
 				float dist1 = _Altitude1 / ray.y;
 				float stride = (dist1 - dist0) / samples;
-			
+					
 				if (ray.y < 0.0) return inscattering;
 			
-				float3 light = normalize(_WorldSpaceLightPos0.xyz);
-				float hg = HenyeyGreenstein(dot(ray, light));
+				float3 light = ((_WorldSpaceLightPos0.xyz));
+
+				float3 stars = float3(0,0,0);
+	
+				float s = pow(max(0.0, snoise(float3(i.vertex.xyz) * 1e2)), 14.0);
+				stars += float3(s, s, s);
+				
+				stars = lerp(stars, stars * testlightDir.y, (testlightDir.y));
+
+				if(testlightDir.y > 0.2)
+				{
+					stars = lerp(stars, float3(0,0,0), (testlightDir.y * 2));
+				}
+
+
+				float hg = (HenyeyGreenstein(saturate(dot(ray, light))));
 			
 				float2 uv = i.uv + _Time.x;
 				float offs = UVRandom(uv) * (dist1 - dist0) / samples;
@@ -268,12 +298,13 @@ Shader "Skybox/AtmosphericScattering"
 				    }
 				    pos += ray * stride;
 				}
+
+				if(stars.r > 0)
+				inscattering += stars.r;
+
+				acc += Beer(depth) * (inscattering);
 			
-			
-			
-				acc += Beer(depth) * inscattering;
-			
-				acc = lerp(acc, inscattering, saturate(dist0 / _FarDist));
+				acc = lerp(acc, inscattering , saturate(dist0 / _FarDist));
 			
 				float4 clouds = half4(acc, 1);
 			

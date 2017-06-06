@@ -11,12 +11,12 @@ public class Camera_Imageing_Controls : MonoBehaviour
   // Use this for initialization
   void Awake ()
   {
-      Camera.main.depthTextureMode = DepthTextureMode.Depth;
+       this.GetComponent<Camera>().depthTextureMode = DepthTextureMode.Depth;
   }
 
 	// Update is called once per frame
 	void Update ()
     {
-        Camera.main.depthTextureMode = DepthTextureMode.Depth;
+        this.GetComponent<Camera>().depthTextureMode = DepthTextureMode.Depth;
     }
 }
