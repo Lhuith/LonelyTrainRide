@@ -64,6 +64,7 @@
 				float3 skyColor : TEXCOORD5;
 				float3 sunColor : TEXCOORD6;
 				float3 wPos : TEXCOORD7;
+				float3 normal : NORMAL;
         };
  	
         v2f vert( appdata_base v )
@@ -72,6 +73,7 @@
   
 				o.pos = UnityObjectToClipPos(v.vertex);
 				o.vertex = v.vertex;
+				o.normal = v.normal;
 				o.uv = v.texcoord;
 				o.wPos = mul(unity_ObjectToWorld, v.vertex);
 				float3 eyeRay = normalize(mul((float3x3)unity_ObjectToWorld, v.vertex));
@@ -184,7 +186,7 @@
 				float3 lightDir = -_WorldSpaceLightPos0.xyz;
 			
 				float3 ray = rayDir;
-				int samples = lerp(_SampleCount1, _SampleCount0, rayDir.y)/6;
+				int samples = lerp(_SampleCount1, _SampleCount0, rayDir.y)/4;
 			
 				float dist0 = _Altitude0 / ray.y;
 				float dist1 = _Altitude1 / ray.y;

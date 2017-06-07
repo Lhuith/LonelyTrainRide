@@ -6,12 +6,6 @@ Shader "Eugene/Enviroment/Water/WaterShader"
 {
 	Properties
 	{
-		_Color ("Color", Color) = (1.0, 1.0, 1.0, 1.0)
-		_NUM_SAMPLES("Iteration Amount", Float) = 1.0
-		_Weight("Iteration Weight", Float) = 1.0
-		_Decay("Light Decay", Float) = 1.0
-		_Exposure("Light Exposure", Float) = 1.0
-		_Density("Density", Float) = 1.0
 		//Basic Ocean Information
 		_FrameSampler("Frame Sampler Texture", 2D) = "white" {}
 		_OceanColor("Ocean Color", Color) = (1,1,1,1)
@@ -89,15 +83,14 @@ SubShader
 		
 		GrabPass { "_BackgroundTexture" Tags{"LightMode" = "Always"}} 
 
-
-	Tags {"Queue" = "Transparent"   "RenderType" = "Sparkle" "LightMode" = "ForwardBase" "IgnoreProjector " = "True"}
-	
+	Tags {"Queue" = "Transparent"  "RenderType" = "Sparkle" "LightMode" = "ForwardBase"}
 	Pass
 	{	
-	
+		
+		//Blend SrcAlpha OneMinusSrcAlpha
 		Cull Off	
 		ZWrite On
-		//Blend SrcAlpha OneMinusSrcAlpha
+			
 		CGPROGRAM
 	
 		//#pragma glsl
@@ -111,14 +104,6 @@ SubShader
 	
 		uniform fixed4 _OceanColor;
 		uniform fixed4 _SubColor;
-	
-		uniform float _Exposure;
-		uniform float _Decay;
-		uniform float _NUM_SAMPLES;
-		uniform sampler2D _FrameSampler;
-		uniform float _Weight;
-		uniform float _Density;
-	
 		//------------ 
 		// Lighting Controls
 		uniform float4 _AtmosDarkColor;
@@ -183,7 +168,10 @@ SubShader
 		
 		sampler2D _BackgroundTexture;
 		float4 _BackgroundTexture_TexelSize;
-	
+		
+		//sampler2D _ShadowMapTexture;
+		//float4 _ShadowMapTexture_ST;
+
 		struct Wave
 		{
 			float  freq;
@@ -195,7 +183,7 @@ SubShader
 		struct v2f
 		{
 			fixed4 pos : SV_POSITION;
-			SHADOW_COORDS(0)
+			SHADOW_COORDS(1)
 			fixed2 tex : TEXCOORD2;
 			fixed4 wPos : TEXCOORD3;
 			fixed4 Dist : TEXCOORD4;
@@ -208,7 +196,8 @@ SubShader
 			fixed4 projPos : TEXCOORD11;
 			fixed3 rayDir : TEXCOORD12;
 			fixed4 fragPos : TEXCOORD13;
-			float4 uvgrab : TEXCOORD14;		
+			float4 uvgrab : TEXCOORD14;
+			float3 normal : NORMAL;		
 		};
 	
 		uniform Wave w[3];
@@ -300,7 +289,9 @@ SubShader
 	v2f vert (appdata_base v)
 	{
 		v2f o;
-				
+		UNITY_INITIALIZE_OUTPUT(v2f,o);	
+		
+		o.normal = v.normal;	
 		w[0].freq =  _Frequency;		   
 		w[0].amp =   _Amplitude; 	
 		w[0].phase = _Phase;	
@@ -317,6 +308,7 @@ SubShader
 		w[2].dir =   _Dir3;
 	
 		o.wPos =  mul(unity_ObjectToWorld, v.vertex);
+
 		half2 x0 = o.wPos.xz;
 		float3 newPos = float3(0.0, 0.0, 0.0);
 		float4 tangent = float4(0.0, 0.0, 0.0, 0.0);
@@ -340,10 +332,9 @@ SubShader
 		v.vertex.x -= newPos.x;
 		v.vertex.z -= newPos.z;
 		v.vertex.y += newPos.y;
-	
 	    o.pos = UnityObjectToClipPos(v.vertex);
 		o.fragPos = v.vertex;
-	
+		
 		//o.tangentWorld =  normalize( mul( float4(tangent, 0.0), unity_ObjectToWorld));
 		o.tangentWorld = normalize(mul(unity_ObjectToWorld, half4(tangent.xyz, 0.0)));
 	
@@ -352,7 +343,7 @@ SubShader
 	
 		o.viewDir = normalize(_WorldSpaceCameraPos.xyz - o.wPos.xyz);
 		o.projPos = ComputeScreenPos (o.pos);
-		
+		//o.shadowCoordinates = o.pos;
 		COMPUTE_EYEDEPTH(o.projPos.z);
 	
 		o.tex = v.texcoord; 
@@ -370,7 +361,7 @@ SubShader
 		
 		fixed4 frag (v2f i) : SV_Target
 		{
-			
+			i.normalDir = normalize(mul(float4(i.normal, 0.0), unity_WorldToObject).xyz);
 			//Initlializing Values
 			fixed4 finalColor = fixed4(0,0,0, 1.0);		
 			fixed4 fadecol = fixed4(0,0,0, 0);
@@ -379,7 +370,6 @@ SubShader
 			//Normal Calculations
 			//------------------------------------------
 			fixed4 texN = tex2D(_BumpMap, i.tex.xy * _BumpMap_ST.xy + _BumpMap_ST.zw);
-			fixed4 texBloom = tex2D(_FrameSampler, i.tex.xy);
 							//unpackNormal function
 			fixed3 localCoords = float3(2.0 * texN.ag - float2(1.0, 1.0),	_BumpDepth);
 			
@@ -412,11 +402,11 @@ SubShader
 			fixed tDotHX = dot(i.tangentWorld, h)/ _AniX;
 			fixed bDotHY = dot(binormalDir, h)/ _AniY;
 	
-			float attenuation = LIGHT_ATTENUATION(i);
+			UNITY_LIGHT_ATTENUATION(attenuation, i, i.fragPos);
 	
-			fixed3 diffuseReflection = i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
-		    fixed3 specularReflection = (diffuseReflection * _SpecColor.xyz * pow(saturate(dot(reflect(-i.lightDir.xyz, 
-										normalDirection), i.viewDir)) , _Shininess)) * _SpecStrength * _LightColor0; 
+			fixed3 diffuseReflection =  attenuation * i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
+		    fixed3 specularReflection = attenuation * _LightColor0.xyz *  saturate( dot( normalDirection, i.lightDir)) *
+			 pow( saturate(dot (reflect(-i.lightDir, normalDirection), i.viewDir)), _Shininess);
 			
 			fixed3 specularAniReflection = diffuseReflection * _SpecColor.xyz * exp(-(tDotHX * tDotHX + bDotHY * bDotHY)) * _Shininess;
 	
@@ -425,8 +415,7 @@ SubShader
 			float ex =  exp(-si * _sigma_t);	
 							 				
 			fixed4 SSS = float4(ex,ex,ex,ex);
-			
-	
+				
 			fixed3 worldRefl = reflect(-i.viewDir, normalDirection);
 	
 			float r = (1.2-1-0)/(1.2+1.0);
@@ -458,22 +447,66 @@ SubShader
 				
 			refraction = lerp(refraction, float3(1,1,1), fade);
 	
-			fixed4 lightFinal = (fixed4((specularReflection + specularAniReflection ), 1.0) * fresnelFactor) ;		
+			fixed4 lightFinal = (fixed4((specularReflection), 1.0)) * fresnelFactor * 4;		
 	
-			float3 waterColor = GetWaterColor(fade, waterDepth, refraction, 
-			specularReflection + specularAniReflection + diffuseReflection);		
+			float3 waterColor = GetWaterColor(fade, waterDepth, refraction, lightFinal + diffuseReflection);		
 			
-	
-			fixed shadow = SHADOW_ATTENUATION(i);
-			fixed shadowalpha = (1.0 - shadow) * _ShadowStrength;
-			//clip(shadowalpha - 0.5);
 	
 		    return float4(waterColor + reflection + lightFinal, fade) ;
 	
 		}
 		ENDCG
 	}
-	
+
+	//Pass
+	//{	
+	//	Cull Off	
+	//	ZWrite On
+	//
+	//	CGPROGRAM
+	//
+	//	//#pragma glsl
+	//	#pragma vertex vert
+	//	#pragma fragment frag
+	//	#include "UnityCG.cginc"
+	//	#include "AutoLight.cginc"
+	//	#include "SparkNoise.cginc"
+	//	#include "Trace.cginc"
+	//	#pragma multi_compile_fwdbase
+	//
+	//	struct v2f
+	//	{
+	//		fixed4 pos : SV_POSITION;
+	//		SHADOW_COORDS(1)
+	//		fixed2 tex : TEXCOORD2;
+	//		fixed4 wPos : TEXCOORD3;
+	//		fixed4 fragPos : TEXCOORD13;	
+	//	};
+	//
+	//v2f vert (appdata_base v)
+	//{
+	//	v2f o;
+	//	
+	//	o.pos = UnityObjectToClipPos(v.vertex);
+	//
+	//	o.wPos =  mul(unity_ObjectToWorld, v.vertex);
+	//	
+	//	o.fragPos = v.vertex;
+	//			TRANSFER_SHADOW(o);
+	//	return o;
+	//	}
+	//	
+	//	fixed4 frag (v2f i) : SV_Target
+	//	{
+	//		UNITY_LIGHT_ATTENUATION(attenuation, i, i.wPos);
+	//
+	//		//if(attenuation > 0.9) discard;
+	//
+	//	    return (attenuation * 2) ;
+	//
+	//	}
+	//	ENDCG
+	//}
 
 		}
 	  //Fallback "Diffuse"

@@ -90,6 +90,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\BloomFix.cs" />
     <Compile Include="Assets\Clouds3\CloudSkybox\NoiseVolume.cs" />
     <Compile Include="Assets\Clouds3\Klak\Extension\MaterialExtension.cs" />
     <Compile Include="Assets\Clouds3\Klak\Extension\VectorMathExtension.cs" />
@@ -117,7 +118,9 @@
     <Compile Include="Assets\Clouds3\NoiseTools\WorleyNoise.cs" />
     <Compile Include="Assets\Clouds3\NoiseTools\XXHash.cs" />
     <Compile Include="Assets\Clouds_Manager.cs" />
+    <Compile Include="Assets\DynamicDOF.cs" />
     <Compile Include="Assets\Head_Movement.cs" />
+    <Compile Include="Assets\Light_Controls.cs" />
     <Compile Include="Assets\Moon_Manager.cs" />
     <Compile Include="Assets\Moon_Texture.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
@@ -264,6 +267,7 @@
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_UpdatePoses.cs" />
     <Compile Include="Assets\SteamVR\Scripts\SteamVR_Utils.cs" />
     <Compile Include="Assets\SunRotation.cs" />
+    <Compile Include="Assets\Train_Locomotion.cs" />
     <Compile Include="Assets\hemisphere_Position_Manager.cs" />
   </ItemGroup>
   <ItemGroup>

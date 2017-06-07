@@ -15,7 +15,7 @@ public class hemisphere_Position_Manager : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        transform.position = new Vector3(followTarget.position.x, offset.y, followTarget.position.z);
+        transform.position = new Vector3(followTarget.position.x + offset.x, offset.y, followTarget.position.z + offset.z);
 
     }
 }

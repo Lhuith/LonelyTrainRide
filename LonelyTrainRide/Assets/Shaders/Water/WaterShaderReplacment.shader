@@ -475,11 +475,11 @@ SubShader
 			   // return float4(waterColor + reflection + lightFinal, fade);
 
 				float3 glitterSpec = glitter(i.wPos, normalDirection , 
-				i.lightDir, (((diffuseReflection) / 24) + specularAniReflection + specularReflection), i.viewDir) * fresnelFactor;
+				i.lightDir, specularAniReflection + specularReflection, i.viewDir) * fresnelFactor / 2;
 		
-				glitterSpec *= _GlitterStrength * 12;
+				glitterSpec *= _GlitterStrength * (12 * saturate(_WorldSpaceLightPos0.y));
 
-			    return float4(glitterSpec, 1.0); 
+			    return float4(glitterSpec * float3(1,.5, .5), 1.0); 
 		
 			}
 			ENDCG
@@ -488,6 +488,6 @@ SubShader
 
 	}
 
-	  Fallback "VertexLit"
+	//  Fallback "VertexLit"
 }
  

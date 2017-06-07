@@ -6,6 +6,7 @@
 		_SparkleTex("SparklerTexture", 2D) = "white" {}
 		_TrainAlphaTex("TrainAlphaTexture", 2D) = "white" {}
 		_ShadowAlphaTex("Clouds Shadows", 2D) = "white" {}
+		_BorderRemove("Remove Outer Bloom Edges", 2D) = "white" {}
 	}
 	SubShader
 	{
@@ -47,6 +48,9 @@
 			sampler2D _ShadowAlphaTex;
 			float4 _ShadowAlphaTex_ST;
 
+			sampler2D _BorderRemove;
+			float4 _BorderRemove_ST;
+
 			float2 saturate(float2 p) { return clamp(p,0.,1.); }
 
 			float2 rot(float2 p, float a) {
@@ -68,6 +72,7 @@
 					 float4 screen = tex2D(_MainTex, i.uv);
 					 float4 TrainAlpha = tex2D(_TrainAlphaTex, i.uv); //BEtter To do Depth Testing for this
 					 float4 CloudAlpha = tex2D(_ShadowAlphaTex, i.uv);
+					 float4 border = tex2D(_BorderRemove, i.uv);
 
 					 float dist = 1.0 - (distance(i.vertex, _WorldSpaceCameraPos));
 
@@ -115,8 +120,12 @@
 				        float3 col = pow(scale*max(col1,col2)*3.7,float3(5.2, 5.2, 5.2));
 				        color+=col;
 				    }
-				    return (float4(lerp(tex2D(_SparkleTex,uv).rgb, color, 
-					smoothstep(.01,.2,min(uv.x,uv.y)) * smoothstep(-.99,-.8,-max(uv.x,uv.y))),1) * (1.0 -TrainAlpha.a)) + screen + CloudAlpha;
+
+					border *= i.uv.y;
+					border *= i.uv.x;
+				    return ((float4(lerp(tex2D(_SparkleTex,uv).rgb, color, 
+					smoothstep(.01,.2,min(uv.x,uv.y)) * 
+					smoothstep(-.99,-.8,-max(uv.x,uv.y))),1) * (1.0 -TrainAlpha.a)) * border) + screen;
 				}
 			ENDCG
 		}

@@ -5,7 +5,6 @@ using UnityEngine;
 public class Reflection_Probe_Update : MonoBehaviour {
 
     ReflectionProbe probe;
-    public int probeIterations;
 
     void Awake()
     {
@@ -19,8 +18,6 @@ public class Reflection_Probe_Update : MonoBehaviour {
             Camera.main.transform.position.y,
             Camera.main.transform.position.z
         );
-
-        for(int i = 0; i < probeIterations; i++)
         probe.RenderProbe();
     }
 }

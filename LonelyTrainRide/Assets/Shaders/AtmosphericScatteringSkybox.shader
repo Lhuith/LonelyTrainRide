@@ -230,13 +230,6 @@ Shader "Skybox/AtmosphericScattering"
 
 				float3 lightDir = -_WorldSpaceLightPos0.xyz;
 				
-				float3 lightDir2 = -_MoonPos.xyz;
-
-				if(	testlightDir.y < 0)
-				lightDir = lightDir2;
-				else
-				lightDir = lightDir;
-
 				float3 planetCenter = _CameraPos;
 				planetCenter = float3(0, -_PlanetRadius - 125, 0);
 
