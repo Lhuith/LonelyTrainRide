@@ -142,6 +142,8 @@ SubShader
 		uniform float _ScatterStrength;
 		uniform fixed _InvFade;
 		uniform float _FresnelPower;
+		uniform float _GlitterStrength;
+		uniform float _GlitDistanceFade;
 		//Depth
 		//-------------------------------------------
 		
@@ -284,6 +286,22 @@ SubShader
 	   return lerp(_SubColor, refractionAmountAtSurface, inverseScatterAmount) * incidentLight;
 	}
 	
+	fixed3 glitter(float3 pos, float3 normalDir, float3 lightDir, float3 diffuse, float3 viewVec)
+	{
+			float dist = distance(pos, _WorldSpaceCameraPos) / _GlitDistanceFade;
+	
+			normalDir.y += pos * _GlitterStrength;
+			float3 specBase = diffuse * saturate(dot(reflect(-normalize(viewVec), normalDir),
+			lightDir));
+			// Perturb a grid pattern with some noise and with the view-vector
+			// to let the glittering change with view.
+			float3 fp = frac(0.9 * (pos * dist) + 9 * snoise( pos * 0.07).r + 0.09 * viewVec) ;
+			fp *= (1 - fp);
+			float3 glitter = saturate(1 - 9 * (fp.x + fp.y + fp.z));
+			return  glitter * pow(specBase, 1.5 * length(pos.y));					
+	}
+		
+
 	v2f vert (appdata_base v)
 	{
 		v2f o;
@@ -444,62 +462,16 @@ SubShader
 	
 			float3 waterColor = GetWaterColor(fade, waterDepth, refraction, lightFinal + diffuseReflection);		
 			
+			float3 glitterSpec = glitter(i.wPos, normalDirection , 
+			i.lightDir, specularAniReflection + specularReflection, i.viewDir) * fresnelFactor / 2;
 	
-		    return float4(waterColor + reflection + lightFinal, fade) ;
+			glitterSpec *= _GlitterStrength * (12 * saturate(_WorldSpaceLightPos0.y)) * specularReflection;
+	
+		    return float4(waterColor + reflection + lightFinal + glitterSpec, fade) ;
 	
 		}
 		ENDCG
 	}
-
-	//Pass
-	//{	
-	//	Cull Off	
-	//	ZWrite On
-	//
-	//	CGPROGRAM
-	//
-	//	//#pragma glsl
-	//	#pragma vertex vert
-	//	#pragma fragment frag
-	//	#include "UnityCG.cginc"
-	//	#include "AutoLight.cginc"
-	//	#include "SparkNoise.cginc"
-	//	#include "Trace.cginc"
-	//	#pragma multi_compile_fwdbase
-	//
-	//	struct v2f
-	//	{
-	//		fixed4 pos : SV_POSITION;
-	//		SHADOW_COORDS(1)
-	//		fixed2 tex : TEXCOORD2;
-	//		fixed4 wPos : TEXCOORD3;
-	//		fixed4 fragPos : TEXCOORD13;	
-	//	};
-	//
-	//v2f vert (appdata_base v)
-	//{
-	//	v2f o;
-	//	
-	//	o.pos = UnityObjectToClipPos(v.vertex);
-	//
-	//	o.wPos =  mul(unity_ObjectToWorld, v.vertex);
-	//	
-	//	o.fragPos = v.vertex;
-	//			TRANSFER_SHADOW(o);
-	//	return o;
-	//	}
-	//	
-	//	fixed4 frag (v2f i) : SV_Target
-	//	{
-	//		UNITY_LIGHT_ATTENUATION(attenuation, i, i.wPos);
-	//
-	//		//if(attenuation > 0.9) discard;
-	//
-	//	    return (attenuation * 2) ;
-	//
-	//	}
-	//	ENDCG
-	//}
 
 		}
 	  //Fallback "Diffuse"

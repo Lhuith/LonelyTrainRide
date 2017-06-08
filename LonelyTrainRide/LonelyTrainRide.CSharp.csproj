@@ -90,6 +90,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Alpha_Fix.cs" />
     <Compile Include="Assets\BloomFix.cs" />
     <Compile Include="Assets\Clouds3\CloudSkybox\NoiseVolume.cs" />
     <Compile Include="Assets\Clouds3\Klak\Extension\MaterialExtension.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Assets\DynamicDOF.cs" />
     <Compile Include="Assets\Head_Movement.cs" />
     <Compile Include="Assets\Light_Controls.cs" />
+    <Compile Include="Assets\MoonShaftController.cs" />
     <Compile Include="Assets\Moon_Manager.cs" />
     <Compile Include="Assets\Moon_Texture.cs" />
     <Compile Include="Assets\Prefabs\MusicTech\ChildRenderer.cs" />
@@ -281,7 +283,6 @@
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
     <None Include="Assets\Shaders\Depth\DepthImageEffect.shader" />
-    <None Include="Assets\Shaders\Depth\DownscaleDepth.shader" />
     <None Include="Assets\Shaders\Depth\Trace.cginc" />
     <None Include="Assets\Shaders\DynamicTest\Invert.shader" />
     <None Include="Assets\Shaders\DynamicTest\Smoke.shader" />

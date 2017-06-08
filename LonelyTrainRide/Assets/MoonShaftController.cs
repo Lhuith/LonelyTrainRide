@@ -19,16 +19,16 @@ public class MoonShaftController : MonoBehaviour {
 	{
 		float cosAngle = Vector3.Dot(Vector3.up, -Sun.transform.forward);
 
+
         if (cosAngle < 0)
         {
-            //GetComponent<SunShafts>().enabled = true;
-			GetComponent<SunShafts>().sunShaftIntensity = Mathf.Lerp(0, intensSave, Time.deltaTime * 40);
+            if(GetComponent<SunShafts>().sunShaftIntensity != intensSave)
+            GetComponent<SunShafts>().sunShaftIntensity = Mathf.Lerp(GetComponent<SunShafts>().sunShaftIntensity, intensSave, Time.deltaTime);
         }
-		else
+        else if (cosAngle > 0)
         {
-
-		GetComponent<SunShafts>().sunShaftIntensity = 0;
-           // GetComponent<SunShafts>().sunShaftIntensity = Mathf.Lerp(intensSave, 0, Time.deltaTime * 12);
+            if (GetComponent<SunShafts>().sunShaftIntensity > 1)
+                GetComponent<SunShafts>().sunShaftIntensity = Mathf.Lerp(GetComponent<SunShafts>().sunShaftIntensity, 1, Time.deltaTime);
 		}
 		
 	}

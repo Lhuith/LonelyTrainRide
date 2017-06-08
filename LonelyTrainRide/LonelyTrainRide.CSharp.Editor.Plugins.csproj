@@ -166,7 +166,6 @@
     <None Include="Assets\Shaders\Depth\DephScatter_old.shader" />
     <None Include="Assets\Shaders\Depth\Depth.shader" />
     <None Include="Assets\Shaders\Depth\DepthImageEffect.shader" />
-    <None Include="Assets\Shaders\Depth\DownscaleDepth.shader" />
     <None Include="Assets\Shaders\Depth\Trace.cginc" />
     <None Include="Assets\Shaders\DynamicTest\Invert.shader" />
     <None Include="Assets\Shaders\DynamicTest\Smoke.shader" />

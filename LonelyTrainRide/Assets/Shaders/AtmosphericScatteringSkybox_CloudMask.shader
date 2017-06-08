@@ -55,8 +55,7 @@
  		#include "AtmosphericScattering.cginc"
 
         struct v2f {
-            V2F_SHADOW_CASTER;
-  
+				V2F_SHADOW_CASTER;
 				float4 vertex : TEXCOORD1;
 				float2 uv : TEXCOORD2;
 				float3 rayDir : TEXCOORD3;
