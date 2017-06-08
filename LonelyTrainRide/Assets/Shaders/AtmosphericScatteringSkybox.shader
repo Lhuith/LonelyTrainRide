@@ -112,8 +112,8 @@ Shader "Skybox/AtmosphericScattering"
 
 			v2f vert (appdata_base v)
 			{
-				
 				v2f o;
+				UNITY_INITIALIZE_OUTPUT(v2f,o);	
 				o.pos = UnityObjectToClipPos(v.vertex);
 				o.vertex = v.vertex;
 				o.uv = v.texcoord;
@@ -291,14 +291,17 @@ Shader "Skybox/AtmosphericScattering"
 				    }
 				    pos += ray * stride;
 				}
+				
+				if(stars.r > 0)
+				acc += Beer(depth) * (inscattering + stars.r);
+				else
+				acc += Beer(depth) * (inscattering);
+
+				acc = lerp(acc, inscattering , saturate(dist0 / _FarDist));
 
 				if(stars.r > 0)
 				inscattering += stars.r;
 
-				acc += Beer(depth) * (inscattering);
-			
-				acc = lerp(acc, inscattering , saturate(dist0 / _FarDist));
-			
 				float4 clouds = half4(acc, 1);
 			
 

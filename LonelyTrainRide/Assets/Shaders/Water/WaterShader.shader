@@ -183,22 +183,20 @@ SubShader
 		struct v2f
 		{
 			fixed4 pos : SV_POSITION;
-			SHADOW_COORDS(1)
-			fixed2 tex : TEXCOORD2;
-			fixed4 wPos : TEXCOORD3;
-			fixed4 Dist : TEXCOORD4;
-			fixed3 normalWorld : TEXCOORD5;
-			fixed4 lightDir : TEXCOORD6;
-			fixed3 viewDir : TEXCOORD7;
-			fixed3 normalDir : TEXCOORD8;
-			fixed4 tangentWorld : TEXCOORD9;
-			float3 binormalWorld : TEXCOORD10;
-			fixed4 projPos : TEXCOORD11;
-			fixed3 rayDir : TEXCOORD12;
-			fixed4 fragPos : TEXCOORD13;
-			float4 uvgrab : TEXCOORD14;
-			float3 normal : NORMAL;		
-		};
+			fixed2 tex : TEXCOORD1;
+			fixed4 wPos : TEXCOORD2;
+			fixed4 Dist : TEXCOORD3;
+			fixed3 normalWorld : TEXCOORD4;
+			fixed4 lightDir : TEXCOORD5;
+			fixed3 viewDir : TEXCOORD6;
+			fixed3 normalDir : TEXCOORD7;
+			fixed4 tangentWorld : TEXCOORD8;
+			float3 binormalWorld : TEXCOORD9;
+			fixed4 projPos : TEXCOORD10;
+			fixed3 rayDir : TEXCOORD11;
+			float4 uvgrab : TEXCOORD0;
+
+		}; 
 	
 		uniform Wave w[3];
 		
@@ -291,7 +289,6 @@ SubShader
 		v2f o;
 		UNITY_INITIALIZE_OUTPUT(v2f,o);	
 		
-		o.normal = v.normal;	
 		w[0].freq =  _Frequency;		   
 		w[0].amp =   _Amplitude; 	
 		w[0].phase = _Phase;	
@@ -333,7 +330,6 @@ SubShader
 		v.vertex.z -= newPos.z;
 		v.vertex.y += newPos.y;
 	    o.pos = UnityObjectToClipPos(v.vertex);
-		o.fragPos = v.vertex;
 		
 		//o.tangentWorld =  normalize( mul( float4(tangent, 0.0), unity_ObjectToWorld));
 		o.tangentWorld = normalize(mul(unity_ObjectToWorld, half4(tangent.xyz, 0.0)));
@@ -355,13 +351,11 @@ SubShader
 	
 		half3 eyeRay = normalize(mul(unity_WorldToObject, v.vertex.xyz));
 		o.rayDir = half3(-eyeRay);
-		TRANSFER_SHADOW(o);
 		return o;
 		}
 		
 		fixed4 frag (v2f i) : SV_Target
 		{
-			i.normalDir = normalize(mul(float4(i.normal, 0.0), unity_WorldToObject).xyz);
 			//Initlializing Values
 			fixed4 finalColor = fixed4(0,0,0, 1.0);		
 			fixed4 fadecol = fixed4(0,0,0, 0);
@@ -402,8 +396,7 @@ SubShader
 			fixed tDotHX = dot(i.tangentWorld, h)/ _AniX;
 			fixed bDotHY = dot(binormalDir, h)/ _AniY;
 	
-			UNITY_LIGHT_ATTENUATION(attenuation, i, i.fragPos);
-	
+			float attenuation = 1;
 			fixed3 diffuseReflection =  attenuation * i.lightDir.w * _LightColor0.xyz * saturate(nDotl);
 		    fixed3 specularReflection = attenuation * _LightColor0.xyz *  saturate( dot( normalDirection, i.lightDir)) *
 			 pow( saturate(dot (reflect(-i.lightDir, normalDirection), i.viewDir)), _Shininess);

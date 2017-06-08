@@ -70,7 +70,7 @@
         v2f vert( appdata_base v )
         {
             v2f o;
-  
+  UNITY_INITIALIZE_OUTPUT(v2f,o);	
 				o.pos = UnityObjectToClipPos(v.vertex);
 				o.vertex = v.vertex;
 				o.normal = v.normal;
@@ -186,7 +186,7 @@
 				float3 lightDir = -_WorldSpaceLightPos0.xyz;
 			
 				float3 ray = rayDir;
-				int samples = lerp(_SampleCount1, _SampleCount0, rayDir.y)/4;
+				int samples = lerp(_SampleCount1, _SampleCount0, rayDir.y);
 			
 				float dist0 = _Altitude0 / ray.y;
 				float dist1 = _Altitude1 / ray.y;
@@ -205,7 +205,7 @@
 			
 				float depth = 0;
 			
-				UNITY_LOOP for (int s = 0; s < samples; s++)
+				UNITY_LOOP for (int s = 0; s < 4; s++)
 				{
 				    float n = SampleNoise(pos);
 				    if (n > 0)

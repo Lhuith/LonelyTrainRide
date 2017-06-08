@@ -14,9 +14,16 @@ public class BloomFix : MonoBehaviour {
 
     }
 
+	void LateUpadate()
+	{
+		//transform.rotation = transform.root.rotation;
+	}
+
     // Update is called once per frame
     void Update()
     {
+
+		
         float cosAngle = Vector3.Dot(Vector3.up, -Sun.transform.forward);
 
         if (cosAngle < 0)

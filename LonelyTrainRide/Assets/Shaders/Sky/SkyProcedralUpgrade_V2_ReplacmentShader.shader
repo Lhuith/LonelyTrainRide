@@ -712,6 +712,7 @@ float4 render_clouds(_in(ray_t) eye, fixed lightAngle)
         v2f vert (appdata_full v)
         {
             v2f OUT;
+			UNITY_INITIALIZE_OUTPUT(v2f,OUT);	
             OUT.pos = UnityObjectToClipPos(v.vertex);
 
             half3 cameraPos = half3(0,kInnerRadius + kCameraHeight,0);     // The camera's current position

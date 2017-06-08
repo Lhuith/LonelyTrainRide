@@ -23,7 +23,6 @@ public class Light_Controls : MonoBehaviour {
         }
         else
         {
-            Debug.Log("Turinging Off");
             startLightOff();
         }
     }
